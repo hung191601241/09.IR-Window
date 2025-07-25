@@ -1,0 +1,49 @@
+﻿<local:VisionTool x:Class="VisionTools.ToolDesign.OutVidiCogResTool"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisionTools.ToolDesign"
+             mc:Ignorable="d" 
+            d:DesignHeight="110" d:DesignWidth="150">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="30"/>
+        <RowDefinition Height="20"/>
+        <RowDefinition Height="20"/>
+        <RowDefinition Height="20"/>
+        <RowDefinition Height="20"/>
+    </Grid.RowDefinitions>
+    <Grid.Resources>
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#FF0B5FEC"/>
+        </Style>
+        <Style TargetType="{x:Type Polyline}">
+            <Setter Property="Stroke" Value="DimGray"/>
+            <Setter Property="Points" Value="10,-9 10,10 25,10"/>
+            <Setter Property="StrokeDashArray" Value="3,3"/>
+            <Setter Property="StrokeThickness" Value="0.5"/>
+        </Style>
+    </Grid.Resources>
+    <StackPanel Orientation="Horizontal">
+        <Label Content="OutVidiCogRes" x:Name="lbTitle" x:FieldModifier="public" Margin="0,-2,0,0" Foreground="Black" MouseDown="Lb_MouseDown"/>
+        <Ellipse x:Name="elipSttRun" Height="10" Width="10" Fill="#FFE90E0E"/>
+    </StackPanel>
+    <StackPanel Grid.Row="1" Orientation="Horizontal">
+        <Polyline/>
+        <Label x:Name="lbInputImage" Content="InputImage" x:FieldModifier="public" Padding="2,0,0,0" MouseDown="Lb_MouseDown"/>
+    </StackPanel>
+    <StackPanel Grid.Row="2" Orientation="Horizontal">
+        <Polyline/>
+        <Label x:Name="lbScore" Content="Score" x:FieldModifier="public" Padding="2,0,0,0" MouseDown="Lb_MouseDown"/>
+    </StackPanel>
+    <StackPanel Grid.Row="3" Orientation="Horizontal">
+        <Polyline/>
+        <Label x:Name="lbStrResult" Content="StrResult" x:FieldModifier="public" Padding="2,0,0,0" MouseDown="Lb_MouseDown"/>
+    </StackPanel>
+    <StackPanel Grid.Row="4" Orientation="Horizontal">
+        <Polyline/>
+        <Label x:Name="lbJudge" Content="Judge" x:FieldModifier="public" Padding="2,0,0,0" MouseDown="Lb_MouseDown"/>
+    </StackPanel>
+</local:VisionTool>

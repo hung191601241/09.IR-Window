@@ -1,0 +1,1112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\OpenCvSharp3-AnyCPU.4.0.0.20181129\build\OpenCvSharp3-AnyCPU.props" Condition="Exists('packages\OpenCvSharp3-AnyCPU.4.0.0.20181129\build\OpenCvSharp3-AnyCPU.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0D5D5FB0-0CF1-416A-9AA2-449C00D62937}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>VisionInspection</RootNamespace>
+    <AssemblyName>VisionInspection-IV3</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>3</WarningLevel>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>VisionInspection.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>preview</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>preview</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Cognex.VisionPro, Version=75.1.1.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64" />
+    <Reference Include="Cognex.VisionPro.Core, Version=75.1.1.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64" />
+    <Reference Include="Cognex.VisionPro.ToolGroup, Version=75.1.1.0, Culture=neutral, PublicKeyToken=ef0f902af9dee505, processorArchitecture=AMD64" />
+    <Reference Include="EPPlus, Version=7.5.2.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>packages\EPPlus.7.5.2\lib\net462\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.Interfaces, Version=7.5.0.0, Culture=neutral, PublicKeyToken=a694d7f3b0907a61, processorArchitecture=MSIL">
+      <HintPath>packages\EPPlus.Interfaces.7.5.0\lib\net462\EPPlus.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.System.Drawing, Version=7.5.0.0, Culture=neutral, PublicKeyToken=2308d35469c9bac0, processorArchitecture=MSIL">
+      <HintPath>packages\EPPlus.System.Drawing.7.5.0\lib\net462\EPPlus.System.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+    </Reference>
+    <Reference Include="MvCameraControl.Net">
+      <HintPath>bin\Debug\MvCameraControl.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="MVSDK_Net, Version=1.3.0.9252, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Dll\MVSDK_Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp">
+      <HintPath>packages\OpenCvSharp3-AnyCPU.4.0.0.20181129\lib\net461\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Blob">
+      <HintPath>packages\OpenCvSharp3-AnyCPU.4.0.0.20181129\lib\net461\OpenCvSharp.Blob.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions">
+      <HintPath>packages\OpenCvSharp3-AnyCPU.4.0.0.20181129\lib\net461\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.UserInterface">
+      <HintPath>packages\OpenCvSharp3-AnyCPU.4.0.0.20181129\lib\net461\OpenCvSharp.UserInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot">
+      <HintPath>packages\OxyPlot.Core.2.0.0\lib\net45\OxyPlot.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot.Wpf, Version=2.0.0.0, Culture=neutral, PublicKeyToken=75e952ba404cdbb0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\20. ITM Projects\VisionInspection-IV3\packages\OxyPlot.Wpf.2.0.0\lib\net45\OxyPlot.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.113.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>packages\System.Data.SQLite.Core.1.0.113.1\lib\net46\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Drawing.Common.9.0.0\lib\net462\System.Drawing.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.IO.FileSystem.Primitives.4.3.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.Packaging, Version=4.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.IO.Packaging.4.7.0\lib\net46\System.IO.Packaging.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Printing" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Text.Encodings.Web, Version=4.0.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Encodings.Web.4.6.0\lib\netstandard2.0\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Json.4.6.0\lib\net461\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Channels, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Threading.Channels.4.7.0\lib\netstandard2.0\System.Threading.Channels.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Threading.Tasks.Extensions.4.5.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="ViDi.NET, Version=4.1.3.21525, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Cognex\ViDi Suite\4.1\Vidi Suite\ViDi.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="ViDi.NET.Common">
+      <HintPath>C:\Program Files\Cognex\ViDi Suite\4.1\Vidi Suite\ViDi.NET.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ViDi.NET.Extensions">
+      <HintPath>C:\Program Files\Cognex\ViDi Suite\4.1\Vidi Suite\ViDi.NET.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="ViDi.NET.Interfaces, Version=4.1.3.21525, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Cognex\ViDi Suite\4.1\Vidi Suite\ViDi.NET.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ViDi.NET.Local, Version=4.1.3.21525, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Cognex\ViDi Suite\4.1\Vidi Suite\ViDi.NET.Local.dll</HintPath>
+    </Reference>
+    <Reference Include="ViDi.NET.UI, Version=4.1.3.21525, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Cognex\ViDi Suite\4.1\Vidi Suite\ViDi.NET.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="ViDi.NET.UI.Interfaces, Version=4.1.3.21525, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Cognex\ViDi Suite\4.1\Vidi Suite\ViDi.NET.UI.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=4.3.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.3.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=4.3.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.3.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=4.3.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.3.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=4.3.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.3.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=4.3.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Extended.Wpf.Toolkit.4.3.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="AlarmList.cs" />
+    <Compile Include="DataCheckPKG.cs" />
+    <Compile Include="INIFile.cs" />
+    <Compile Include="ListData.cs" />
+    <Compile Include="MechanicalJig.cs" />
+    <Compile Include="nrt.cs" />
+    <Compile Include="PLC\Common PLC\Device.cs" />
+    <Compile Include="PLC\Common PLC\SelectDevice.cs" />
+    <Compile Include="PLC\COMSetting.cs" />
+    <Compile Include="PLC\Mitsubishi\FX3_SC09.cs" />
+    <Compile Include="PLC\Mitsubishi\SC09Setting.cs" />
+    <Compile Include="PLC\Mitsubishi\ServiceRs422Fx.cs" />
+    <Compile Include="PLC\Mitsubishi\ServiceTCPMCProtocolBinary.cs" />
+    <Compile Include="PLC\Mitsubishi\TCP_MCProtocol.cs" />
+    <Compile Include="PLC\ModbusCOMSetting.cs" />
+    <Compile Include="PLC\PLC LS\ServiceLSXGTServerCOM.cs" />
+    <Compile Include="PLC\PLC LS\ServiceXGTServerTCP.cs" />
+    <Compile Include="PLC\PLC LS\XGTServerCom.cs" />
+    <Compile Include="PLC\PLC LS\XGTServerTCP.cs" />
+    <Compile Include="PLC\SaveDevice.cs" />
+    <Compile Include="PLC\SettingDevice.cs" />
+    <Compile Include="PLC\TCPSetting.cs" />
+    <Compile Include="src\Camera\ICamDevice.cs" />
+    <Compile Include="src\Camera\Region.cs" />
+    <Compile Include="src\CamIrayple\CameraOperatorIr.cs" />
+    <Compile Include="src\CamIrayple\IraypleCam.cs" />
+    <Compile Include="src\ui\Pages\PgMainVision.xaml.cs">
+      <DependentUpon>PgMainVision.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScannerTCP.cs" />
+    <Compile Include="src\ui\Pages\PgMechanicalMenu.xaml.cs">
+      <DependentUpon>PgMechanicalMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PgRecipe.xaml.cs">
+      <DependentUpon>PgRecipe.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PlcStore.cs" />
+    <Compile Include="src\datatypes\ModelSetting.cs" />
+    <Compile Include="src\ui\Camera Setting\RegionCreatMatrix.xaml.cs">
+      <DependentUpon>RegionCreatMatrix.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Camera Setting\RegionProperty.xaml.cs">
+      <DependentUpon>RegionProperty.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Pages\PgSuperUserMenu2.xaml.cs">
+      <DependentUpon>PgSuperUserMenu2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\Camera\CameraOperator.cs" />
+    <Compile Include="src\Camera\CameraOperatorHandle.cs" />
+    <Compile Include="src\Camera\HikCam.cs" />
+    <Compile Include="src\comm\MCEProtocol.cs" />
+    <Compile Include="src\comm\Ping.cs" />
+    <Compile Include="src\comm\PlcComm.cs" />
+    <Compile Include="src\comm\Postgres.cs" />
+    <Compile Include="src\comm\QrBuffer.cs" />
+    <Compile Include="src\comm\ScannerComm.cs" />
+    <Compile Include="src\comm\ScannerCommTcp.cs" />
+    <Compile Include="src\comm\TesterComm.cs" />
+    <Compile Include="src\comm\Visual.cs" />
+    <Compile Include="src\dao\Dba.cs" />
+    <Compile Include="src\dao\DbRead.cs" />
+    <Compile Include="src\dao\DbWrite.cs" />
+    <Compile Include="src\dao\Qr1Manager.cs" />
+    <Compile Include="src\dao\ScannerManager.cs" />
+    <Compile Include="src\dao\UserManager.cs" />
+    <Compile Include="src\datatypes\AppSettings.cs" />
+    <Compile Include="src\datatypes\DataType.cs" />
+    <Compile Include="src\datatypes\EventLog.cs" />
+    <Compile Include="src\datatypes\LotStaus.cs" />
+    <Compile Include="src\datatypes\PcmInfo.cs" />
+    <Compile Include="src\datatypes\Qr1Status.cs" />
+    <Compile Include="src\datatypes\ScannerStatus.cs" />
+    <Compile Include="src\datatypes\UserLog.cs" />
+    <Compile Include="src\lib\AutoLogger.cs" />
+    <Compile Include="src\lib\CheckConnectionOfIp.cs" />
+    <Compile Include="src\lib\Modbus.cs" />
+    <Compile Include="src\lib\MySocket.cs" />
+    <Compile Include="src\lib\MyWeekDays.cs" />
+    <Compile Include="src\lib\ScannerLogger.cs" />
+    <Compile Include="src\lib\TesterLogger.cs" />
+    <Compile Include="src\Camera\VisionAL.cs" />
+    <Compile Include="src\ui\ChartViewModels.cs" />
+    <Compile Include="src\ui\Camera Setting\PgCamera.xaml.cs">
+      <DependentUpon>PgCamera.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\PgMain.cs" />
+    <Compile Include="src\ui\VisionTools\SV Base\IDrawObject.cs" />
+    <Compile Include="src\ui\VisionTools\SV Base\InteractDrawObject.cs" />
+    <Compile Include="src\ui\VisionTools\SV Base\SvFunc.cs" />
+    <Compile Include="src\ui\VisionTools\SV Base\SvImage.cs" />
+    <Compile Include="src\ui\VisionTools\SV Base\SvMask.cs" />
+    <Compile Include="src\ui\VisionTools\SV Base\SvParametersAttributes.cs" />
+    <Compile Include="src\ui\VisionTools\SV Base\SvPoint.cs" />
+    <Compile Include="src\ui\VisionTools\SV Base\SvRectangle.cs" />
+    <Compile Include="src\ui\VisionTools\ToolDesign\AcquisitionTool.xaml.cs">
+      <DependentUpon>AcquisitionTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\BlobTool.xaml.cs">
+      <DependentUpon>BlobTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\ContrastNBrightnessTool.xaml.cs">
+      <DependentUpon>ContrastNBrightnessTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\EditRegionTool.xaml.cs">
+      <DependentUpon>EditRegionTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\FixtureTool.xaml.cs">
+      <DependentUpon>FixtureTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\ImageProcessTool.xaml.cs">
+      <DependentUpon>ImageProcessTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\OutAcquisResTool.xaml.cs">
+      <DependentUpon>OutAcquisResTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\OutVidiCogResTool.xaml.cs">
+      <DependentUpon>OutVidiCogResTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\OutSegNeuroResTool.xaml.cs">
+      <DependentUpon>OutSegNeuroResTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\OutputImageSubTool.xaml.cs">
+      <DependentUpon>OutputImageSubTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\OutBlobResTool.xaml.cs">
+      <DependentUpon>OutBlobResTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\VisionProTool.xaml.cs">
+      <DependentUpon>VisionProTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\SaveImageTool.xaml.cs">
+      <DependentUpon>SaveImageTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\SegmentNeuroTool.xaml.cs">
+      <DependentUpon>SegmentNeuroTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\TemplateMatchTool.xaml.cs">
+      <DependentUpon>TemplateMatchTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\TempMatchZeroTool.xaml.cs">
+      <DependentUpon>TempMatchZeroTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\ToolArea.xaml.cs">
+      <DependentUpon>ToolArea.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\ToolList.xaml.cs">
+      <DependentUpon>ToolList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\VidiCognexTool.xaml.cs">
+      <DependentUpon>VidiCognexTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\VisionTool.cs" />
+    <Compile Include="src\ui\VisionTools\ToolEdit\AcquisitionEdit.xaml.cs">
+      <DependentUpon>AcquisitionEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\BlobEdit.xaml.cs">
+      <DependentUpon>BlobEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\ContrastNBrightnessEdit.xaml.cs">
+      <DependentUpon>ContrastNBrightnessEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\EditRegionEdit.xaml.cs">
+      <DependentUpon>EditRegionEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\FixtureEdit.xaml.cs">
+      <DependentUpon>FixtureEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\OutVidiCogResEdit.xaml.cs">
+      <DependentUpon>OutVidiCogResEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\ZGridBase.cs" />
+    <Compile Include="src\ui\VisionTools\ToolEdit\ImageProcessEdit.xaml.cs">
+      <DependentUpon>ImageProcessEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\OutAcquisResEdit.xaml.cs">
+      <DependentUpon>OutAcquisResEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\OutSegNeuroResEdit.xaml.cs">
+      <DependentUpon>OutSegNeuroResEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\OutBlobResEdit.xaml.cs">
+      <DependentUpon>OutBlobResEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\VisionProEdit.xaml.cs">
+      <DependentUpon>VisionProEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\SaveImageEdit.xaml.cs">
+      <DependentUpon>SaveImageEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\VidiCognexEdit.xaml.cs">
+      <DependentUpon>VidiCognexEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\SegmentNeuroEdit.xaml.cs">
+      <DependentUpon>SegmentNeuroEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\TemplateMatchEdit.xaml.cs">
+      <DependentUpon>TemplateMatchEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\TempMatchZeroEdit.xaml.cs">
+      <DependentUpon>TempMatchZeroEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\ToolEditBase.xaml.cs">
+      <DependentUpon>ToolEditBase.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WindowPopUp.xaml.cs">
+      <DependentUpon>WindowPopUp.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WindowPopUp2.xaml.cs">
+      <DependentUpon>WindowPopUp2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WindowPopUp3.xaml.cs">
+      <DependentUpon>WindowPopUp3.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WindowPopUpCh2-2.xaml.cs">
+      <DependentUpon>WindowPopUpCh2-2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WindowPopUpCh2-3.xaml.cs">
+      <DependentUpon>WindowPopUpCh2-3.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WindowPopUpCh2.xaml.cs">
+      <DependentUpon>WindowPopUpCh2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndChangePassword.xaml.cs">
+      <DependentUpon>WndChangePassword.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndCommEdit.xaml.cs">
+      <DependentUpon>WndCommEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndIO.xaml.cs">
+      <DependentUpon>WndIO.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndLogOn.xaml.cs">
+      <DependentUpon>WndLogOn.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndLotFull.xaml.cs">
+      <DependentUpon>WndLotFull.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndMesVisionSetting.xaml.cs">
+      <DependentUpon>WndMesVisionSetting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndSC09Setting.xaml.cs">
+      <DependentUpon>WndSC09Setting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndWorkEnd.xaml.cs">
+      <DependentUpon>WndWorkEnd.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndConfirm.xaml.cs">
+      <DependentUpon>WndConfirm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndMessenger.xaml.cs">
+      <DependentUpon>WndMessenger.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TCP Tranfer Vision Data\DATACheck.cs" />
+    <Compile Include="TCP Tranfer Vision Data\FormatVision.cs" />
+    <Compile Include="TCP Tranfer Vision Data\MESVisionService.cs" />
+    <Compile Include="TCP Tranfer Vision Data\VisionTCPClient.cs" />
+    <Compile Include="VisionProtocolPacket.cs" />
+    <Compile Include="src\ui\Windows\WndAlarm.xaml.cs">
+      <DependentUpon>WndAlarm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndMCTCPSetting.xaml.cs">
+      <DependentUpon>WndMCTCPSetting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndModbusComSetting.xaml.cs">
+      <DependentUpon>WndModbusComSetting.xaml</DependentUpon>
+    </Compile>
+    <Page Include="src\ui\Pages\PgMainVision.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Pages\PgMechanicalMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PgRecipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Camera Setting\RegionCreatMatrix.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Camera Setting\RegionProperty.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Pages\PgSuperUserMenu2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Camera Setting\PgCamera.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Pages\PgPlc.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Pages\PgIO.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\AcquisitionTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\BlobTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\ContrastNBrightnessTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\EditRegionTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\FixtureTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\ImageProcessTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\OutAcquisResTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\OutVidiCogResTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\OutSegNeuroResTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\OutputImageSubTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\OutBlobResTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\VisionProTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\SaveImageTool.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\SegmentNeuroTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\TemplateMatchTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\TempMatchZeroTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\ToolArea.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\ToolList.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\VidiCognexTool.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\AcquisitionEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\BlobEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\ContrastNBrightnessEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\EditRegionEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\FixtureEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\ImageProcessEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\OutAcquisResEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\OutVidiCogResEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\OutSegNeuroResEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\OutBlobResEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\VisionProEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\SaveImageEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\VidiCognexEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\SegmentNeuroEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\TemplateMatchEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\TempMatchZeroEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\ToolEditBase.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\Windows\WindowPopUp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WindowPopUp2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WindowPopUp3.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WindowPopUpCh2-2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WindowPopUpCh2-3.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WindowPopUpCh2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndAlert.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndChangePassword.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndCommEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\Windows\WndComSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndIO.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndLogOn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndLotFull.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndLotInput.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndMain.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\dao\PlcStore.cs" />
+    <Compile Include="src\datatypes\AlarmInfo.cs" />
+    <Compile Include="src\datatypes\ComSettings.cs" />
+    <Compile Include="src\lib\MyLogger.cs" />
+    <Compile Include="src\lib\TestLogger.cs" />
+    <Compile Include="src\ui\Pages\PgPlc.xaml.cs">
+      <DependentUpon>PgPlc.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Pages\PgIO.xaml.cs">
+      <DependentUpon>PgIO.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\UiManager.cs" />
+    <Compile Include="src\ui\Windows\WndAlert.xaml.cs">
+      <DependentUpon>WndAlert.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndComSettings.xaml.cs">
+      <DependentUpon>WndComSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndLotInput.xaml.cs">
+      <DependentUpon>WndLotInput.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\Windows\WndMain.xaml.cs">
+      <DependentUpon>WndMain.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="src\ui\Windows\WndMesVisionSetting.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\Windows\WndSC09Setting.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\Windows\WndWorkEnd.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndConfirm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndMessenger.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndAlarm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndMCTCPSetting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="src\ui\Windows\WndModbusComSetting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\power-button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\menu-status.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\menu-save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\menu-system.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\menu-mechanic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\arrow-down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\arrow-left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\arrow-right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\triangle-right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\triangle-right-2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\page-left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\page-right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\open-folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\arrow-up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="HISTORY.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\alarm-on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\alarm-off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\continue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\test-end.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\co my.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\robot.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\report.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\system.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\assign.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\teaching.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\recipe.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\sort-right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\sort-down.png" />
+    <Resource Include="src\ui\Images\sort-up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\one cycle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\down1.png" />
+    <Resource Include="src\ui\Images\up1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\Off1.png" />
+    <Resource Include="src\ui\Images\On1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\pressStart.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\blueOff.jpg" />
+    <Resource Include="src\ui\Images\blueOn.jpg" />
+    <Resource Include="src\ui\Images\redOff.jpg" />
+    <Resource Include="src\ui\Images\redOn.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\backGround.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\BackGround1.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\center.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\MVS.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\CH1 OK.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\default.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\save1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\pylon.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\trim-image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\start.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\start.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\camera_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\camera.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\OK.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\data.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\data.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\pause.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\1111.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\Status.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\picture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\save03.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\btup1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\btdown1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\Stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\Reset.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\RunToolButton.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\edit.png" />
+    <Resource Include="src\ui\Images\EditCom.png" />
+    <Resource Include="src\ui\Images\greenOff.jpg" />
+    <Resource Include="src\ui\Images\greenOn.jpg" />
+    <Resource Include="src\ui\Images\home--v2.png" />
+    <Resource Include="src\ui\Images\home.png" />
+    <Resource Include="src\ui\Images\initial.png" />
+    <Resource Include="src\ui\Images\intray.jpg" />
+    <Resource Include="src\ui\Images\left.png" />
+    <Resource Include="src\ui\Images\log.png" />
+    <Resource Include="src\ui\Images\logo.jpg" />
+    <Resource Include="src\ui\Images\lotend.png" />
+    <Resource Include="src\ui\Images\lotin.png" />
+    <Resource Include="src\ui\Images\maintenance.png" />
+    <Resource Include="src\ui\Images\manual.png" />
+    <Resource Include="src\ui\Images\master.png" />
+    <Resource Include="src\ui\Images\mating.jpg" />
+    <Resource Include="src\ui\Images\mechanic.png" />
+    <Resource Include="src\ui\Images\menu-admin.png" />
+    <Resource Include="src\ui\Images\menu-grid.png" />
+    <Resource Include="src\ui\Images\menu-login.png" />
+    <Resource Include="src\ui\Images\menu-logout.png" />
+    <Resource Include="src\ui\Images\menu-manual.png" />
+    <Resource Include="src\ui\Images\Wire bonding.bmp" />
+    <Resource Include="src\ui\Images\ZoomInButton.png" />
+    <Resource Include="src\ui\Images\ZoomOutButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\RunRed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\Delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\Add.png" />
+    <Resource Include="src\ui\Images\RemoveToBin.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="src\ui\Images\Decode.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="packages\System.Data.SQLite.Core.1.0.113.1\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.113.1\build\net46\System.Data.SQLite.Core.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\System.Data.SQLite.Core.1.0.113.1\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\System.Data.SQLite.Core.1.0.113.1\build\net46\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('packages\OpenCvSharp3-AnyCPU.4.0.0.20181129\build\OpenCvSharp3-AnyCPU.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\OpenCvSharp3-AnyCPU.4.0.0.20181129\build\OpenCvSharp3-AnyCPU.props'))" />
+  </Target>
+</Project>

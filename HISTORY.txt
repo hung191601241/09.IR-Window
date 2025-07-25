@@ -1,0 +1,3 @@
+﻿** v1.0.0: 2022-07-6
+	- Sửa lỗi Giữ nút JOG khi trượt Touch
+

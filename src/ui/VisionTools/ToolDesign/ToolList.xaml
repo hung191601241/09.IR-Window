@@ -1,0 +1,44 @@
+﻿<Grid x:Class="VisionTools.ToolDesign.ToolList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisionTools.ToolDesign"
+             mc:Ignorable="d" Background="White"
+             d:DesignHeight="450" d:DesignWidth="145">
+    <Grid.Resources>
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="8,0"/>
+        </Style>
+    </Grid.Resources>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="27"/>
+        <RowDefinition/>
+    </Grid.RowDefinitions>
+    <StackPanel Orientation="Horizontal" Background="#FF505050" >
+        <Label Content="Tool List" FontSize="16" Foreground="White" FontWeight="Bold" Padding="3,3,0,0" Margin="0,0,60,0"/>
+        <Button x:Name="btnClose" Content="x" Margin="0,2" FontWeight="Bold" Background="White" Width="20" BorderBrush="Transparent" Padding="0,-5,0,0" Click="BtnClose_Click"/>
+    </StackPanel>
+    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <Label x:Name="lbAcquisitionTool" Content="Acquisition" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbSaveImageTool" Content="SaveImage" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbEditRegionTool" Content="EditRegion" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbTemplateMatchTool" Content="TemplateMatch" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbTempMatchZeroTool" Content="TempMatchZeroTool" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbFixtureTool" Content="Fixture" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbContrastNBrightnessTool" Content="ContrastNBrightness" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbImageProcessTool" Content="ImageProcess" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbBlobTool" Content="Blob" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbSegmentNeuroTool" Content="SegmentNeuro" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbVisionProTool" Content="VisionPro" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbVidiCognexTool" Content="VidiCognex" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbOutAcquisResTool" Content="OutAcquisRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbOutBlobResTool" Content="OutBlobRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbOutSegNeuroResTool" Content="OutSegNeuroRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbOutVidiCogResTool" Content="OutVidiCogRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+        </StackPanel>
+    </ScrollViewer>
+</Grid>

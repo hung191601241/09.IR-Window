@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AutoLaserCuttingInput.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="CurrentCustom" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LGE</Value>
+    </Setting>
+    <Setting Name="CurrentModel" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Toyota DCM</Value>
+    </Setting>
+    <Setting Name="alarmList" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">02 alarmList.xlsx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

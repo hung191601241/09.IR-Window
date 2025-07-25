@@ -1,0 +1,119 @@
+﻿<local:GridBase x:Class="VisionTools.ToolEdit.TempMatchZeroEdit"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisionTools.ToolEdit"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="500">
+    <TabControl Background="White">
+        <TabControl.ItemContainerStyle>
+            <Style TargetType="TabItem">
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </TabControl.ItemContainerStyle>
+        <TabControl.Resources>
+            <ContextMenu x:Key="cmRegion">
+                <MenuItem Background="Transparent" Foreground="Black" Header="Property" Click="PropertyItem_Click">
+                    <MenuItem.Icon>
+                        <Image></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+            <Style TargetType="{x:Type Label}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="Width" Value="100"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="IsEditable" Value="False"/>
+            </Style>
+            <Style TargetType="{x:Type Path}">
+                <Setter Property="Height" Value="15"/>
+                <Setter Property="Width" Value="15"/>
+                <Setter Property="Fill" Value="Black"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+            </Style>
+        </TabControl.Resources>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Main Parameter"></TextBlock>
+            </TabItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="300"/>
+                    <!--<RowDefinition Height="30"/>
+                <RowDefinition Height="180"/>-->
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="120"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Background="#FF8A8A8A" >
+                    <Label Content="Pattern" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0,2,0,0"/>
+                </Grid>
+                <Border Grid.Row="1" BorderBrush="#FF8A8A8A" BorderThickness="0.5">
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <Canvas x:Name="canvasMaster" x:FieldModifier="public" Height="250" Width="480" Margin="0" Background="DimGray">
+                            <Image x:Name="imgMaster" x:FieldModifier="public"/>
+                        </Canvas>
+                        <Button x:Name="btnGrabMaster" Width="480" Height="35" Margin="0" Click="BtnGrabMaster_Click">
+                            <TextBlock>Train Master Image</TextBlock>
+                        </Button>
+                    </StackPanel>
+                </Border>
+                <Grid Grid.Row="2" Background="#FF8A8A8A" >
+                    <Label Content="Priority" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0,2,0,0"/>
+                </Grid>
+                <Border Grid.Row="3" BorderBrush="#FF8A8A8A" BorderThickness="0.5">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="15,15,0,10" Grid.ColumnSpan="2">
+                            <Label Content="Priority Creteria :" Padding="0" Margin="2,2,4,2" VerticalAlignment="Center"/>
+                            <xctk:DoubleUpDown Width="100" Margin="5,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="True" Value="{Binding PriorityCreteria, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0.00" Maximum="1.0" Increment="0.01" HorizontalContentAlignment="Left"/>
+                            <Label Content="Max Count :" Padding="0" Margin="50,2,4,2" VerticalAlignment="Center"/>
+                            <xctk:IntegerUpDown Width="100" Margin="5,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="True" Value="{Binding MaxCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100"  HorizontalContentAlignment="Left"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="15,10,0,15" Grid.ColumnSpan="2">
+                            <CheckBox Margin="270,0,5,0" IsEnabled="{Binding IsUseROIEnable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsChecked="{Binding IsUseROI, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+                            <Label Content="Use ROI Search" Padding="0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Grid Grid.Row="4" Background="#FF8A8A8A" >
+                    <Label Content="Offset" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0,2,0,0"/>
+                </Grid>
+                <Border Grid.Row="5" BorderBrush="#FF8A8A8A" BorderThickness="0.5">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="15,15,0,10" Grid.ColumnSpan="2">
+                            <Label Content="OffsetX :" Padding="0" Margin="2,2,4,2" VerticalAlignment="Center"/>
+                            <TextBox Width="100" Margin="15,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="False" Text="{Binding TxtOffsetX, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
+                            <Label Content="px" Padding="0" Margin="5,2,4,2" VerticalAlignment="Center"/>
+                            <Label Content="OffsetY :" Padding="0" Margin="60,2,4,2" VerticalAlignment="Center"/>
+                            <TextBox Width="100" Margin="15,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="False" Text="{Binding TxtOffsetY, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
+                            <Label Content="px" Padding="0" Margin="5,2,4,2" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="15,10,0,15" Grid.ColumnSpan="2">
+                            <Label Content="Rotation :" Padding="0" Margin="2,2,4,2" VerticalAlignment="Center"/>
+                            <TextBox Width="100" Margin="8,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="False" Text="{Binding TxtRotate, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
+                            <Label Content="deg" Padding="0" Margin="5,2,4,2" VerticalAlignment="Center"/>
+                            <Label Content="Score :" Padding="0" Margin="50,2,4,2" VerticalAlignment="Center"/>
+                            <TextBox Width="100" Margin="26,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="False" Text="{Binding TxtScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</local:GridBase>

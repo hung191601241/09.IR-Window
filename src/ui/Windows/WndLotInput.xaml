@@ -1,0 +1,105 @@
+﻿<Window x:Class="VisionInspection.WndLotInput"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisionInspection"
+        mc:Ignorable="d"
+        Title="LOT IN" Height="375" Width="480" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="0*"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" FontSize="32" Background="Teal" Foreground="White" FontWeight="Bold"
+            HorizontalContentAlignment="Center" VerticalContentAlignment="Center">LOT IN DATA</Label>
+        <Grid Grid.Row="1" Margin="0,2,0,2">
+            <Grid.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Background" Value="LightCyan"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Setter Property="Padding" Value="0,0,0,0"/>
+                    <Setter Property="Margin" Value="2,2,2,2"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="TextBox">
+                    <Setter Property="Margin" Value="2,2,2,2"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+            </Grid.Resources>                
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0">WORK GROUP</Label>
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtWorkGroup"></TextBox>
+
+            <Label Grid.Row="1" Grid.Column="0">DEVICE ID</Label>
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtDeviceId"></TextBox>
+
+            <Label Grid.Row="2" Grid.Column="0">LOT ID</Label>
+            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                <TextBox x:Name="txtLotId" Width="150" HorizontalContentAlignment="Left"></TextBox>
+                <TextBox IsReadOnly="True" TabIndex="-1" Width="50" HorizontalContentAlignment="Center">6</TextBox>
+                <TextBlock FontSize="16" VerticalAlignment="Center">characters</TextBlock>
+            </StackPanel>            
+
+            <Label Grid.Row="3" Grid.Column="0">LOT QTY</Label>
+            <TextBox Grid.Row="3" Grid.Column="1" x:Name="txtLotQty"></TextBox>
+        </Grid>
+        <!--<UniformGrid Grid.Row="2" Columns="2">
+            <UniformGrid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource mButton}">
+                    <Setter Property="Margin" Value="10,5,10,5"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+            </UniformGrid.Resources>
+
+            <Button Name="btnPrimeTest" Margin="10,5,10,5" Grid.Row="0" Grid.Column="1">
+                <Button.Content>
+                    <StackPanel>
+                        <Rectangle Name="rectPrimeTest" Width="100" Height="10" Fill="Gray" />
+                        <TextBlock HorizontalAlignment="Center" >Prime Test</TextBlock>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Name="btnReTest" Margin="10,5,10,5" Grid.Row="0" Grid.Column="1">
+                <Button.Content>
+                    <StackPanel>
+                        <Rectangle Name="rectReTest" Width="100" Height="10" Fill="Gray" />
+                        <TextBlock HorizontalAlignment="Center" >Re-Test</TextBlock>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </UniformGrid>-->
+
+        <UniformGrid Grid.Row="2" Columns="2">
+            <UniformGrid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource mButton}">
+                    <Setter Property="Margin" Value="10,5,10,5"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+            </UniformGrid.Resources>
+            
+            <Button x:Name="btOk" Foreground="Blue">OK</Button>
+            <Button x:Name="btCancel" Foreground="Red">CANCEL</Button>
+        </UniformGrid>
+    </Grid>
+</Window>

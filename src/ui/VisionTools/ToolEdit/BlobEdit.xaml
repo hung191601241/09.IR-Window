@@ -1,0 +1,444 @@
+﻿<local:GridBase x:Class="VisionTools.ToolEdit.BlobEdit"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisionTools.ToolEdit" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="500">
+    <TabControl Background="White">
+        <TabControl.ItemContainerStyle>
+            <Style TargetType="TabItem">
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </TabControl.ItemContainerStyle>
+        <TabControl.Resources>
+            <Style TargetType="{x:Type Label}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="Width" Value="120"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="IsEditable" Value="False"/>
+            </Style>
+            <Style TargetType="{x:Type Path}">
+                <Setter Property="Height" Value="15"/>
+                <Setter Property="Width" Value="15"/>
+                <Setter Property="Fill" Value="White"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+            </Style>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="#555555"/>
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+            <Style TargetType="{x:Type xctk:DoubleUpDown}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type xctk:IntegerUpDown}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+        </TabControl.Resources>
+        <TabItem >
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Setting"></TextBlock>
+            </TabItem.Header>
+            <StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="1.2*"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="1.2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.Resources>
+                        <Style TargetType="{x:Type Label}">
+                            <Setter Property="FontSize" Value="15"/>
+                            <Setter Property="Margin" Value="20,0"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="0"/>
+                        </Style>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="Margin" Value="0,10, 10, 10"/>
+                            <Setter Property="FontSize" Value="15"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Label Grid.Row="1" Grid.Column="0" Content="Mode : "/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="True" ItemsSource="{Binding BlobModes}" SelectedItem="{Binding SelectBlobMode, Mode=TwoWay}"/>
+
+                    <Label Grid.Row="2" Content="Type : "/>
+                    <ComboBox Grid.Row="2" Grid.Column="1" IsEnabled="{Binding IsBlobTypeEnable, Mode=TwoWay}" ItemsSource="{Binding BlobTypes}" SelectedItem="{Binding SelectBlobType, Mode=TwoWay}"/>
+
+                    <Label Grid.Row="1" Grid.Column="2" Content="Polarity : "/>
+                    <ComboBox Grid.Row="1" Grid.Column="3" IsEnabled="{Binding IsPolarityEnable , Mode=TwoWay}" ItemsSource="{Binding BlobPolarities}" SelectedItem="{Binding SelectBlobPolarity, Mode=TwoWay}"/>
+
+                    <Label Grid.Row="2" Grid.Column="2" Content="Binary Type : " Margin="20,0,0,0"/>
+                    <ComboBox Grid.Row="2" Grid.Column="3" IsEnabled="{Binding IsBinaryEnable , Mode=TwoWay}" ItemsSource="{Binding BlobBinaries}" SelectedItem="{Binding SelectBlobBinary, Mode=TwoWay}"/>
+                </Grid>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+                    <Grid.Resources>
+                        <Style TargetType="{x:Type Label}">
+                            <Setter Property="FontSize" Value="15"/>
+                            <Setter Property="Margin" Value="20,0,5,0"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="0"/>
+                        </Style>
+                        <Style TargetType="{x:Type Slider}">
+                            <Setter Property="Width" Value="270"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                        <Style TargetType="{x:Type xctk:IntegerUpDown}">
+                            <Setter Property="Margin" Value="10,0"/>
+                            <Setter Property="FontSize" Value="15"/>
+                        </Style>
+                    </Grid.Resources>
+                    <StackPanel x:Name="stRange" Grid.Row="1" Height="Auto" Width="Auto" Orientation="Horizontal">
+                        <Label Content="Range : "/>
+                        <Slider Margin="38,0,0,0" Value="{Binding Range, Mode=TwoWay}" Minimum="0" Maximum="255"></Slider>
+                        <xctk:IntegerUpDown Value="{Binding Range, Mode=TwoWay}" Minimum="0" Maximum="255" Height="25" Width="80"/>
+                    </StackPanel>
+                    <StackPanel x:Name="stBlockSize" Grid.Row="2" Height="Auto" Width="Auto" Orientation="Horizontal">
+                        <Label Content="Block Size : "/>
+                        <Slider Margin="14,0,0,0" Value="{Binding BlockSize, Mode=TwoWay}" Minimum="-1000" Maximum="1000"></Slider>
+                        <xctk:IntegerUpDown Value="{Binding BlockSize, Mode=TwoWay}" Minimum="-1000" Maximum="1000" Height="25" Width="80"/>
+                    </StackPanel>
+                    <StackPanel x:Name="stCoeff" Grid.Row="3" Height="Auto" Width="Auto" Orientation="Horizontal">
+                        <Label Content="Coefficient : "/>
+                        <Slider Margin="9,0,0,0" Value="{Binding Coefficient, Mode=TwoWay}" Minimum="-1000" Maximum="1000"></Slider>
+                        <xctk:IntegerUpDown Value="{Binding Coefficient, Mode=TwoWay}" Minimum="-1000" Maximum="1000" Height="25" Width="80"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="4" x:Name="stCoeffR" Height="Auto" Width="Auto" Orientation="Horizontal">
+                        <Label Content="CoefficientR : "/>
+                        <Slider Margin="0" Value="{Binding CoefficientR, Mode=TwoWay}" Minimum="-1000" Maximum="1000"></Slider>
+                        <xctk:IntegerUpDown Value="{Binding CoefficientR, Mode=TwoWay}" Minimum="-1000" Maximum="1000" Height="25" Width="80"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" x:Name="stLowHigh" Height="Auto" Width="Auto" Orientation="Horizontal" Visibility="Hidden">
+                        <Label Content="Low : "/>
+                        <xctk:IntegerUpDown Value="{Binding LowRange, Mode=TwoWay}" Minimum="-1000" Maximum="1000" Height="25" Width="80"/>
+                        <Label Content="High : " Margin="30,0,0,0"/>
+                        <xctk:IntegerUpDown Value="{Binding HighRange, Mode=TwoWay}" Minimum="-1000" Maximum="1000" Height="25" Width="80"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="3" x:Name="stConstSub" Height="Auto" Width="Auto" Orientation="Horizontal" Visibility="Hidden">
+                        <Label Content="Const Sub : "/>
+                        <Slider Margin="12,0,0,0" Value="{Binding ConstSub, Mode=TwoWay}" Minimum="-1000" Maximum="1000"></Slider>
+                        <xctk:IntegerUpDown Value="{Binding ConstSub, Mode=TwoWay}" Minimum="-1000" Maximum="1000" Height="25" Width="80"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="3" x:Name="stConstMin" Height="Auto" Width="Auto" Orientation="Horizontal" Visibility="Hidden">
+                        <Label Content="Const Min : "/>
+                        <Slider Margin="12,0,0,0" Value="{Binding ConstMin, Mode=TwoWay}" Minimum="-1000" Maximum="1000"></Slider>
+                        <xctk:IntegerUpDown Value="{Binding ConstMin, Mode=TwoWay}" Minimum="-1000" Maximum="1000" Height="25" Width="80"/>
+                    </StackPanel>
+
+                </Grid>
+            </StackPanel>
+
+
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Segmentation"></TextBlock>
+            </TabItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="400"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Background="#FF8A8A8A" >
+                    <StackPanel Orientation="Horizontal" Margin="15,2,5,0">
+                        <CheckBox IsChecked="{Binding IsCalBlob, Mode=TwoWay}" VerticalAlignment="Center"/>
+                        <Label Content="Calculate Blob" FontWeight="Bold" Foreground="White" Margin="5,3" Padding="0"/>
+                    </StackPanel>
+                </Grid>
+                <Border Grid.Row="1" BorderBrush="#FF8A8A8A" BorderThickness="0.5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="100"/>
+                            <RowDefinition/>
+                            <RowDefinition Height="260"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="215"/>
+                                <ColumnDefinition Width="1.2*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.Resources>
+                                <Style TargetType="{x:Type Label}">
+                                    <Setter Property="FontSize" Value="15"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                </Style>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="Margin" Value="0,10, 10, 10"/>
+                                    <Setter Property="FontSize" Value="15"/>
+                                    <Setter Property="Padding" Value="10,0"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                </Style>
+                            </Grid.Resources>
+                            <StackPanel Orientation="Horizontal" Margin="10,8,0,8">
+                                <Label Content="Priority : " VerticalAlignment="Center"/>
+                                <ComboBox Width="120" Margin="3" Padding="5,0,0,0" ItemsSource="{Binding Priorities}" SelectedItem="{Binding SelectPriority, Mode=TwoWay}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,8,0,8">
+                                <Label Content="Sort : " VerticalAlignment="Center"/>
+                                <ComboBox Width="120" Margin="22,3" Padding="5,0,0,0" IsEnabled="{Binding IsSortTypeEnable, Mode=TwoWay}" ItemsSource="{Binding SortTypes}" SelectedItem="{Binding SelectSort, Mode=TwoWay}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsExceptBound, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                <Label Content="Except Bounding" Margin="3,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,6">
+                                <CheckBox IsChecked="{Binding IsFillHole, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                <Label Content="Filling Hole" Margin="3,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsAscend, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                <Label Content="Ascending" Margin="3,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                        <DataGrid Grid.Row="3" AutoGenerateColumns="False" ItemsSource="{Binding BlobFilters}" CanUserAddRows="False" HeadersVisibility="Column" SelectionUnit="FullRow" VerticalScrollBarVisibility="Hidden">
+                            <DataGrid.Resources>
+                                <Style TargetType="{x:Type Label}">
+                                    <Setter Property="FontSize" Value="15"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                                <Style TargetType="{x:Type TextBox}">
+                                    <Setter Property="FontSize" Value="15"/>
+                                    <Setter Property="Height" Value="30"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <!-- Cột Property (hiển thị enum) -->
+                                <DataGridTemplateColumn Width="130">
+                                    <DataGridTemplateColumn.Header>
+                                        <Label Content="Low" Padding="0"/>
+                                    </DataGridTemplateColumn.Header>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Label Content="{Binding Property}" HorizontalContentAlignment="Left" FontWeight="Normal" Background="#FFEEEEEE"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Width="40">
+                                    <DataGridTemplateColumn.Header>
+                                        <Label Content="Use" Padding="0"/>
+                                    </DataGridTemplateColumn.Header>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding Use}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <!-- Cột Range (ComboBox hiển thị Enum) -->
+                                <DataGridTemplateColumn Width="100">
+                                    <DataGridTemplateColumn.Header>
+                                        <Label Content="Range" Padding="0"/>
+                                    </DataGridTemplateColumn.Header>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding Source={x:Static local:RangeValues.All}}" SelectedItem="{Binding Range, Mode=TwoWay}" Padding="10,3,0,3" Width="97"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Cột Low (hiển thị text) -->
+                                <DataGridTemplateColumn Width="110">
+                                    <DataGridTemplateColumn.Header>
+                                        <Label Content="Low" Padding="0"/>
+                                    </DataGridTemplateColumn.Header>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Label Content="{Binding Low}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Low, Mode=TwoWay}" VerticalContentAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                </DataGridTemplateColumn>
+                                <!-- Cột High (hiển thị text) -->
+                                <DataGridTemplateColumn Width="110">
+                                    <DataGridTemplateColumn.Header>
+                                        <Label Content="High" Padding="0"/>
+                                    </DataGridTemplateColumn.Header>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Label Content="{Binding High}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding High, Mode=TwoWay}" VerticalContentAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+                </Border>
+            </Grid>
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Result"></TextBlock>
+            </TabItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="450"/>
+                </Grid.RowDefinitions>
+                <Grid Background="#FF8A8A8A" >
+                    <Label Content="Edit Region" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0"/>
+                </Grid>
+                <Grid Grid.Row="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <ListView x:Name="lvResult" SelectionMode="Single"
+                          FontSize="15"
+                          ToolTip="Hiển thị thông tin Blob"
+                          HorizontalAlignment="Left"
+                          Background="LightGray"
+                          SnapsToDevicePixels="True"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ItemsSource="{Binding Blobs, Mode=OneWay}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="IsTabStop" Value="False"/>
+                                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="BorderBrush" Value="White"/>
+                                <Setter Property="Background" Value="White"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="60" Header="ID">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="1,0" Padding="4" Margin="-8">
+                                                <TextBlock Text="{Binding Label}" VerticalAlignment="Center" TextAlignment="Left" HorizontalAlignment="Left"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="80" Header="Area">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="1,0" Padding="4" Margin="-5,0,-8,0">
+                                                <TextBlock Text="{Binding Area}" VerticalAlignment="Center" TextAlignment="Left" HorizontalAlignment="Left"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="120" Header="CenterMassX">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="1,0" Padding="4" Margin="-5,0,-8,0">
+                                                <TextBlock Text="{Binding CenterMassX}" VerticalAlignment="Center" TextAlignment="Left" HorizontalAlignment="Left"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="120" Header="CenterMassY">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="1,0" Padding="4" Margin="-5,0,-8,0">
+                                                <TextBlock Text="{Binding CenterMassY}" VerticalAlignment="Center" TextAlignment="Left" HorizontalAlignment="Left"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="80" Header="Angle">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="1,0" Padding="4" Margin="-5,0,-8,0">
+                                                <TextBlock Text="{Binding Angle}" VerticalAlignment="Center" TextAlignment="Left" HorizontalAlignment="Left"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="100" Header="RectSize">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="1,0" Padding="4" Margin="-5,0,-8,0">
+                                                <TextBlock Text="{Binding RectSize}" VerticalAlignment="Center" TextAlignment="Left" HorizontalAlignment="Left"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="100" Header="RectWidth">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="1,0" Padding="4" Margin="-5,0,-8,0">
+                                                <TextBlock Text="{Binding RectWidth}" VerticalAlignment="Center" TextAlignment="Left" HorizontalAlignment="Left"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="100" Header="RectHeight">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="1,0" Padding="4" Margin="-5,0,-8,0">
+                                                <TextBlock Text="{Binding RectHeight}" VerticalAlignment="Center" TextAlignment="Left" HorizontalAlignment="Left"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5,10,0,0">
+                        <Label Content="Max Count : " Padding="0,0,3,0"/>
+                        <xctk:IntegerUpDown Value="{Binding MaxCount, Mode=TwoWay}" IsEnabled="True" Width="60" Minimum="0" Maximum="100" FontSize="15"/>
+                        <Label Content="(If choose 0, result contains all segments)" Padding="0" Margin="15,0,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</local:GridBase>

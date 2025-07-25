@@ -1,0 +1,103 @@
+﻿<Page x:Class="VisionInspection.PgRecipe"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:VisionInspection"
+      mc:Ignorable="d" 
+      d:DesignHeight="700" d:DesignWidth="1200"
+      Title="PgRecipe">
+
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0" Margin="2,0,2,2" Name="gridLeft">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"></RowDefinition>
+                <RowDefinition Height="6*"></RowDefinition>
+                <RowDefinition Height="2*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" BorderThickness="1" BorderBrush="#bbbbbb" MinHeight="60">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Foreground="#FF0F53BE" FontSize="24" FontWeight="Bold" FontStyle="Italic" 
+                               Margin="20,0,0,0" VerticalAlignment="Center">
+                         SETUP SYSTEM
+                    </TextBlock>
+                    <Button Grid.Column="1" x:Name="btSaveRecipe" Style="{StaticResource mButton}" Margin="5,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="menu-save.png" />
+                            <TextBlock VerticalAlignment="Center" Margin="10,0,10,0"
+                                       FontSize="20" FontWeight="Bold">Save</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Background="Wheat">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="5*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Black" FontSize="19" FontWeight="Bold" Content="Setting Model"></Label>
+                    <Border Grid.Column="1" Margin="5 10 200 10" Background="White" BorderBrush="#444444" BorderThickness="2" CornerRadius="4">
+                        <!--<Label  FontFamily="Bahnschrift SemiBold Condensed" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#333333" Content="X2907_SEMI_AUTO" FontSize="20"></Label>-->
+                        <ComboBox Grid.Row="0" Margin="1" Grid.Column="1" Width="auto" FontFamily="Bahnschrift SemiBold Condensed" IsEditable="True" x:Name="cbModel" SelectedValuePath="Content" VerticalAlignment="Center" FontSize="30" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+                            <ComboBoxItem FontFamily="Bahnschrift SemiBold Condensed" HorizontalAlignment="Center" VerticalAlignment="Center" Tag="1200" FontSize="25">X2833</ComboBoxItem>
+                            <ComboBoxItem FontFamily="Bahnschrift SemiBold Condensed" HorizontalAlignment="Center" VerticalAlignment="Center" Tag="2400" FontSize="25">X2835</ComboBoxItem>
+                            <ComboBoxItem FontFamily="Bahnschrift SemiBold Condensed" HorizontalAlignment="Center" VerticalAlignment="Center" Tag="4800" FontSize="25">X2836</ComboBoxItem>
+                            <!--<ComboBoxItem FontFamily="Bahnschrift SemiBold Condensed" HorizontalAlignment="Center" VerticalAlignment="Center" Tag="9600" FontSize="20">TEP5L</ComboBoxItem>
+                    <ComboBoxItem FontFamily="Bahnschrift SemiBold Condensed" HorizontalAlignment="Center" VerticalAlignment="Center" Tag="9600" FontSize="20">TEP6L</ComboBoxItem>
+                    <ComboBoxItem FontFamily="Bahnschrift SemiBold Condensed" HorizontalAlignment="Center" VerticalAlignment="Center" Tag="9600" FontSize="20">WTEP4L</ComboBoxItem>-->
+                        </ComboBox>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+        <Border Grid.Column="1" BorderThickness="1" BorderBrush="#cccccc" Margin="0,0,0,0">
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource mButton}">
+                        <Setter Property="FontSize" Value="24"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                        <Setter Property="Padding" Value="10,0,0,0"/>
+                        <Setter Property="Background" Value="LightGray"/>
+                        <Setter Property="Margin" Value="4,2,4,2"/>
+                    </Style>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="1*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Background="#FFC2DEEA" Name="btRun">
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="20" Height="30" Fill="DarkGray" />
+                        <TextBlock VerticalAlignment="Center" Padding="10,0,0,0">Run Mode</TextBlock>
+                    </StackPanel>
+                </Button>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</Page>

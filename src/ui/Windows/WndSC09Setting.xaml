@@ -1,0 +1,52 @@
+﻿<Window x:Class="VisionInspection.WndSC09Setting"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisionInspection"
+        mc:Ignorable="d"
+        Title="WndSC09Setting" Height="280" Width="420" >
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="Margin" Value="10,0,5,0"/>
+                <Setter Property="FontSize" Value="16"/>
+            </Style>
+            <Style TargetType="Button" BasedOn="{StaticResource mButton}">
+                <Setter Property="Margin" Value="10,10,10,10"/>
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="Margin" Value="10,2,100,2"/>
+            </Style>
+            <Style TargetType="ComboBox">
+                <Setter Property="Margin" Value="10,2,100,2"/>
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="1" Grid.Column="0">Port Name</TextBlock>
+        
+        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="cbPortName" SelectedValuePath="Content"></ComboBox>
+       
+        
+
+        <UniformGrid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Columns="2"
+                 Margin="100,10,100,10" Height="50">
+            <Button x:Name="btOk">OK</Button>
+            <Button x:Name="btCancel">CANCEL</Button>
+        </UniformGrid>
+    </Grid>
+</Window>

@@ -1,0 +1,300 @@
+﻿<local:GridBase x:Class="VisionTools.ToolEdit.TemplateMatchEdit"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisionTools.ToolEdit" 
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="500">
+    <TabControl Background="White">
+        <TabControl.ItemContainerStyle>
+            <Style TargetType="TabItem">
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </TabControl.ItemContainerStyle>
+        <TabControl.Resources>
+            <ContextMenu x:Key="cmRegion">
+                <MenuItem Background="Transparent" Foreground="Black" Header="Property" Click="PropertyItem_Click">
+                    <MenuItem.Icon>
+                        <Image></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+            <Style TargetType="{x:Type Label}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="Width" Value="100"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="IsEditable" Value="False"/>
+            </Style>
+            <Style TargetType="{x:Type Path}">
+                <Setter Property="Height" Value="15"/>
+                <Setter Property="Width" Value="15"/>
+                <Setter Property="Fill" Value="Black"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+            </Style>
+        </TabControl.Resources>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Main Parameter"></TextBlock>
+            </TabItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="300"/>
+                    <RowDefinition Height="140"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Vertical">
+                        <Label Height="25" Margin="5,0,0,0" Content="- Pattern:" Padding="0"/>
+                        <Canvas x:Name="masterCanvas" Height="200" Width="400" Margin="5,0,5,0" Background="DimGray">
+                            <Image x:Name="masterImg"/>
+                        </Canvas>
+                        <Grid Height="50" Margin="0, 5, 10, 0" HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="btnAxisLeft" Margin="5,14,5,14">
+                                <Path Data="M 121.80644,181.02422 59.673309,144.94692 121.25982,109.23405Z"/>
+                            </Button>
+                            <StackPanel Grid.Column="1" Orientation="Vertical">
+                                <Button x:Name="btnAxisUp" Height="20" Margin="5,1,5,5">
+                                    <Path Data="m 56.66687,177.83558 36.0773,-62.13313 35.71288,61.58651z"/>
+                                </Button>
+                                <Button x:Name="btnAxisDown" Height="20" Margin="5,3,5,0">
+                                    <Path Data="M 126.63496,114.06257 90.557659,176.1957 54.844788,114.60919Z"/>
+                                </Button>
+                            </StackPanel>
+                            <Button x:Name="btnAxisRight" Grid.Column="2" Margin="5,14,5,14">
+                                <Path Data="m 59.673307,109.23405 62.133133,36.0773 -61.586513,35.71287z"/>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="60"/>
+                            <RowDefinition Height="60"/>
+                            <RowDefinition Height="60"/>
+                            <RowDefinition Height="60"/>
+                        </Grid.RowDefinitions>
+
+                        <!--x:Name="btnPttSave"-->
+
+                        <Button  Margin="2">
+                            <TextBlock>Pattern<LineBreak/>Save</TextBlock>
+                        </Button>
+
+                        <!--Name="btnPttLoad"-->
+
+                        <Button Grid.Row="1"  Margin="2">
+                            <TextBlock>Pattern<LineBreak/>Load</TextBlock>
+                        </Button>
+
+                        <!--x:Name="btnPttAdd"-->
+
+                        <Button Grid.Row="2"  Margin="2">
+                            <TextBlock>Pattern<LineBreak/>Add</TextBlock>
+                        </Button>
+
+                        <!--x:Name="btnPttRemove"-->
+
+                        <Button Grid.Row="3"  Margin="2,2,2,4">
+                            <TextBlock>Pattern<LineBreak/>Remove</TextBlock>
+                        </Button>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="1" Height="150" Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Margin="30,0,0,0">
+
+                            <!--x:Name="ckbIsUseEdge"-->
+                            <CheckBox Margin="10,40, 0, -5" Height="15" IsChecked="{Binding IsUseEdge, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Label Content="Use Edge Detect: " Margin="5,50,0,0" Padding="0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="30,0,0,0">
+                            <xctk:IntegerUpDown Name="udvEdgeMin" FontSize="15" Margin="5,15,-5,30" IsEnabled="True" Foreground="White" Value="50" Minimum="0" Maximum="255" Background="#454343" Width="70"/>
+                            <Label Content="~" FontSize="20" FontWeight="Bold" Margin="5,7,3,10"/>
+                            <xctk:IntegerUpDown Name="udvEdgeMax" FontSize="15" Margin="0,15,0,30" IsEnabled="True" Foreground="White" Value="100" Minimum="0" Maximum="255" Background="#454343" Width="70"/>
+                        </StackPanel>
+                    </Grid>
+                    <UniformGrid Grid.Column="1" Columns="2" Rows="2">
+                        <Button x:Name="btnGrabMaster" Margin="10,20,10,10" Click="BtnMaskOn_Click">
+                            <TextBlock Text="Train Master"/>
+                        </Button>
+                        <Button x:Name="btnFitCenter" Margin="5,20,15,10">
+                            <TextBlock>Ref. To<LineBreak/>Center</TextBlock>
+                        </Button>
+                        <Button x:Name="btnMaskOn" Margin="10,5,10,25" Click="BtnMaskOn_Click">
+                            <Label Content="Mask On"/>
+                        </Button>
+                        <Button x:Name="btnResetMask" Margin="5,5,15,25">
+                            <Label Content="Reset Mask"/>
+                        </Button>
+                    </UniformGrid>
+                </Grid>
+            </Grid>
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Setting"></TextBlock>
+            </TabItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="180"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="80"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Background="#FF8A8A8A" >
+                    <StackPanel Orientation="Horizontal" Margin="5,2,5,0">
+                        <!--x:Name="ckbIsAutoMatchPara"-->
+                        <CheckBox Margin="5,6,0,5" IsChecked="{Binding IsAutoMatchPara, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Is Auto Matching Parameter" FontSize="15" FontWeight="Bold" Foreground="White" Margin="5,3" Padding="0"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="1.2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Content="- Scale: " Margin="10,0,0,0" Padding="2" FontWeight="Bold"/>
+                    <Label Grid.Column="1" Content="- Angle: " Margin="0,0,0,0" Padding="2" FontWeight="Bold"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="1,6,3,6">
+                        <Label Content="First:    1 / " Padding="20,3,5,0"/>
+
+                        <!--Name="udvScaleFirst"-->
+                        <xctk:DoubleUpDown Width="80"  FontSize="15"  IsEnabled="True" Minimum="1" Maximum="100" HorizontalContentAlignment="Left" Value="{Binding ScaleFirst, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="1,6,3,6">
+                        <Label Content="Last:    1 / " Padding="21,3,5,0"/>
+
+                        <!--Name="udvScaleLast"-->
+
+                        <xctk:DoubleUpDown Width="80"  FontSize="15"  IsEnabled="True" Minimum="1" Maximum="100" HorizontalContentAlignment="Left" Value="{Binding ScaleLast, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <Grid Grid.Row="1" Grid.Column="1" Margin="1,6,1,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="- Deg: " Padding="2" Margin="10,0,0,0"/>
+
+                        <!--Name="udvDegMin"-->
+                        <xctk:DoubleUpDown Grid.Column="1" Width="80" FontSize="15" HorizontalAlignment="Left" IsEnabled="True" Value="{Binding DegMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="-360.0" Maximum="360.0" HorizontalContentAlignment="Left"/>
+                    </Grid>
+                    <Grid Grid.Row="2" Grid.Column="1" Margin="1,6,1,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="+Deg: " Padding="2" Margin="10,0,0,0"/>
+                        <!--Name="udvDegMax"-->
+                        <xctk:DoubleUpDown Grid.Column="1" Width="80"  FontSize="15" HorizontalAlignment="Left" IsEnabled="True" Value="{Binding DegMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="-360.0" Maximum="360.0" HorizontalContentAlignment="Left"/>
+                    </Grid>
+                    <Grid Grid.Row="3" Grid.Column="1" Margin="1,6,1,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="First Step: " Padding="2" Margin="10,0,0,0"/>
+
+                        <!--Name="udvFirstStep"-->
+                        <xctk:DoubleUpDown Grid.Column="1" Width="80"  FontSize="15" HorizontalAlignment="Left" IsEnabled="True" Value="{Binding FirstStep, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0.0" Maximum="100.0" HorizontalContentAlignment="Left"/>
+                    </Grid>
+                    <Grid Grid.Row="4" Grid.Column="1" Margin="1,6,1,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Precision: " Padding="2" Margin="10,0,0,0"/>
+
+                        <!--Name="udvPrecision"-->
+                        <xctk:DoubleUpDown Grid.Column="1" Width="80"  FontSize="15" HorizontalAlignment="Left" IsEnabled="True" Value="{Binding Precision, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0.01" Maximum="1.0" HorizontalContentAlignment="Left"/>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="2" Background="#FF8A8A8A" >
+                    <Label Content="Priority" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0"/>
+                </Grid>
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="150*"/>
+                        <ColumnDefinition Width="37*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Margin="10,10,0,10">
+                        <Label Content="Priority : " Padding="0" Margin="2"/>
+
+                        <!--x:Name="cbxPriority"-->
+                        <ComboBox  Margin="1" Width="90" IsEditable="False" ItemsSource="{Binding Priorities}" SelectedItem="{Binding SelectedPriority, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column ="1" Orientation="Horizontal" Margin="15,10,0,10" Grid.ColumnSpan="2">
+                        <Label Content="Priority Creteria :" Padding="0" Margin="2,2,4,2"/>
+                        <!--Name="udvPrioCrete"-->
+                        <xctk:DoubleUpDown Width="80" Margin="16,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="True" Value="{Binding PriorityCreteria, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0.00" Maximum="1.0" HorizontalContentAlignment="Left"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column ="1" Orientation="Horizontal" Margin="15,10,0,10" Grid.ColumnSpan="2">
+                        <Label Content="Max Count :" Padding="0" Margin="2,2,23,2"/>
+
+                        <!--Name="udvMaxCount"-->
+                        <xctk:IntegerUpDown Width="80" Margin="28,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="True" Value="{Binding MaxCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" HorizontalContentAlignment="Left"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="4" Background="#FF8A8A8A" >
+                    <Label Content="Scale" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0"/>
+                </Grid>
+                <Border Grid.Row="5" BorderBrush="#FF8A8A8A" BorderThickness="0.5">
+                    <StackPanel Orientation="Horizontal" Margin="15" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                        <!--Name="udvScaleMin"-->
+
+                        <xctk:DoubleUpDown  FontSize="15" IsEnabled="True" Value="{Binding TempScaleMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0.5" Maximum="1.0" Width="70"/>
+                        <Label Content="~" FontSize="20" Padding="0" Margin="10,-3,10,0"/>
+
+                        <!--Name="udvScaleMax"-->
+
+                        <xctk:DoubleUpDown  FontSize="15" IsEnabled="True" Value="{Binding TempScaleMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="0.5" Maximum="1.0" Width="70"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</local:GridBase>

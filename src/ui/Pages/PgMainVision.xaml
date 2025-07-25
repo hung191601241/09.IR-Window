@@ -1,0 +1,407 @@
+﻿<Page x:Class="VisionInspection.PgMainVision"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:VisionInspection"
+      mc:Ignorable="d" 
+      d:DesignHeight="840" d:DesignWidth="1300"
+      Title="PgMainVision">
+
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" VerticalAlignment="Top">
+                    <Grid.Resources>
+                        <Style TargetType="{x:Type Label}">
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="Background" Value="#879ec8" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Padding" Value="5,0" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="FontSize" Value="16" />
+                        </Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="Background" Value="#879ec8" />
+                            <Setter Property="Padding" Value="5,0" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="FontSize" Value="16" />
+                        </Style>
+                        <Style TargetType="{x:Type TextBox}">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="FontSize" Value="16" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0*"></ColumnDefinition>
+                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                        <ColumnDefinition Width="4.3*"></ColumnDefinition>
+                        <ColumnDefinition Width="1.32*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Column="0" FontSize="24" FontWeight="Bold" Background="DarkBlue"  ></Label>
+                    <Grid Grid.Column="1" Background="LightBlue">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.8*"></ColumnDefinition>
+                            <ColumnDefinition Width="3*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0"  Background="#FFEF7F7F">Equipment Id</Label>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="lbEquipmentId" FontWeight="Bold" Foreground="#FF099CF1"></TextBox>
+                        <Label Grid.Row="1" Grid.Column="0" Background="#FF3572C1">Model</Label>
+                        <TextBox x:Name="txtCurrentModel" Grid.Row="1" Grid.Column="1" FontWeight="Bold" Foreground="#FF099CF1">B7 Main</TextBox>
+                    </Grid>
+                    <Grid Grid.Column="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="3*"></ColumnDefinition>
+                            <ColumnDefinition Width="0*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="1" Grid.Column="0" Background="#FF3572C1">LOT ID</Label>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtLotId" FontWeight="Bold" Foreground="#FF099CF1"></TextBox>
+                        <Label Grid.Row="0" Grid.Column="0" Background="#FFEF7F7F">DEVICE ID</Label>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtProductId" FontWeight="Bold" Foreground="#FF099CF1"></TextBox>
+                        <Button Grid.Row="0" Background="LightGreen" Grid.RowSpan="2" Grid.Column="2" x:Name="btLight" Style="{StaticResource sButton}">
+                            <Label Background="Transparent" Foreground="Black" FontWeight="Bold">Light ON</Label>
+                        </Button>
+                    </Grid>
+                    <UniformGrid Grid.Column="3" Columns="1" Rows="2" Background="#FF5E97E1">
+                        <Label Margin="1,0,1,0">PLC</Label>
+                        <Label Margin="1,0,1,0" x:Name="lblPLCOnline" Background="Red">Disconnect</Label>
+                    </UniformGrid>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid Margin="-1,0,1,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="6*"></ColumnDefinition>
+                            <ColumnDefinition Width="1.08*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="8*" ></RowDefinition>
+                                <RowDefinition Height="30"></RowDefinition>
+                                <RowDefinition Height="8*" ></RowDefinition>
+                                <RowDefinition Height="30"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Margin="0 0 0 0" Background="White" BorderThickness="0.25" BorderBrush="Gray">
+                                    <Image Name="imgView1"></Image>
+                                </Border>
+                                <Border Grid.Column="1" Margin="0 0 0 0" Background="White" BorderThickness="0.25" BorderBrush="Gray">
+                                    <Image Name="imgView2"></Image>
+                                </Border>
+                                <Border Grid.Column="2" Margin="0 0 0 0" Background="White" BorderThickness="0.25" BorderBrush="Gray">
+                                    <Image Name="imgView3"></Image>
+                                </Border>
+                            </Grid>
+                            <Grid Grid.Row="1" Background="White">
+                                <Grid.Resources>
+                                    <Style TargetType="Label" >
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                        <Setter Property="VerticalAlignment" Value="Stretch" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="FontSize" Value="10" />
+                                        <Setter Property="Foreground" Value="Black"/>
+                                        <Setter  Property="FontWeight" Value="Bold"/>
+                                    </Style>
+                                </Grid.Resources>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Background="White" BorderThickness="0.25">
+                                    <Label Background="CadetBlue" Padding="0,8,0,0" Margin="0,0,0.5,0" HorizontalContentAlignment="Center">FPCB 1</Label>
+                                </Border>
+                                <Border Grid.Column="1" Background="White" BorderThickness="0.25">
+                                    <Label Background="CadetBlue" Padding="0,8,0,0" Margin="0,0,0.5,0" HorizontalContentAlignment="Center">FPCB 2</Label>
+                                </Border>
+                                <Border Grid.Column="2" Background="White" BorderThickness="0.25">
+                                    <Label Background="CadetBlue" Padding="0,8,0,0" Margin="0,0,0.5,0" HorizontalContentAlignment="Center">FPCB 3</Label>
+                                </Border>
+                            </Grid>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Margin="0 0 0 0" Background="White" BorderThickness="0.25" BorderBrush="Gray">
+                                    <Image Name="imgView4"></Image>
+                                </Border>
+                                <Border Grid.Column="1" Margin="0 0 0 0" Background="White" BorderThickness="0.25" BorderBrush="Gray">
+                                    <Image Name="imgView5"></Image>
+                                </Border>
+                                <Grid x:Name="gridView" Grid.Column="2" Margin="0 0 0 0" Background="#fff8dc">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border BorderBrush="Gray" BorderThickness="0.5">
+                                        <Label Content="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" FontWeight="Bold"/>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Row="3" Background="White">
+                                <Grid.Resources>
+                                    <Style TargetType="Label" >
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                        <Setter Property="VerticalAlignment" Value="Stretch" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="FontSize" Value="10" />
+                                        <Setter Property="Foreground" Value="Black"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </Style>
+                                </Grid.Resources>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Background="White" BorderThickness="0.25">
+                                    <Label Background="CadetBlue" Padding="0,8,0,0" Margin="0,0,0.5,0" HorizontalContentAlignment="Center">FPCB 4</Label>
+                                </Border>
+                                <Border Grid.Column="1" Background="White" BorderThickness="0.25">
+                                    <Label Background="CadetBlue" Padding="0,8,0,0" Margin="0,0,0.5,0" HorizontalContentAlignment="Center">FPCB 5</Label>
+                                </Border>
+                                <Border Grid.Column="2" Background="White" BorderThickness="0.25">
+                                    <Label Background="CadetBlue" Padding="0,8,0,0" Margin="0,0,0.5,0" HorizontalContentAlignment="Center">STATUS</Label>
+                                </Border>
+                            </Grid>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
+                                              Foreground="Gray" FontStyle="Italic" FontSize="20">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="IsHitTestVisible" Value="False"/>
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SampleViewerViewModel.Sample}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Stream}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Hidden"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                                  drag image here to process ...
+                            </TextBlock>
+                        </Grid>
+                        <Grid Grid.Column="1" Background="#fff8dc"  Margin=" 0 0 0 0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"></RowDefinition>
+                                <RowDefinition Height="3*"></RowDefinition>
+                                <RowDefinition Height="30"></RowDefinition>
+                                <RowDefinition Height="2*"></RowDefinition>
+                                <RowDefinition Height="30"></RowDefinition>
+                                <RowDefinition Height="1.2*"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Background="White" >
+                                <Border Margin="0 0 1 0" CornerRadius=" 10 10 0 0 " Background="#696969" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Margin="15,0,0,0" Background="#333333" HorizontalAlignment="Left" BorderBrush="Silver" BorderThickness="1" CornerRadius="0,0,8,8" Grid.Row="0" >
+                                        <StackPanel>
+                                            <Label Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Foreground="White" Content=" Event Message  " FontSize="15"></Label>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid Grid.Row="1" Background="#696969">
+                                <ScrollViewer Background="Black" Margin="0,0,3,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="True" ScrollChanged="ScrollViewer_ScrollChanged">
+                                    <!--hien thi addlog-->
+                                    <ItemsControl ItemsSource="{Binding LogEntries}">
+                                        <ItemsControl.Template>
+                                            <ControlTemplate>
+                                                <ItemsPresenter />
+                                            </ControlTemplate>
+                                        </ItemsControl.Template>
+
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel IsItemsHost="True" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Foreground="White" FontFamily="Arial">
+                                                    <Run Text="{Binding logTime}" />
+                                                    <Run Text=" - " />
+                                                    <Run Text="{Binding logMessage}" />
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                            <Grid Grid.Row="2" Background="White" >
+                                <Border Margin="0 0 1 0" CornerRadius=" 10 10 0 0 " Background="#696969" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Margin="15,0,0,0" Background="#333333" HorizontalAlignment="Left" BorderBrush="Silver" BorderThickness="1" CornerRadius="0,0,8,8" Grid.Row="0" >
+                                        <StackPanel>
+                                            <Label Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Foreground="White" Content="  Setting Matrix  " FontSize="15"></Label>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="3" Background="#FFABABAB" >
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border Margin="5,5,10,0" Background="#333333" CornerRadius=" 10 10 0 0 ">
+                                    <TextBlock x:Name="tblJigPos" Text="0" Foreground="White" FontSize="20" FontWeight = "Bold"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ScrollViewer Grid.Row="1" Margin="5,0,10,5" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                                    <StackPanel x:Name="stImgLink" Background="#fff8dc">
+                                        <!--<TextBlock Text="LotInt-12345-1 .jpg" Padding="5,3,0,0" FontSize="13" Foreground="#FF489E37" FontStyle="Italic" TextDecorations="Underline" Cursor="Hand"/>-->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Grid>
+                            <Grid Grid.Row="4"  Background="White" MouseDown="Grid_MouseDown">
+                                <Border Margin="0 0 1 0" CornerRadius=" 10 10 0 0 " Background="#696969" />
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox x:Name="CbShow" Unchecked="AlarmCheckBox_Unchecked" Checked="AlarmCheckBox_Checked" Margin="10 0 0 0" Content="Not Show" Foreground="White" FontSize="12"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Border Margin="10,0,0,0" Background="#333333" HorizontalAlignment="Left" BorderBrush="Silver" BorderThickness="1" CornerRadius="0,0,8,8" Grid.Row="0" >
+                                        <StackPanel>
+                                            <Label Grid.Row="0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Foreground="White" Content=" Event Alarm  " FontSize="15"></Label>
+                                        </StackPanel>
+                                    </Border>
+                                    <Label Grid.Row="0" Padding="20 0 0 0"  HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Foreground="White" FontSize="15">
+                                        <TextBlock FontSize="13" Text=" Click to here show alarm " TextDecorations="Underline"/>
+                                    </Label>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="5" Background="#696969"  >
+                                <ScrollViewer CanContentScroll="True" Name="scrollView" VerticalScrollBarVisibility="Auto" Grid.Row="2">
+                                    <Grid Grid.Row="2" Background="White">
+                                        <Grid.RowDefinitions>
+                                            <!--Sử dụng vòng lặp để tạo 20 hàng-->
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+                                            <RowDefinition Height="23"></RowDefinition>
+
+                                            <!--Copy và dán dòng trên 19 lần nữa-->
+                                        </Grid.RowDefinitions>
+
+                                        <!--Nội dung của các hàng Label 
+                 Đảm bảo điều chỉnh Grid.Row cho mỗi Label-->
+                                        <Label x:Name="lbMes1" Grid.Row="0"  Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes2" Grid.Row="1"  Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes3" Grid.Row="2"  Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes4" Grid.Row="3"  Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes5" Grid.Row="4"  Background="Black" Foreground="White" Margin="0"></Label>
+
+                                        <Label x:Name="lbMes6" Grid.Row="5"  Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes7" Grid.Row="6"  Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes8" Grid.Row="7"  Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes9" Grid.Row="8"  Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes10" Grid.Row="9"  Background="Black" Foreground="White" Margin="0"></Label>
+
+                                        <Label x:Name="lbMes11" Grid.Row="10" Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes12" Grid.Row="11" Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes13" Grid.Row="12" Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes14" Grid.Row="13" Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes15" Grid.Row="14" Background="Black" Foreground="White" Margin="0"></Label>
+
+                                        <Label x:Name="lbMes16" Grid.Row="15" Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes17" Grid.Row="16" Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes18" Grid.Row="17" Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes19" Grid.Row="18" Background="Black" Foreground="White" Margin="0"></Label>
+                                        <Label x:Name="lbMes20" Grid.Row="19" Background="Black" Foreground="White" Margin="0"></Label>
+
+                                        <Label x:Name="lbMes21" Grid.Row="20" Background="Black" Foreground="White" Margin="0">21: No Error</Label>
+                                        <Label x:Name="lbMes22" Grid.Row="21" Background="Black" Foreground="White" Margin="0">22: No Error</Label>
+                                        <Label x:Name="lbMes23" Grid.Row="22" Background="Black" Foreground="White" Margin="0">23: No Error</Label>
+                                        <Label x:Name="lbMes24" Grid.Row="23" Background="Black" Foreground="White" Margin="0">24: No Error</Label>
+                                        <Label x:Name="lbMes25" Grid.Row="24" Background="Black" Foreground="White" Margin="0">25: No Error</Label>
+
+                                        <Label x:Name="lbMes26" Grid.Row="25" Background="Black" Foreground="White" Margin="0">26: No Error</Label>
+                                        <Label x:Name="lbMes27" Grid.Row="26" Background="Black" Foreground="White" Margin="0">27: No Error</Label>
+                                        <Label x:Name="lbMes28" Grid.Row="27" Background="Black" Foreground="White" Margin="0">28: No Error</Label>
+                                        <Label x:Name="lbMes29" Grid.Row="28" Background="Black" Foreground="White" Margin="0">29: No Error</Label>
+                                        <Label x:Name="lbMes30" Grid.Row="29" Background="Black" Foreground="White" Margin="0">30: No Error</Label>
+
+
+                                    </Grid>
+                                </ScrollViewer>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+        </DockPanel>
+    </Grid>
+</Page>

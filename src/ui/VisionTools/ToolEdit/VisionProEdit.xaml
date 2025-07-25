@@ -1,0 +1,226 @@
+﻿<local:GridBase x:Class="VisionTools.ToolEdit.VisionProEdit"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisionTools.ToolEdit"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             d:DataContext="{d:DesignInstance Type=local:VisionProEdit}"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="500">
+    <TabControl Background="White">
+        <TabControl.ItemContainerStyle>
+            <Style TargetType="TabItem">
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </TabControl.ItemContainerStyle>
+        <TabControl.Resources>
+            <Style TargetType="{x:Type Label}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type TextBox}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="0,3,0,0"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="Width" Value="120"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="IsEditable" Value="False"/>
+            </Style>
+            <Style TargetType="{x:Type Path}">
+                <Setter Property="Height" Value="15"/>
+                <Setter Property="Width" Value="15"/>
+                <Setter Property="Fill" Value="White"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+            </Style>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="#555555"/>
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+            <Style TargetType="{x:Type xctk:DoubleUpDown}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type xctk:IntegerUpDown}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+        </TabControl.Resources>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Setting"></TextBlock>
+            </TabItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Background="#999999">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="35"/>
+                        <ColumnDefinition Width="3"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Padding="10,5,0,0" FontStyle="Normal" FontWeight="Bold" Foreground="White">VisionPro Setting</Label>
+                    <Border Grid.Column="2" BorderThickness="1" BorderBrush="Silver" Background="White" CornerRadius="5">
+                        <Button x:Name="btnDecode" Background="Transparent" BorderBrush="Transparent">
+                            <Image Height="25" Width="25" Source="/src/ui/Images/Decode.png"/>
+                        </Button>
+                    </Border>
+                </Grid>
+
+                <Border Grid.Row="1" BorderBrush="#888888" BorderThickness="0.5">
+                    <StackPanel Margin="15,5,0,5" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Label Width="110" Foreground="Black">VisionPro Path :</Label>
+                        <TextBox x:Name="TxtVppPath" TextWrapping="NoWrap" Width="280"></TextBox>
+                        <Button x:Name="btnChooseVppFile" Content=" . . . " Margin="5,0,0,0" Padding="0,-3,0,0" Width="30"></Button>
+
+                    </StackPanel>
+                </Border>
+                <Label Grid.Row="2" FontStyle="Normal" Padding="10,5,0,0" Background="#999999" FontWeight="Bold" Foreground="White">Input</Label>
+                <DataGrid Grid.Row="3" AutoGenerateColumns="False" ItemsSource="{Binding VppInInforRaws}" IsReadOnly="True" CanUserAddRows="False" HeadersVisibility="Column">
+                    <DataGrid.Resources>
+                        <Style TargetType="{x:Type Label}">
+                            <Setter Property="FontSize" Value="15"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                        <Style TargetType="{x:Type TextBox}">
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Height" Value="30"/>
+                            <Setter Property="Padding" Value="0,5,0,0"/>
+                            <Setter Property="IsReadOnly" Value="True"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <!--Cột Property (hiển thị enum)-->
+                        <DataGridTemplateColumn Width="40">
+                            <DataGridTemplateColumn.Header>
+                                <Label Content="STT" Padding="0"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding STT}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Width="150">
+                            <DataGridTemplateColumn.Header>
+                                <Label Content="Name" Padding="0"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Name}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!--Cột Low (hiển thị text)-->
+                        <DataGridTemplateColumn Width="150">
+                            <DataGridTemplateColumn.Header>
+                                <Label Content="Type" Padding="0"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding ValueType}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <!--Cột High (hiển thị text)-->
+                        <DataGridTemplateColumn Width="150">
+                            <DataGridTemplateColumn.Header>
+                                <Label Content="Value" Padding="0"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Value}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Label Grid.Row="4" FontStyle="Normal" Padding="10,5,0,0" Background="#999999" FontWeight="Bold" Foreground="White">Output</Label>
+                <DataGrid Grid.Row="5" AutoGenerateColumns="False" ItemsSource="{Binding VppOutInforRaws}" IsReadOnly="True" CanUserAddRows="False" HeadersVisibility="Column">
+                    <DataGrid.Resources>
+                        <Style TargetType="{x:Type Label}">
+                            <Setter Property="FontSize" Value="15"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                        <Style TargetType="{x:Type TextBox}">
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Height" Value="30"/>
+                            <Setter Property="Padding" Value="0,5,0,0"/>
+                            <Setter Property="IsReadOnly" Value="True"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <!--Cột Property (hiển thị enum)-->
+                        <DataGridTemplateColumn Width="40">
+                            <DataGridTemplateColumn.Header>
+                                <Label Content="STT" Padding="0"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding STT}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Width="150">
+                            <DataGridTemplateColumn.Header>
+                                <Label Content="Name" Padding="0"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Name}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!--Cột Low (hiển thị text)-->
+                        <DataGridTemplateColumn Width="150">
+                            <DataGridTemplateColumn.Header>
+                                <Label Content="Type" Padding="0"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding ValueType}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <!--Cột High (hiển thị text)-->
+                        <DataGridTemplateColumn Width="150">
+                            <DataGridTemplateColumn.Header>
+                                <Label Content="Value" Padding="0"/>
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Value}" HorizontalContentAlignment="Left" FontWeight="Normal"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</local:GridBase>

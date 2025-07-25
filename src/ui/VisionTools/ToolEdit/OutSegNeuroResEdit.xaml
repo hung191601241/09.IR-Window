@@ -1,0 +1,132 @@
+﻿<local:GridBase x:Class="VisionTools.ToolEdit.OutSegNeuroResEdit"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisionTools.ToolEdit" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+      mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="500">
+    <TabControl Background="White">
+        <TabControl.ItemContainerStyle>
+            <Style TargetType="TabItem">
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </TabControl.ItemContainerStyle>
+        <TabControl.Resources>
+            <Style TargetType="{x:Type Label}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type TextBox}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type xctk:IntegerUpDown}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="Width" Value="100"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="IsEditable" Value="False"/>
+            </Style>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="#555555"/>
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+        </TabControl.Resources>
+        <TabItem >
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Setting"></TextBlock>
+            </TabItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="180"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="270"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Background="#FF8A8A8A" >
+                    <Label Content="Results Input" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0,2,0,0"/>
+                </Grid>
+                <StackPanel Grid.Row="1" Background="LightGray">
+                    <DataGrid Height="150" ItemsSource="{Binding ResultInputLst}" AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          HeadersVisibility="Column"
+                          CanUserAddRows="False"
+                          Margin="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding ID}" Width="50">
+                                <DataGridTextColumn.Header>
+                                    <Label Content="ID" FontSize="12" FontWeight="Bold" Padding="3,0,0,0"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Judge}" Width="100">
+                                <DataGridTextColumn.Header>
+                                    <Label Content="Judge Value" FontSize="12" FontWeight="Bold" Padding="3,0,0,0"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Result}" Width="240">
+                                <DataGridTextColumn.Header>
+                                    <Label Content="Result" FontSize="12" FontWeight="Bold" Padding="3,0,0,0"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Score}" Width="100">
+                                <DataGridTextColumn.Header>
+                                    <Label Content="Score" FontSize="12" FontWeight="Bold" Padding="3,0,0,0"/>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button x:Name="btnClearTb" FontSize="12" Width="65" HorizontalAlignment="Right" Margin="10,3" Click="BtnClearTb_Click">
+                        <StackPanel Orientation="Horizontal" Width="55">
+                            <Image Height="16" Width="16" Source="/src/ui/Images/Delete.png" HorizontalAlignment="Left"></Image>
+                            <Label Foreground="White" Content="Clear" Padding="5,0,0,1"></Label>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <Grid Grid.Row="2" Background="#FF8A8A8A" >
+                    <Label Content="Setting Address Output" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0,2,0,0"/>
+                </Grid>
+                <Border Grid.Row="3" BorderBrush="#FF8A8A8A" BorderThickness="0.5">
+                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="170"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Background="#CCCCCC" Margin="15,0,15,0">
+                            <Label Width="140" Margin="20,0,0,0">Start Address :</Label>
+                            <ComboBox Width="70" ItemsSource="{Binding DeviceCodes}" SelectedItem="{Binding SelectDevOut, Mode=TwoWay}" Margin="0,5,0,5"/>
+                            <TextBox Width="150" Margin="3,5,0,5" Text="{Binding TxtAddrOut, Mode=TwoWay}" Padding="3"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" Background="#CCCCCC" Margin="15,0,15,0">
+                            <Label Width="140" Margin="20,0,0,0">Number Posision :</Label>
+                            <xctk:IntegerUpDown Value="{Binding NumberPos, Mode=TwoWay}" Minimum="0" Maximum="100" Margin="0,5,0,5" Width="70"/>
+                            <Button x:Name="btnRefreshTb" FontSize="12" Width="80" Margin="73,5,0,5" Click="BtnRefreshTb_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Height="16" Width="16" Source="/src/ui/Images/reset.png" ></Image>
+                                    <Label Foreground="White" Content="Create" Padding="5,0,0,1"></Label>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <DataGrid x:Name="dtgdAddr" Grid.Row="3" ItemsSource="{Binding DataView, Mode=TwoWay}" FontSize="15" Margin="15,10,10,0" AutoGenerateColumns="True" CanUserAddRows="False" HeadersVisibility="All" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</local:GridBase>

@@ -1,0 +1,109 @@
+﻿<local:GridBase x:Class="VisionTools.ToolEdit.VidiCognexEdit"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VisionTools.ToolEdit"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             d:DataContext="{d:DesignInstance Type=local:VidiCognexEdit}"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="500">
+    <TabControl Background="White">
+        <TabControl.ItemContainerStyle>
+            <Style TargetType="TabItem">
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </TabControl.ItemContainerStyle>
+        <TabControl.Resources>
+            <Style TargetType="{x:Type Label}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type TextBox}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="0,3,0,0"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="Width" Value="120"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="IsEditable" Value="False"/>
+            </Style>
+            <Style TargetType="{x:Type Path}">
+                <Setter Property="Height" Value="15"/>
+                <Setter Property="Width" Value="15"/>
+                <Setter Property="Fill" Value="White"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+            </Style>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Background" Value="#555555"/>
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+            <Style TargetType="{x:Type xctk:DoubleUpDown}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+            <Style TargetType="{x:Type xctk:IntegerUpDown}">
+                <Setter Property="FontSize" Value="15"/>
+            </Style>
+        </TabControl.Resources>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Setting"></TextBlock>
+            </TabItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="160"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label FontStyle="Normal" Background="#999999" FontWeight="Bold" Foreground="White">Select GPU Device</Label>
+                <StackPanel Grid.Row="1" Margin="15,5,0,5" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Label Width="110" Foreground="Black">Device GPU :</Label>
+                    <ComboBox x:Name="cbxDevice" IsEditable="False" Width="300" ItemsSource="{Binding BindableDevices, Mode=TwoWay}" SelectedItem="{Binding DeviceSelected, Mode=TwoWay}" SelectedIndex="{Binding DevCbxIdx, Mode=TwoWay}" SelectionChanged="CbxDevice_SelectionChanged"/>
+                </StackPanel>
+                <Label Grid.Row="2" FontStyle="Normal" Background="#999999" FontWeight="Bold" Foreground="White">Model Vidi Setting</Label>
+                <StackPanel Grid.Row="3" Margin="10,5,10,5" Background="#999999">
+                    <Button x:Name="btnCreateModel" Background="#555555" Content="Creat New Model" FontSize="15" Margin="0,0,0,0" Height="35" Click="BtnCreateModel_Click"/>
+                    <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
+                        <Label Width="110" Foreground="Black">Model Name :</Label>
+                        <TextBox x:Name="txtModelName" Width="300"></TextBox>
+                    </StackPanel>
+                    <StackPanel Margin="5,5,0,0" Orientation="Horizontal">
+                        <Label Width="110" Foreground="Black">Model Path :</Label>
+                        <TextBox x:Name="txtModelPath" Width="300" TextWrapping="NoWrap"></TextBox>
+                        <Button x:Name="btnModelChooseFile" Content=" . . . " Margin="5,0,0,0" Width="30" Click="BtnModelChooseFile_Click"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="5,5,0,5" Orientation="Horizontal">
+                        <Label Width="110" Foreground="Black">Score :</Label>
+                        <xctk:IntegerUpDown Value="{Binding xctScore, Mode=TwoWay}" HorizontalAlignment="Left" Minimum="0" Maximum="100" Width="100"/>
+                    </StackPanel>
+                </StackPanel>
+                <Grid Grid.Row="4" Margin="10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" FontStyle="Normal" Background="#fff8dc" FontWeight="DemiBold" Foreground="Black">Vidi Model List</Label>
+                    <ScrollViewer Grid.Row="1">
+                        <StackPanel x:Name="stModelList">
+                            <Label Margin="10,0,0,0" BorderBrush="#888888" BorderThickness="0.5" Foreground="#888888" FontStyle="Italic">Have No Model To Display</Label>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</local:GridBase>

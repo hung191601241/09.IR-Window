@@ -1,0 +1,54 @@
+﻿<Window x:Class="VisionInspection.WndMCTCPSetting"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisionInspection"
+        mc:Ignorable="d"
+        Title="WndMCTCPSetting" Background="Transparent" WindowStartupLocation="CenterScreen" Height="250" Width="420">
+    <Grid MouseDown="Window_MouseDown">
+        <Border BorderThickness="2" CornerRadius="10" BorderBrush="#6787c0" Background="White">
+
+            <Grid Background="Transparent">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1.8*"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="2*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Margin="1" Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="25" BorderBrush="Black" BorderThickness="1">IP</Label>
+                    <Label Margin="1" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="25" BorderBrush="Black" BorderThickness="1">PORT</Label>
+
+
+                    <TextBox x:Name="txtIp" Margin="1" Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="25" BorderBrush="Black" BorderThickness="1">192.168.3.40</TextBox>
+                    <TextBox x:Name="txtPort" Margin="1" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="25" BorderBrush="Black" BorderThickness="1">502</TextBox>
+
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Margin="10" Width="150" Content="OK"  x:Name="btnOk" FontWeight="Bold" ></Button>
+                    <Button Grid.Column="1" Margin="10" Width="150" Content="CANCEL"  x:Name="btnCancle" FontWeight="Bold" ></Button>
+
+
+                </Grid>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>
