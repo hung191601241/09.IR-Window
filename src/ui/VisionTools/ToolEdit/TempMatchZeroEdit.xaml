@@ -52,26 +52,57 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="300"/>
+                    <RowDefinition Height="270"/>
                     <!--<RowDefinition Height="30"/>
                 <RowDefinition Height="180"/>-->
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="90"/>
                     <RowDefinition Height="30"/>
-                    <RowDefinition Height="120"/>
+                    <RowDefinition Height="160"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0" Background="#FF8A8A8A" >
                     <Label Content="Pattern" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0,2,0,0"/>
                 </Grid>
                 <Border Grid.Row="1" BorderBrush="#FF8A8A8A" BorderThickness="0.5">
-                    <StackPanel Orientation="Vertical" Margin="5">
-                        <Canvas x:Name="canvasMaster" x:FieldModifier="public" Height="250" Width="480" Margin="0" Background="DimGray">
-                            <Image x:Name="imgMaster" x:FieldModifier="public"/>
-                        </Canvas>
-                        <Button x:Name="btnGrabMaster" Width="480" Height="35" Margin="0" Click="BtnGrabMaster_Click">
-                            <TextBlock>Train Master Image</TextBlock>
-                        </Button>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Vertical" Margin="5">
+                            <Canvas x:Name="canvasMaster" x:FieldModifier="public" Height="220" Width="300" Margin="0" Background="DimGray">
+                                <Image x:Name="imgMaster" x:FieldModifier="public"/>
+                            </Canvas>
+                            <Button x:Name="btnGrabMaster" Width="300" Height="35" Margin="0" Click="BtnGrabMaster_Click">
+                                <TextBlock>Train Master Image</TextBlock>
+                            </Button>
+                        </StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                                <Label Content="OffsetX :" Padding="0" Width="65" Margin="2,2,0,2" VerticalAlignment="Center"/>
+                                <TextBox Width="80" Margin="0,5,0,5" FontSize="15" HorizontalAlignment="Left" IsReadOnly="True" Text="{Binding TxtOffsetX, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
+                                <Label Content="px" Padding="0" Margin="5,2,4,2" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10">
+                                <Label Content="OffsetY :" Padding="0" Width="65" Margin="2,2,0,2" VerticalAlignment="Center"/>
+                                <TextBox Width="80" Margin="0,5,0,5" FontSize="15" HorizontalAlignment="Left" IsReadOnly="True" Text="{Binding TxtOffsetY, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
+                                <Label Content="px" Padding="0" Margin="5,2,4,2" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,10">
+                                <Label Content="Rotate :" Padding="0" Width="65" Margin="2,2,0,2" VerticalAlignment="Center"/>
+                                <TextBox Width="80" Margin="0,5,0,5" FontSize="15" HorizontalAlignment="Left" IsReadOnly="True" Text="{Binding TxtRotate, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
+                                <Label Content="deg" Padding="0" Margin="5,2,4,2" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,10,0,10">
+                                <Label Content="Score :" Padding="0" Width="65" Margin="2,2,0,2" VerticalAlignment="Center"/>
+                                <TextBox Width="80" Margin="0,5,0,5" FontSize="15" HorizontalAlignment="Left" IsReadOnly="True" Text="{Binding TxtScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
+                            </StackPanel>
+
+                        </Grid>
                     </StackPanel>
                 </Border>
                 <Grid Grid.Row="2" Background="#FF8A8A8A" >
@@ -92,26 +123,77 @@
                     </StackPanel>
                 </Border>
                 <Grid Grid.Row="4" Background="#FF8A8A8A" >
-                    <Label Content="Offset" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0,2,0,0"/>
+                    <Label Content="Send Data to PLC" FontSize="15" FontWeight="Bold" Foreground="White" Margin="15,3" Padding="0,2,0,0"/>
                 </Grid>
                 <Border Grid.Row="5" BorderBrush="#FF8A8A8A" BorderThickness="0.5">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="15,15,0,10" Grid.ColumnSpan="2">
-                            <Label Content="OffsetX :" Padding="0" Margin="2,2,4,2" VerticalAlignment="Center"/>
-                            <TextBox Width="100" Margin="15,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="False" Text="{Binding TxtOffsetX, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
-                            <Label Content="px" Padding="0" Margin="5,2,4,2" VerticalAlignment="Center"/>
-                            <Label Content="OffsetY :" Padding="0" Margin="60,2,4,2" VerticalAlignment="Center"/>
-                            <TextBox Width="100" Margin="15,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="False" Text="{Binding TxtOffsetY, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
-                            <Label Content="px" Padding="0" Margin="5,2,4,2" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="15,10,0,15" Grid.ColumnSpan="2">
-                            <Label Content="Rotation :" Padding="0" Margin="2,2,4,2" VerticalAlignment="Center"/>
-                            <TextBox Width="100" Margin="8,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="False" Text="{Binding TxtRotate, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
-                            <Label Content="deg" Padding="0" Margin="5,2,4,2" VerticalAlignment="Center"/>
-                            <Label Content="Score :" Padding="0" Margin="50,2,4,2" VerticalAlignment="Center"/>
-                            <TextBox Width="100" Margin="26,0,0,0" FontSize="15" HorizontalAlignment="Left" IsEnabled="False" Text="{Binding TxtScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Left"/>
-                        </StackPanel>
-                    </StackPanel>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="120"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="20,10,10,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="ckbxIsUsePx2mm" x:FieldModifier="public" VerticalContentAlignment="Center"/>
+                            <Label Grid.Column="1" Content="Pixel to Mm : " VerticalAlignment="Center"/>
+                            <xctk:DoubleUpDown Grid.Column="2" x:Name="numUDPx2mm" x:FieldModifier="public" Value="1.0" Margin="5,2,0,2" Minimum="-100" Maximum="100" Increment="0.001" FontSize="15"/>
+                            <Label Grid.Column = "3" Content="mm/px"/>
+                        </Grid>
+                        <Grid Grid.Row="1" Margin="13,00,10,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="220"/>
+                                <ColumnDefinition Width="220"/>
+                            </Grid.ColumnDefinitions>
+                            <Border BorderThickness="0.5,0.5,0,0.5" BorderBrush="Gray" Margin="0,0,0,17">
+                                <CheckBox x:Name="ckbxIsSend2PLC" x:FieldModifier="public" VerticalContentAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" x:Name="stAddr" Orientation="Vertical">
+                                <Border BorderThickness="0.5" BorderBrush="Gray">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Address X : " Margin="3,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtAddrX" x:FieldModifier="public" Width="100" Margin="12,3,3,3" FontSize="15"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderThickness="0.5" BorderBrush="Gray">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Address Y : " Margin="3,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtAddrY" x:FieldModifier="public" Width="100" Margin="12,3,3,3" FontSize="15"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderThickness="0.5" BorderBrush="Gray">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Address CPL :" Margin="3,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtAddrCpl" x:FieldModifier="public" Width="100" Margin="0,3,3,3" FontSize="15"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" x:Name="stVal" Orientation="Vertical">
+                                <Border BorderThickness="0.5" BorderBrush="Gray">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Value X : " Width="90" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtValX" Text="0.00" IsReadOnly="True" Width="100" Margin="0,3,3,3" FontSize="15"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderThickness="0.5" BorderBrush="Gray">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Value Y : " Width="90" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtValY" Text="0.00" IsReadOnly="True" Width="100" Margin="0,3,3,3" FontSize="15"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderThickness="0.5" BorderBrush="Gray">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Value CPL : " Width="90" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="txtValCpl" Text="True" Width="100" Margin="0,3,3,3" FontSize="15"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
                 </Border>
             </Grid>
         </TabItem>

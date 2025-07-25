@@ -1,10 +1,15 @@
-﻿using System;
+﻿using Development;
+using nrt;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,8 +21,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using OpenCvSharp;
-using OpenCvSharp.Extensions;
 using VisionInspection;
 using Point = System.Windows.Point;
 using Rect = OpenCvSharp.Rect;
@@ -70,11 +73,15 @@ namespace VisionTools.ToolEdit
                 }
             }
         }
+        public SvImage OutputImage { get; set; } = new SvImage();
 
         public double OutScore = 0;
         public double OutTranslateX = 0;
         public double OutTranslateY = 0;
         public double OutRotation = 0;
+
+        public double OutOffsetX = 0d;
+        public double OutOffsetY = 0d;
         //Binding
         public event PropertyChangedEventHandler PropertyChanged;
         private double _priorityCreteria = 0.75;
@@ -88,13 +95,15 @@ namespace VisionTools.ToolEdit
         public string TxtOffsetX { get => _txtOffsetX; set { _txtOffsetX = value; OnPropertyChanged(nameof(TxtOffsetX)); } }
         public string TxtOffsetY { get => _txtOffsetY; set { _txtOffsetY = value; OnPropertyChanged(nameof(TxtOffsetY)); } }
         public string TxtRotate { get => _txtRotate; set { _txtRotate = value; OnPropertyChanged(nameof(TxtRotate)); } }
-        public bool IsUseROI { get => _isUseROI; set 
+        public bool IsUseROI
+        {
+            get => _isUseROI; set
             {
                 _isUseROI = value;
-                if(value == true)
+                if (value == true)
                 {
                     CanvasImg.Children.RemoveRange(1, CanvasImg.Children.Count - 1);
-                    inEle.ForEach(l =>  CanvasImg.Children.Add(l));
+                    inEle.ForEach(l => CanvasImg.Children.Add(l));
                 }
                 else
                 {
@@ -106,8 +115,19 @@ namespace VisionTools.ToolEdit
                     CanvasImg.Children.RemoveRange(1, CanvasImg.Children.Count - 1);
                 }
                 OnPropertyChanged(nameof(IsUseROI));
-            } }
+            }
+        }
         public bool IsUseROIEnable { get => _isUseROIEnable; set { _isUseROIEnable = value; OnPropertyChanged(nameof(IsUseROIEnable)); } }
+
+        public bool IsSendData2PLC
+        {
+            get => (bool)ckbxIsSend2PLC.IsChecked; set
+            {
+                ckbxIsSend2PLC.IsChecked = value;
+                stAddr.IsEnabled = value;
+                stVal.IsEnabled = value;
+            }
+        }
 
         private Mat mTransform2D = Mat.Eye(3, 3, MatType.CV_64FC1);
         public Mat Transform2D
@@ -452,7 +472,8 @@ namespace VisionTools.ToolEdit
                 {
                     Foreground = Brushes.Red,
                     Background = Brushes.Transparent,
-                    Content = String.Format("({0:F3}, {1:F3}, {2:F3}deg)", cpPattern.X, cpPattern.Y, cpPattern.Z)
+                    Content = String.Format("({0:F3}, {1:F3}, {2:F3}deg)", cpPattern.X, cpPattern.Y, cpPattern.Z),
+                    FontSize = 8,
                 };
                 Canvas.SetLeft(lbMaster, P0.X + 10d);
                 Canvas.SetTop(lbMaster, P0.Y + 10d);
@@ -533,7 +554,7 @@ namespace VisionTools.ToolEdit
                 logger.Create("Get ROI Error: " + ex.Message, ex);
                 return new Mat(0, 0, new MatType());
             }
-            
+
         }
         public void SavePattentImage(Mat img, string fileName)
         {
@@ -574,7 +595,7 @@ namespace VisionTools.ToolEdit
                 logger.Create("Load Pattern Image Error: " + ex.Message, ex);
                 return new Mat(0, 0, new MatType());
             }
-            
+
         }
 
         private Point RotatePoint(Point pointToRot, Point centerPoint, double angleInDeg)
@@ -593,7 +614,7 @@ namespace VisionTools.ToolEdit
             catch (Exception ex)
             {
                 logger.Create("Rotate Point Error: " + ex.Message, ex);
-                return new Point(0,0);
+                return new Point(0, 0);
             }
         }
         public void FitMasterImage()
@@ -754,7 +775,7 @@ namespace VisionTools.ToolEdit
             {
                 logger.Create("Cbx Image Error: " + ex.Message, ex);
             }
-            
+
         }
         private Line CreateLineThroughCenter(Vector dir, double cx, double cy, double width, double height)
         {
@@ -886,6 +907,92 @@ namespace VisionTools.ToolEdit
                 logger.Create("Draw Cross Error: " + ex.Message, ex);
             }
         }
+        private bool CheckDeviceDSyntax(string _address)
+        {
+            return Regex.IsMatch(_address, @"^D[1-9]\d*$");
+        }
+        private bool CheckDeviceMSyntax(string _address)
+        {
+            return Regex.IsMatch(_address, @"^M[1-9]\d*$");
+        }
+        private bool String2Enum(string strDev, out DeviceCode _devType, out string _strDevNo)
+        {
+            bool isDefined = false;
+            string letters = "";
+            _devType = DeviceCode.M;
+            _strDevNo = "";
+            try
+            {
+                foreach (char synx in strDev)
+                {
+                    if (char.IsLetter(synx)) { letters += synx; }
+                    else if (char.IsDigit(synx)) { _strDevNo += synx; }
+                }
+
+                isDefined = Enum.IsDefined(typeof(DeviceCode), letters);
+                if (isDefined)
+                {
+                    _devType = (DeviceCode)Enum.Parse(typeof(DeviceCode), letters);
+                }
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.Message);
+                logger.Create("Convert syntax error: " + ex.Message);
+            }
+            return isDefined;
+        }
+        private void SendDataOffset(string address, int dataOffset)
+        {
+            try
+            {
+                String2Enum(address, out DeviceCode _devType, out string _strDevNo);
+                UiManager.PLC1.device.WriteDoubleWord(_devType, int.Parse(_strDevNo), dataOffset);
+            }
+            catch (Exception ex)
+            {
+                logger.Create($"SendDataOffset to {address} Error: " + ex.Message);
+            }
+        }
+        private void SendBitComplete(string address, bool value)
+        {
+            try
+            {
+                String2Enum(address, out DeviceCode _devType, out string _strDevNo);
+                UiManager.PLC1.device.WriteBit(_devType, int.Parse(_strDevNo), value);
+            }
+            catch (Exception ex)
+            {
+                logger.Create($"SendBitComplete to {address} Error: " + ex.Message);
+            }
+        }
+        public Mat RenderCanvasToMat(Canvas canvas)
+        {
+            canvas.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+            canvas.Arrange(new System.Windows.Rect(canvas.DesiredSize));
+            canvas.UpdateLayout();
+            int width = runImage.Mat.Width;
+            int height = runImage.Mat.Height;
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap(
+                width,
+                height,
+                96, 96, // dpiX, dpiY
+                PixelFormats.Pbgra32);
+
+            rtb.Render(canvas);
+            BmpBitmapEncoder encoder = new BmpBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(rtb));
+            using (MemoryStream stream = new MemoryStream())
+            {
+                encoder.Save(stream);
+                stream.Position = 0;
+                using (System.Drawing.Bitmap bitmapImg = new System.Drawing.Bitmap(stream))
+                {
+                    return bitmapImg.ToMat();
+                }
+            }
+        }
         public void DisplayResult()
         {
             try
@@ -1010,6 +1117,17 @@ namespace VisionTools.ToolEdit
                     foreach (var ele in outEle)
                         CanvasImg.Children.Add(ele);
                     DrawCross(CanvasImg, new Point2d(resultBox.CP.X, resultBox.CP.Y), 20, 20, resultBox.CP.Z, Brushes.Green);
+
+                    CanvasImg.InvalidateVisual();
+                    if (runImage.Mat.Channels() < 3)
+                    {
+                        runImage.Mat = runImage.Mat.CvtColor(ColorConversionCodes.GRAY2RGB);
+                    }
+                    OutputImage.Mat = runImage.Mat.Clone();
+                    Cv2.Line(OutputImage.Mat, new OpenCvSharp.Point(0, (int)cpPattern.Y), new OpenCvSharp.Point(OutputImage.Mat.Width, (int)cpPattern.Y), Scalar.LightGreen, 2);
+                    Cv2.Line(OutputImage.Mat, new OpenCvSharp.Point((int)cpPattern.X, 0), new OpenCvSharp.Point(cpPattern.X, OutputImage.Mat.Height), Scalar.LightGreen, 2);
+                    Cv2.Line(OutputImage.Mat, new OpenCvSharp.Point((int)resultBox.CP.X - 12, (int)resultBox.CP.Y), new OpenCvSharp.Point((int)resultBox.CP.X + 12, (int)resultBox.CP.Y), Scalar.Red, 2);
+                    Cv2.Line(OutputImage.Mat, new OpenCvSharp.Point((int)resultBox.CP.X, (int)resultBox.CP.Y - 12), new OpenCvSharp.Point((int)resultBox.CP.X, (int)resultBox.CP.Y + 12), Scalar.Red, 2);
                 }
             }
             catch (Exception ex)
@@ -1021,7 +1139,7 @@ namespace VisionTools.ToolEdit
         private SvImage runImage = new SvImage();
         public override void Run()
         {
-            ShapeEditor shEdit = (oldSelect == 0) ? shEditSearch: shEditTrain;
+            ShapeEditor shEdit = (oldSelect == 0) ? shEditSearch : shEditTrain;
             shEdit.ReleaseElement();
             shEdit.KeyDown -= ShEditTrain_KeyDown;
             shEdit.LostKeyboardFocus -= ShEditTrain_LostKeyboardFocus;
@@ -1178,6 +1296,65 @@ namespace VisionTools.ToolEdit
                     TxtOffsetX = (OutTranslateX - cpPattern.X).ToString("F3");
                     TxtOffsetY = (OutTranslateY - cpPattern.Y).ToString("F3");
                     TxtRotate = (OutRotation - cpPattern.Z).ToString("F3");
+                    OutOffsetX = OutTranslateX - cpPattern.X;
+                    OutOffsetY = OutTranslateY - cpPattern.Y;
+
+                    if ((bool)ckbxIsUsePx2mm.IsChecked)
+                    {
+                        OutOffsetX *= (double)numUDPx2mm.Value;
+                        OutOffsetY *= (double)numUDPx2mm.Value;
+                    }
+                    OutOffsetX = Math.Round(OutOffsetX, 3);
+                    OutOffsetY = Math.Round(OutOffsetY, 3);
+                    txtValX.Text = OutOffsetX.ToString();
+                    txtValY.Text = OutOffsetY.ToString();
+
+                    if ((bool)ckbxIsSend2PLC.IsChecked)
+                    {
+                        if (!String.IsNullOrEmpty(txtAddrX.Text) && CheckDeviceDSyntax(txtAddrX.Text))
+                        {
+                            SendDataOffset(txtAddrX.Text, (int)(OutOffsetX * 1000));
+                        }
+                        else
+                        {
+                            MessageBox.Show("Address PLC Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            meaRunTime.Stop();
+                            toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Address PLC Empty or Error Syntax!");
+                            return;
+                        }
+                        if (!String.IsNullOrEmpty(txtAddrY.Text) && CheckDeviceDSyntax(txtAddrY.Text))
+                        {
+                            SendDataOffset(txtAddrY.Text, (int)(OutOffsetY * 1000));
+                        }
+                        else
+                        {
+                            MessageBox.Show("Address PLC Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            meaRunTime.Stop();
+                            toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Address PLC Empty or Error Syntax!");
+                            return;
+                        }
+                        if (!String.IsNullOrEmpty(txtAddrCpl.Text) && CheckDeviceMSyntax(txtAddrCpl.Text))
+                        {
+                            if (txtValCpl.Text.ToLower() == "true" || txtValCpl.Text.ToLower() == "false")
+                            {
+                                SendBitComplete(txtAddrCpl.Text, (txtValCpl.Text.ToLower() == "true" ? true : false));
+                            }
+                            else
+                            {
+                                MessageBox.Show("Value Bit Complete Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                meaRunTime.Stop();
+                                toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Value Bit Complete Error Syntax!");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Address PLC Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            meaRunTime.Stop();
+                            toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Address PLC Empty or Error Syntax!");
+                            return;
+                        }
+                    }
                 }
                 else
                 {
@@ -1185,9 +1362,12 @@ namespace VisionTools.ToolEdit
                     OutTranslateY = 0d;
                     OutRotation = 0d;
 
-                    TxtOffsetX = "0";
-                    TxtOffsetY = "0";
-                    TxtRotate = "0";
+                    TxtOffsetX = "0.00";
+                    TxtOffsetY = "0.00";
+                    TxtRotate = "0.00";
+
+                    txtValX.Text = "0.00";
+                    txtValY.Text = "0.00";
                     meaRunTime.Stop();
                     toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Score < Priority Creteria!");
                     return;
@@ -1235,7 +1415,7 @@ namespace VisionTools.ToolEdit
             {
                 runImage = this.InputImage.Clone(true);
             }
-            foreach(var pattern in patternLst)
+            foreach (var pattern in patternLst)
             {
                 if (pattern.PatternImage == null || pattern.PatternImage.Mat == null || pattern.PatternImage.Mat.Width <= 0 || pattern.PatternImage.Mat.Height <= 0)
                 {
@@ -1250,7 +1430,7 @@ namespace VisionTools.ToolEdit
             Point2d[] boundBox = new Point2d[4];
             OpenCvSharp.Point maxPointLast = new OpenCvSharp.Point();
             PatternData patternLast = new PatternData();
-            for(int j = 0; j < patternLst.Count; j++)
+            for (int j = 0; j < patternLst.Count; j++)
             {
                 double maxVal = 0;
                 OpenCvSharp.Point maxPoint = new OpenCvSharp.Point();
@@ -1280,12 +1460,12 @@ namespace VisionTools.ToolEdit
                 }
 
                 maxValLast = Math.Max(maxValLast, maxVal);
-                if(maxValLast == maxVal)
+                if (maxValLast == maxVal)
                 {
                     maxPointLast = maxPoint;
                     patternLast = patternLst[j];
-                }    
-            }    
+                }
+            }
 
             maxValLast = Math.Round(maxValLast, 3);
             if (maxValLast >= PriorityCreteria)
