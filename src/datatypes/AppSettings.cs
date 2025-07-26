@@ -21,7 +21,7 @@ namespace ITM_Semiconductor
 {
     class AppSettings
     {
-        //plc
+        //PLC
         public SettingDevice settingDevice;
         public SaveDevice selectDevice;
 
@@ -42,14 +42,13 @@ namespace ITM_Semiconductor
 
         private ModelSetting settingModel;
 
-        private MesSettings MesSettings;
+        public MesSettings MesSettings { get; set; } = new MesSettings();
 
         // Setting Scanner
 
 
         public RunSettings run { get; set; }
         public ModelSetting SettingModel { get => settingModel; set => settingModel = value; }
-        public MesSettings MesSettings1 { get => MesSettings; set => MesSettings = value; }
 
         public LotInData lotData { get; set; }
 
@@ -84,6 +83,7 @@ namespace ITM_Semiconductor
         {
             this.settingDevice = new SettingDevice();
             this.selectDevice = SaveDevice.Mitsubishi_MC_Protocol_Binary_TCP;
+            this.settingDeviceMesVs = new SettingDevice();
 
             this.currentModel = "Default";
             this.Jig = new MechanicalJig();
@@ -99,7 +99,7 @@ namespace ITM_Semiconductor
 
             this.run = new RunSettings();
 
-            this.MesSettings1 = new MesSettings();
+            this.MesSettings = new MesSettings();
 
             this.FTPClientSettings = new FTPClientSettings();
 
@@ -161,9 +161,9 @@ namespace ITM_Semiconductor
             {
                 _appSettings.SettingModel = new ModelSetting();
             }
-            if (_appSettings.MesSettings1 == null)
+            if (_appSettings.MesSettings == null)
             {
-                _appSettings.MesSettings1 = new MesSettings();
+                _appSettings.MesSettings = new MesSettings();
             }
             if (_appSettings.lotData == null)
             {

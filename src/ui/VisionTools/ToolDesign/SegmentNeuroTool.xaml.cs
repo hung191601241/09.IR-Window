@@ -44,9 +44,9 @@ namespace VisionTools.ToolDesign
         private void ToolBase_OnSaveTool(object sender, RoutedEventArgs e)
         {
             PgCamera pgCamera = UiManager.FindParentOfType<PgCamera>(this);
-            this.toolEdit.PredictInit();
-            this.toolEdit.FlowchartInit();
-            while (!toolEdit.isPdInitCompl || !toolEdit.isFcInitCompl) ;
+            //this.toolEdit.PredictInit();
+            //this.toolEdit.FlowchartInit();
+            //while (!toolEdit.isPdInitCompl || !toolEdit.isFcInitCompl) ;
             pgCamera?.SaveData(); 
         }
 

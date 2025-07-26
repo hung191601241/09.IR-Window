@@ -17,6 +17,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using ViDi2.Common;
 using VisionInspection;
 using Image = System.Windows.Controls.Image;
 using Path = System.IO.Path;
@@ -33,7 +35,6 @@ namespace VisionTools.ToolEdit
         public event RoutedEventHandler OnBtnRunClicked;
         private Dictionary<int, nrt.Predictor> predictors = new Dictionary<int, Predictor>();
         private Dictionary<int, nrt.Flowchart> flowcharts = new Dictionary<int, nrt.Flowchart>();
-        //private int deviceIdx = 0;
         private nrt.Status status;
         private List<NeuroFc> neuroFcLst = new List<NeuroFc>();
         public List<NeuroModel> modelList = new List<NeuroModel>();
@@ -151,13 +152,7 @@ namespace VisionTools.ToolEdit
                 MessageBox.Show("Score is Empty!!!");
                 return;
             }
-            
             CreatNewModel(txtModelName.Text, txtModelPath.Text, "", DeviceSelected, DevCbxIdx-1, Convert.ToInt32(xctScore), modelList.Count);
-            //if (UiManager.appSettings.CurrentModel.dLJobs == null)
-            //{
-            //    UiManager.appSettings.CurrentModel.dLJobs = new List<DLJob>();
-            //}
-            //UiManager.appSettings.CurrentModel.dLJobs.Add(dlJob);
         }
         private List<TextBox> txtModelNameList = new List<TextBox>();
         public void CreatNewModel(string name, string path, string pathRuntime, string devSelected, int deviceIdx, int Score, int index)
@@ -717,7 +712,7 @@ namespace VisionTools.ToolEdit
             }
             
         }
-        private bool DrawImage(Mat src, nrt.Rect rect, OIConverter oiConverter, out Mat dst)
+        private bool ProcessImageDet(Mat src, nrt.Rect rect, OIConverter oiConverter, out Mat dst)
         {
             dst = new Mat();
             try
@@ -765,7 +760,7 @@ namespace VisionTools.ToolEdit
                 return false;
             }
         }
-        private bool DrawSegmentImage(Mat src, nrt.Rect rect, OIConverter oiConverter, out Mat dst)
+        private bool ProcessImageSeg(Mat src, List<OpenCvSharp.Point> contour, nrt.Rect rect, OIConverter oiConverter, out Mat dst)
         {
             dst = new Mat();
             try
@@ -775,19 +770,43 @@ namespace VisionTools.ToolEdit
                     return false;
                 }
                 OpenCvSharp.Rect rectBound = new OpenCvSharp.Rect(rect.x, rect.y, rect.width, rect.height);
+                //Lấy góc của Contour
+                float degAngle = 0;
+                if (contour.Count >= 5)
+                {
+                    RotatedRect ellipse = Cv2.FitEllipse(contour);
+                    // Góc của blob (đơn vị: độ)
+                    degAngle = ellipse.Angle;
+                    //Biến đổi góc: Xoay ngược về mốc 90 thành 0 và đặt góc trong khoảng [0; 360)
+                    degAngle = ((degAngle - 90) + 360) % 360;
+                }
                 OIConvertShape oiShape = oiConverter.get_convert_shape();
                 switch (oiShape)
                 {
                     case OIConvertShape.ORIGINAL:
-                        src = new Mat(src, rectBound);
+                        //1.Tạo mask trắng(đen hết)
+                        using (Mat mask = Mat.Zeros(src.Size(), MatType.CV_8UC1))
+                        {
+                            // 2. Vẽ contour lên mask (trắng vùng contour)
+                            Cv2.FillPoly(mask, new[] { contour.ToArray() }, Scalar.White);
+                            // 3. Áp mask lên ảnh gốc (bitwise AND)
+                            using (Mat matRes = new Mat())
+                            {
+                                Cv2.BitwiseAnd(src.Clone(), src.Clone(), matRes, mask);
+                                // 4. Cắt vùng ảnh chứa sản phẩm 
+                                src = new Mat(matRes, rectBound);
+                                matRes.SaveImage("01. MatRes.bmp");
+                                src.SaveImage("01. src.bmp");
+                                mask.SaveImage("01. mask.bmp");
+                            }
+                        }
+                        src = GetROIRegion(src.Clone(), rectBound, degAngle);
                         break;
                     case OIConvertShape.BOX:
-                        int padding = oiConverter.get_padding();
-                        OpenCvSharp.Rect rectPadding = new OpenCvSharp.Rect(rect.x + padding, rect.y + padding, rect.width - padding * 2, rect.height - padding * 2);
-                        src = new Mat(src, rectPadding);
+                        src = new Mat(src, rectBound);
                         break;
                     case OIConvertShape.FITTED_BOX:
-                        //src.Rectangle(rectBound, Scalar.Blue, -1);
+                        src = GetROIRegion(src.Clone(), rectBound, degAngle);
                         break;
                 }
                 if (src.Width == 0 || src.Height == 0)
@@ -801,6 +820,58 @@ namespace VisionTools.ToolEdit
             {
                 logger.Create("Draw Image Error: " + ex.Message, ex);
                 return false;
+            }
+        }
+        public Mat GetROIRegion(Mat image, OpenCvSharp.Rect rectBound, double degAngle)
+        {
+            try
+            {
+                if (image == null || image.IsDisposed || rectBound == null) return null;
+                double radAngle = (degAngle * Math.PI) / 180d;
+
+                // Tính tọa độ 4 góc trước khi xoay
+                Point2d pLT = new Point2d(rectBound.Left, rectBound.Top);
+                Point2d centerPoint = new Point2d(rectBound.Left + rectBound.Right / 2, rectBound.Top + rectBound.Bottom / 2);
+                Point2d pRB = new Point2d(rectBound.Right, rectBound.Bottom);
+                Point2d pLB = new Point2d(rectBound.Left, rectBound.Bottom);
+                Point2d pRT = new Point2d(rectBound.Right, rectBound.Top);
+                // Tính tọa độ 4 góc sau khi xoay
+                Point2d pLTr = SvFunc.RotateAtCenter(pLT, centerPoint, radAngle);
+                Point2d pRBr = SvFunc.RotateAtCenter(pRB, centerPoint, radAngle);
+                Point2d pLBr = SvFunc.RotateAtCenter(pLB, centerPoint, radAngle);
+                Point2d pRTr = SvFunc.RotateAtCenter(pRT, centerPoint, radAngle);
+                Point2f center = new Point2f((float)pLTr.X, (float)pLTr.Y);
+
+                double T = Math.Atan2(pRTr.Y - pLTr.Y, pRTr.X - pLTr.X);
+                double H = Point2d.Distance(pLTr, pRTr);
+                double V = Point2d.Distance(pLTr, pLBr);
+
+                Mat Rmat = Cv2.GetRotationMatrix2D(center, T * 180 / Math.PI, 1);
+                Rmat.Set<double>(0, 2, Rmat.At<double>(0, 2) - center.X);
+                Rmat.Set<double>(1, 2, Rmat.At<double>(1, 2) - center.Y);
+
+                OpenCvSharp.Rect rect = new OpenCvSharp.Rect((int)center.X, (int)center.Y, (int)H, (int)V);
+
+                Mat templateImg = new Mat(rect.Size, image.Type());
+                Cv2.WarpAffine(image, templateImg, Rmat, rect.Size);
+                if (templateImg.Channels() > 3)
+                {
+                    Cv2.CvtColor(templateImg, templateImg, ColorConversionCodes.BGR2RGB);
+                    Cv2.CvtColor(templateImg, templateImg, ColorConversionCodes.RGB2BGR);
+                }
+                Rmat.Dispose();
+
+                if (templateImg.Cols == 0 || templateImg.Rows == 0)
+                {
+                    templateImg.Dispose();
+                    return null;
+                }
+                return templateImg;
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Get ROI Error: " + ex.Message, ex);
+                return null;
             }
         }
         public List<string> GetHardwareDevices1()
@@ -894,7 +965,7 @@ namespace VisionTools.ToolEdit
                     {
                         //Draw Image
                         OIConverter oiConverter = node.get_child(clsIdx).get_oiconverter();
-                        DrawImage(src, bbox.rect, oiConverter, out src);
+                        ProcessImageDet(src, bbox.rect, oiConverter, out src);
                     }
                 }
             }
@@ -921,9 +992,6 @@ namespace VisionTools.ToolEdit
                     {
                         score = scoreI;
                     }
-
-
-                    //Draw Image
                     nrt.Points points = blob.get_contour();
                     List<OpenCvSharp.Point> contour = new List<OpenCvSharp.Point>();
                     List<List<OpenCvSharp.Point>> contoursList = new List<List<OpenCvSharp.Point>> { contour };
@@ -932,8 +1000,18 @@ namespace VisionTools.ToolEdit
                         nrt.Point point = points.get(pi);
                         contour.Add(new OpenCvSharp.Point((int)point.x, (int)point.y));
                     }
-                    Cv2.DrawContours(src, contoursList, -1, Scalar.Red, 2, lineType: LineTypes.Link8);
-                    src.SaveImage("1.TestSeg.bmp");
+                    if (blob.has_child() || node.has_child(clsIdx))
+                    {
+                        //Draw Image
+                        OIConverter oiConverter = node.get_child(clsIdx).get_oiconverter();
+                        ProcessImageSeg(src, contour, blob.rect, oiConverter, out src);
+                    }
+                    else
+                    {
+                        //Draw Image
+                        Cv2.DrawContours(src, contoursList, -1, Scalar.Red, 2, lineType: LineTypes.Link8);
+                        src.SaveImage("1.TestSeg.bmp");
+                    }
                 }
             }
             catch (Exception ex)
@@ -953,7 +1031,7 @@ namespace VisionTools.ToolEdit
                     {
                         runImage.Mat = (ImgView.Source as BitmapSource).ToMat();
                         runImage.RegionRect.Rect = new OpenCvSharp.Rect(0, 0, (int)ImgView.Source.Width, (int)ImgView.Source.Height);
-                        if (runImage.Mat.Channels() > 3)
+                        if (runImage.Mat.Channels() != 3)
                         {
                             runImage.Mat = runImage.Mat.CvtColor(ColorConversionCodes.BGR2RGB);
                             runImage.Mat = runImage.Mat.CvtColor(ColorConversionCodes.RGB2BGR);
@@ -970,7 +1048,7 @@ namespace VisionTools.ToolEdit
                 {
                     runImage.Mat = (ImgView.Source as BitmapSource).ToMat();
                     runImage.RegionRect.Rect = new OpenCvSharp.Rect(0, 0, (int)ImgView.Source.Width, (int)ImgView.Source.Height);
-                    if (runImage.Mat.Channels() > 3)
+                    if (runImage.Mat.Channels() != 3)
                     {
                         runImage.Mat = runImage.Mat.CvtColor(ColorConversionCodes.BGR2RGB);
                         runImage.Mat = runImage.Mat.CvtColor(ColorConversionCodes.RGB2BGR);

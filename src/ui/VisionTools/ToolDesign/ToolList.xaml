@@ -27,7 +27,7 @@
             <Label x:Name="lbSaveImageTool" Content="SaveImage" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbEditRegionTool" Content="EditRegion" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbTemplateMatchTool" Content="TemplateMatch" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
-            <Label x:Name="lbTempMatchZeroTool" Content="TempMatchZeroTool" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbTempMatchZeroTool" Content="TempMatchZero" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbFixtureTool" Content="Fixture" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbContrastNBrightnessTool" Content="ContrastNBrightness" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbImageProcessTool" Content="ImageProcess" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>

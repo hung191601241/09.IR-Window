@@ -1,33 +1,20 @@
-﻿using Cognex.VisionPro;
-using Cognex.VisionPro.ToolBlock;
-using ITM_Semiconductor;
-using Microsoft.Win32;
-using MvCamCtrl.NET;
+﻿using Microsoft.Win32;
 using MVSDK_Net;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using VisionInspection;
 using Xceed.Wpf.AvalonDock.Controls;
-using Xceed.Wpf.Toolkit;
-using static MvCamCtrl.NET.MyCamera;
 using static MVSDK_Net.IMVDefine;
 
 namespace VisionTools.ToolEdit
@@ -529,45 +516,48 @@ namespace VisionTools.ToolEdit
             Mat img = src.Clone();
             try
             {
-                if ((bool)ckbxToGray.IsChecked)
+                this.Dispatcher.Invoke(() =>
                 {
-                    switch (SelectedGrayMode)
+                    if ((bool)ckbxToGray.IsChecked)
                     {
-                        case GrayMode.BGR2Gray:
-                            Cv2.CvtColor(img, img, ColorConversionCodes.BGR2GRAY);
+                        switch (SelectedGrayMode)
+                        {
+                            case GrayMode.BGR2Gray:
+                                Cv2.CvtColor(img, img, ColorConversionCodes.BGR2GRAY);
+                                break;
+                            case GrayMode.RGB2Gray:
+                                Cv2.CvtColor(img, img, ColorConversionCodes.RGB2GRAY);
+                                break;
+                            case GrayMode.BGR2RGB:
+                                Cv2.CvtColor(img, img, ColorConversionCodes.BGR2RGB);
+                                break;
+                        }
+                    }
+                    if ((bool)ckbxVFlip.IsChecked)
+                    {
+                        Cv2.Flip(img, img, FlipMode.X);
+                    }
+                    if ((bool)ckbxHFlip.IsChecked)
+                    {
+                        Cv2.Flip(img, img, FlipMode.Y);
+                    }
+                    switch (SelectedRotateMode)
+                    {
+                        case RotateMode.Rotate0:
                             break;
-                        case GrayMode.RGB2Gray:
-                            Cv2.CvtColor(img, img, ColorConversionCodes.RGB2GRAY);
+                        case RotateMode.Rotate90:
+                            Cv2.Transpose(img, img);
+                            Cv2.Flip(img, img, FlipMode.Y);
                             break;
-                        case GrayMode.BGR2RGB:
-                            Cv2.CvtColor(img, img, ColorConversionCodes.BGR2RGB);
+                        case RotateMode.Rotate180:
+                            Cv2.Flip(img, img, FlipMode.XY);
+                            break;
+                        case RotateMode.Rotate270:
+                            Cv2.Transpose(img, img);
+                            Cv2.Flip(img, img, FlipMode.X);
                             break;
                     }
-                }
-                if ((bool)ckbxVFlip.IsChecked)
-                {
-                    Cv2.Flip(img, img, FlipMode.X);
-                }
-                if ((bool)ckbxHFlip.IsChecked)
-                {
-                    Cv2.Flip(img, img, FlipMode.Y);
-                }
-                switch (SelectedRotateMode)
-                {
-                    case RotateMode.Rotate0:
-                        break;
-                    case RotateMode.Rotate90:
-                        Cv2.Transpose(img, img);
-                        Cv2.Flip(img, img, FlipMode.Y);
-                        break;
-                    case RotateMode.Rotate180:
-                        Cv2.Flip(img, img, FlipMode.XY);
-                        break;
-                    case RotateMode.Rotate270:
-                        Cv2.Transpose(img, img);
-                        Cv2.Flip(img, img, FlipMode.X);
-                        break;
-                }
+                });
             }
             catch(Exception ex)
             {
@@ -810,7 +800,7 @@ namespace VisionTools.ToolEdit
                     }
                     else
                     {
-                        //logger.Create("Camera Trigger Err - Have no Data from camera - Image is null");
+                        logger.Create("Camera Trigger Err: Have no Data from camera - Image is null");
                         IsStopCamera = true;
                         return;
                     }
@@ -819,7 +809,7 @@ namespace VisionTools.ToolEdit
                 }
                 catch (Exception ex)
                 {
-                    //logger.Create(ex.Message.ToString());
+                    logger.Create("Camera Trigger Err: " + ex.Message.ToString());
                 }
             }
 

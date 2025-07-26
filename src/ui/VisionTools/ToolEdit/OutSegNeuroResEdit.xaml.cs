@@ -116,7 +116,6 @@ namespace VisionTools.ToolEdit
             {
                 ResultInputLst.Clear();
             } 
-                
         }
 
         private void BtnRefreshTb_Click(object sender, RoutedEventArgs e)

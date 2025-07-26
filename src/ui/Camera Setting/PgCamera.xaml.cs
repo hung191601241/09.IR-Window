@@ -709,7 +709,13 @@ namespace VisionInspection
             this.LoadJob();
             oldIdxJob = cbxJob.SelectedIndex + 1;
         }
-        
+        private void DisposeVidiTools(IEnumerable<VidiCognexTool> tools)
+        {
+            if(tools.Count() > 0)
+                foreach (var tool in tools)
+                    tool.toolEdit.Control?.Dispose();
+        }
+
         private void ToolArea_OnChildrenChanged(object sender, RoutedEventArgs e)
         {
             UpdateDisplayOutTool();
@@ -923,8 +929,8 @@ namespace VisionInspection
         }
         private void MnItAddNewSub_Click(object sender, RoutedEventArgs e)
         {
-            if (!((lbVP.Parent as DockPanel).Parent is Expander expdVP)) return;
-            if (!(expdVP.Content is StackPanel stVP)) return;
+            if ((lbVP.Parent as DockPanel).Parent is not Expander expdVP) return;
+            if (expdVP.Content is not StackPanel stVP) return;
             //Skip VP Main & Input Trigger
             CreateSubProgram(0, stVP.Children.Count - 1, stVP);
         }
@@ -933,15 +939,24 @@ namespace VisionInspection
             ContextMenu cm = (sender as MenuItem).Parent as ContextMenu;
             if (cm.PlacementTarget is Label lbVsProgram)
             {
-                if (!((lbVsProgram.Parent as DockPanel).Parent is Expander expdVPn)) return;
+                if ((lbVsProgram.Parent as DockPanel).Parent is not Expander expdVPn) return;
                 lbVsProgram.MouseRightButtonDown -= LbVP_MouseRightButtonDown;
                 //Skip 2 Children is Edit Job and Label
-                int idxVP = stVisionProgram.Children.IndexOf(expdVPn) - 2;
+                int idxVPn = stVisionProgram.Children.IndexOf(expdVPn) - 2;
+
+                //VidiCognexTool là TH đặc biệt, cần Dispose Control trước khi load Job mới
+                var toolAreaGr = toolAreaGrs[idxVPn];
+                // Dispose tool main
+                DisposeVidiTools(toolAreaGr.ToolAreaMain.Children.OfType<VidiCognexTool>());
+                foreach (var sub in toolAreaGr.ToolAreaSubs)
+                {
+                    DisposeVidiTools(sub.Children.OfType<VidiCognexTool>());
+                }
+
+                toolAreaGrs.RemoveAt(idxVPn);
                 stVisionProgram.Children.Remove(expdVPn);
-                toolAreaGrs.RemoveAt(idxVP);
                 UpdateDisplayOutTool();
                 GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
         private void MnItRenameSubVP_Click(object sender, RoutedEventArgs e)
@@ -972,9 +987,21 @@ namespace VisionInspection
         }
         private void MnItDeleteSubVP_Click(object sender, RoutedEventArgs e)
         {
-            if (!((lbMainSub.Parent as DockPanel).Parent is Expander expdSub)) return;
-            if (!(expdSub.Parent is StackPanel stVP)) return;
+            if ((lbMainSub.Parent as DockPanel).Parent is not Expander expdSub) return;
+            if (expdSub.Parent is not StackPanel stVP) return;
+            if (stVP.Parent is not Expander expdVPn) return;
             lbMainSub.MouseRightButtonDown -= LbSub_MouseRightButtonDown;
+
+            //Skip 2 Children is Edit Job and Label
+            int idxVPn = stVisionProgram.Children.IndexOf(expdVPn) - 2;
+            //Skip 2 Children is InpitTrigger and Main Program
+            int idxSub = stVP.Children.IndexOf(expdSub) - 2;
+
+            //VidiCognexTool là TH đặc biệt, cần Dispose Control trước khi load Job mới 
+            DisposeVidiTools(toolAreaGrs[idxVPn].ToolAreaSubs[idxSub].Children.OfType<VidiCognexTool>());
+
+            //Remove Sub in toolAreaGrs
+            toolAreaGrs[idxVPn].ToolAreaSubs.RemoveAt(idxSub);
             //Remove Label Sub
             stVP.Children.Remove(expdSub);
             GC.Collect();
@@ -1497,25 +1524,11 @@ namespace VisionInspection
             //VidiCognexTool là TH đặc biệt, cần Dispose Control trước khi load Job mới 
             foreach (var toolAreaGr in toolAreaGrs)
             {
-                List<VidiCognexTool> vidiToolMains = toolAreaGr.ToolAreaMain.Children.OfType<VidiCognexTool>().ToList();
-                if(vidiToolMains.Count > 0)
+                DisposeVidiTools(toolAreaGr.ToolAreaMain.Children.OfType<VidiCognexTool>());
+                foreach (var sub in toolAreaGr.ToolAreaSubs)
                 {
-                    foreach(var tool in vidiToolMains)
-                    {
-                        tool.toolEdit.Control?.Dispose();
-                    }    
-                }  
-                for (int i = 0; i < toolAreaGr.ToolAreaSubs.Count; i++)
-                {
-                    List<VidiCognexTool> vidiToolSubs = toolAreaGr.ToolAreaSubs[i].Children.OfType<VidiCognexTool>().ToList();
-                    if (vidiToolSubs.Count > 0)
-                    {
-                        foreach (var tool in vidiToolSubs)
-                        {
-                            tool.toolEdit.Control?.Dispose();
-                        }
-                    }
-                }    
+                    DisposeVidiTools(sub.Children.OfType<VidiCognexTool>());
+                }
             }   
             
             toolAreaGrs.ForEach(t => t.ToolAreaSubs.Clear());
@@ -1525,8 +1538,8 @@ namespace VisionInspection
             for (int i = 0; i < this.curVsProgram.vsProgramNs.Count; i++)
             {
                 stVisionProgram.Children.Add(CreateVisionProgram(i, true));
-                if (!(stVisionProgram.Children[i + 2] is Expander expdVP)) return;
-                if (!(expdVP.Content is StackPanel stVP)) return;
+                if (stVisionProgram.Children[i + 2] is not Expander expdVP) return;
+                if (expdVP.Content is not StackPanel stVP) return;
                 for (int j = 0; j < this.curVsProgram.vsProgramNs[i].vsSubs.Count; j++)
                 {
                     CreateSubProgram(i, j, stVP, true);
@@ -1554,8 +1567,8 @@ namespace VisionInspection
             for (int i = 2; i < stVisionProgram.Children.Count; i++)
             {
                 int idxVPn = i - 2;
-                if (!(stVisionProgram.Children[i] is Expander expdVP)) return;
-                if (!(expdVP.Content is StackPanel stVP)) return;
+                if (stVisionProgram.Children[i] is not Expander expdVP) return;
+                if (expdVP.Content is not StackPanel stVP) return;
 
                 DockPanel dkPnVP = expdVP.Header as DockPanel;
                 Label lbVP = dkPnVP.Children.OfType<Label>().FirstOrDefault();
@@ -2325,14 +2338,14 @@ namespace VisionInspection
                 }
                 else if(tool.ToolType == VisionToolType.SEGMENTNEURO)
                 {
-                    if (!(tool is SegmentNeuroTool Tool)) { continue; }
+                    if (tool is not SegmentNeuroTool Tool) { continue; }
                     SegmentNeuroSetting toolSetting = new SegmentNeuroSetting();
                     Tool.toolEdit.modelList.ForEach(model => toolSetting.modelNeuroes.Add(model));
                     vsMnSb.segmentNeuroSettings.Add(toolSetting);
                 }
                 else if (tool.ToolType == VisionToolType.VIDICOGNEX)
                 {
-                    if (!(tool is VidiCognexTool Tool)) { continue; }
+                    if (tool is not VidiCognexTool Tool) { continue; }
                     VidiCognexSetting toolSetting = new VidiCognexSetting()
                     {
                         deviceName = Tool.toolEdit.DeviceSelected,
@@ -2343,7 +2356,7 @@ namespace VisionInspection
                 }
                 else if (tool.ToolType == VisionToolType.VISIONPRO)
                 {
-                    if (!(tool is VisionProTool Tool)) { continue; }
+                    if (tool is not VisionProTool Tool) { continue; }
                     VisionProSetting toolSetting = new VisionProSetting()
                     {
                         path = Tool.toolEdit.TxtVppPath.Text,
