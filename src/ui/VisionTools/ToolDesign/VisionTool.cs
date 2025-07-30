@@ -24,6 +24,7 @@ namespace VisionTools.ToolDesign
         CONTRASTnBRIGHTNESS = 6,
         BLOB = 7,
         SAVEIMAGE = 8,
+        IMAGEBUFF = 9,
 
         //Key Tool
         SEGMENTNEURO = 50,
@@ -36,6 +37,7 @@ namespace VisionTools.ToolDesign
         OUTACQUISRES = 102,
         OUTSEGNEURORES = 103,
         OUTVIDICOGRES = 104,
+        OUTCHECKPRODUCT = 105,
     }
     public class VisionTool : Grid
     {

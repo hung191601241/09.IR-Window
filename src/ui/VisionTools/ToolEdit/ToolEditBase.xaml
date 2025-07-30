@@ -8,18 +8,22 @@
              mc:Ignorable="d" 
              x:Name="ToolBase"
              d:DesignHeight="600" d:DesignWidth="1200">
+    <UserControl.Resources>
+        <ContextMenu x:Key="cmRegion">
+        </ContextMenu>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition Height="20*"/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="1" Background="#FF8A8A8A">
+        <Grid x:Name="gridMain" Grid.Row="1" Background="#FF8A8A8A">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="500"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="1" Background="DimGray">
+            <Grid Grid.Column="1" Background="DimGray" Panel.ZIndex="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="25"/>
                     <RowDefinition/>
@@ -80,9 +84,7 @@
                     </Border>
                 </Grid>
             </Grid>
-            <!--<Grid Background="{Binding BackgroundBase, ElementName=ToolBase}">
-                <ContentPresenter Content="{Binding TabCtrlCusContent, ElementName=ToolBase}"/>
-            </Grid>-->
+            
             <Grid x:Name="gridBase" x:FieldModifier="public">
                 
             </Grid>

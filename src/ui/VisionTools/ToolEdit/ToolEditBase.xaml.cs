@@ -16,6 +16,7 @@ using OpenCvSharp.Extensions;
 using Point = System.Windows.Point;
 using Microsoft.Win32;
 using System.Threading;
+using VisionTools.ToolDesign;
 
 namespace VisionTools.ToolEdit
 {
@@ -31,6 +32,10 @@ namespace VisionTools.ToolEdit
         private bool _bitStatus = false;
         public event EventHandler BitStatusChanged;
         public event RoutedEventHandler OnSaveTool;
+        public event RoutedEventHandler OnPropertyRoi;
+        public event RoutedEventHandler OnDeleteRoi;
+        public event RoutedEventHandler OnMatrixRoi;
+        public List<MenuItem> MnItems = new List<MenuItem>();
         public bool isImgPath = false;
 
 
@@ -88,21 +93,85 @@ namespace VisionTools.ToolEdit
         {
             InitializeComponent();
             TransFormCoordinate();
+            CreateCm();
             btnLoadTool.Click += BtnLoadTool_Click;
             btnSaveTool.Click += BtnSaveTool_Click;
             btnRun.Click += BtnRun_Click;
+            this.Loaded += ToolEditBase_Loaded;
             canvasImg.SizeChanged += (sender, e) => FitImage();
 
             ToolStatus = (Brush)new BrushConverter().ConvertFromString("#FFE90E0E");
             TimeRunText = string.Format("{0:F2}ms", 0);
         }
-        
         protected void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] String propertyName = "")
         {
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+        private void CreateCm()
+        {
+            MenuItem deleteItem = new MenuItem
+            {
+                Name = "deleteItem",
+                Header = "Delete",
+                Background = Brushes.Transparent,
+                Foreground = Brushes.Black,
+            };
+            deleteItem.Click += DeleteItem_Click;
+            MenuItem createMatrixItem = new MenuItem
+            {
+                Name = "createMatrixItem",
+                Header = "Create Matrix",
+                Background = Brushes.Transparent,
+                Foreground = Brushes.Black,
+            };
+            createMatrixItem.Click += CreateMatrixItem_Click;
+            MenuItem propertyItem = new MenuItem
+            {
+                Name = "propertyItem",
+                Header = "Property",
+                Background = Brushes.Transparent,
+                Foreground = Brushes.Black,
+            };
+            propertyItem.Click += PropertyRoi_Click;
+
+            MnItems.Add(deleteItem);
+            MnItems.Add(createMatrixItem);
+            MnItems.Add(propertyItem);
+        }
+        private void PropertyRoi_Click(object sender, RoutedEventArgs e)
+        {
+            OnPropertyRoi?.Invoke(sender, e);
+        }
+
+        private void CreateMatrixItem_Click(object sender, RoutedEventArgs e)
+        {
+            OnMatrixRoi?.Invoke(sender, e);
+        }
+
+        private void DeleteItem_Click(object sender, RoutedEventArgs e)
+        {
+            OnDeleteRoi?.Invoke(sender, e);
+        }
+        private void ToolEditBase_Loaded(object sender, RoutedEventArgs e)
+        {
+            ContextMenu cm = this.FindResource("cmRegion") as ContextMenu;
+            GridBase gridBase = gridMain.Children.OfType<GridBase>().FirstOrDefault();   
+            if(gridBase is TempMatchZeroEdit || gridBase is TemplateMatchEdit)
+            {
+                cm.Items.Clear();
+                cm.Items.Add(MnItems[2]);
+            }    
+            else if(gridBase is EditRegionEdit)
+            {
+                cm.Items.Clear();
+                foreach(var m in MnItems)
+                {
+                    cm.Items.Add(m);
+                } 
+            }     
         }
         private void BtnLoadTool_Click(object sender, RoutedEventArgs e)
         {
@@ -356,7 +425,6 @@ namespace VisionTools.ToolEdit
             
             canvasImg.Children.Add(lineY);
         }
-
         private void ckbCentLine_Unchecked(object sender, RoutedEventArgs e)
         {
             List<Line> linesDelete = new List<Line>();    
@@ -369,5 +437,6 @@ namespace VisionTools.ToolEdit
                 }
             }
         }
+        
     }
 }

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:VisionTools.ToolEdit" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="500">
+             d:DesignHeight="600" d:DesignWidth="500" Background="#FF8A8A8A">
     <TabControl Background="White">
         <TabControl.ItemContainerStyle>
             <Style TargetType="TabItem">
@@ -15,23 +15,6 @@
             </Style>
         </TabControl.ItemContainerStyle>
         <TabControl.Resources>
-            <ContextMenu x:Key="cmRegion">
-                <MenuItem x:Name="deleteItem" Background="Transparent" Foreground="Black" Header="Delete" Click="DeleteItem_Click">
-                    <MenuItem.Icon>
-                        <Image></Image>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem x:Name="createMatrixItem" Background="Transparent" Foreground="Black" Header="Creat ROI matrix" Click="CreateMatrixItem_Click">
-                    <MenuItem.Icon>
-                        <Image></Image>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem x:Name="propertyItem" Background="Transparent" Foreground="Black" Header="Property" Click="PropertyItem_Click">
-                    <MenuItem.Icon>
-                        <Image></Image>
-                    </MenuItem.Icon>
-                </MenuItem>
-            </ContextMenu>
             <Style TargetType="{x:Type Label}">
                 <Setter Property="FontSize" Value="15"/>
             </Style>
@@ -75,8 +58,8 @@
                 <Border Grid.Row="1" BorderBrush="#FF8A8A8A" BorderThickness="1">
                     <StackPanel >
                         <StackPanel Orientation="Horizontal" Height="40" HorizontalAlignment="Center" Margin="10, 10,10,0">
-                            <Button x:Name="btnCreateROI" Content="Create Region" Margin="2,5,2,0" Width="230"/>
-                            <Button x:Name="btnDeleteAllROI" Content="Delete All Region" Margin="2,5,2,0" Width="230"/>
+                            <Button x:Name="btnCreateROI" Content="Create Region" Margin="2,5,2,0" Width="230" Click="BtnCreateROI_Click"/>
+                            <Button x:Name="btnDeleteAllROI" Content="Delete All Region" Margin="2,5,2,0" Width="230" Click="BtnDeleteAllROI_Click"/>
                         </StackPanel>
                         <Border BorderBrush="#FF8A8A8A" BorderThickness="1" Width="464" HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Margin="5,10,5,15">
@@ -92,18 +75,18 @@
                                 <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
-                            <Button x:Name="btnMoveROILeft" Margin="5,14,5,14">
+                            <Button x:Name="btnMoveROILeft" Margin="5,14,5,14" Click="BtnMoveROILeft_Click">
                                 <Path Data="M 121.80644,181.02422 59.673309,144.94692 121.25982,109.23405Z"/>
                             </Button>
                             <StackPanel Grid.Column="1" Orientation="Vertical">
-                                <Button x:Name="btnMoveROIUp" Height="20" Margin="5,1,5,5">
+                                <Button x:Name="btnMoveROIUp" Height="20" Margin="5,1,5,5" Click="BtnMoveROIUp_Click">
                                     <Path Data="m 56.66687,177.83558 36.0773,-62.13313 35.71288,61.58651z"/>
                                 </Button>
-                                <Button x:Name="btnMoveROIDown" Height="20" Margin="5,3,5,0">
+                                <Button x:Name="btnMoveROIDown" Height="20" Margin="5,3,5,0" Click="BtnMoveROIDown_Click">
                                     <Path Data="M 126.63496,114.06257 90.557659,176.1957 54.844788,114.60919Z"/>
                                 </Button>
                             </StackPanel>
-                            <Button x:Name="btnMoveROIRight" Grid.Column="2" Margin="5,14,5,14">
+                            <Button x:Name="btnMoveROIRight" Grid.Column="2" Margin="5,14,5,14" Click="BtnMoveROIRight_Click">
                                 <Path Data="m 59.673307,109.23405 62.133133,36.0773 -61.586513,35.71287z"/>
                             </Button>
                         </Grid>
@@ -193,7 +176,7 @@
 
                             </DataGrid>
                         </ScrollViewer>
-                        <Button x:Name="btnRefresh" Margin="400,10,0, 0" HorizontalAlignment="Left" Height="30" Width="80">
+                        <Button x:Name="btnRefresh" Margin="400,10,0, 0" HorizontalAlignment="Left" Height="30" Width="80" Click="BtnRefresh_Click">
                             <StackPanel Orientation="Horizontal">
                                 <Image Height="16" Width="16" Source="/src/ui/Images/reset.png" ></Image>
                                 <Label Foreground="White" Content="Refresh" Padding="5,0,0,1"></Label>

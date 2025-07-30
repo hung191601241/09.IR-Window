@@ -81,7 +81,6 @@
     <Grid Background="#333333">
         <Grid.RowDefinitions>
             <RowDefinition Height="90*"></RowDefinition>
-            <RowDefinition Height="10*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -503,7 +502,7 @@ StrokeThickness="3" />
                                                     </ScrollViewer>
                                                 </Expander>
                                             </StackPanel>
-                                            
+
                                         </Expander>
 
 
@@ -524,57 +523,5 @@ StrokeThickness="3" />
                       ResizeBehavior="PreviousAndNext"
                       ShowsPreview="True"/>
         </Grid>
-        <Grid Grid.Row="1">
-            <Grid.Resources>
-                <Style TargetType="Button" BasedOn="{StaticResource mButton}">
-                    <Setter Property="FontSize" Value="24" />
-                    <Setter Property="FontWeight" Value="Bold" />
-                    <Setter Property="Margin" Value="10,10,10,10" />
-                </Style>
-                <Style TargetType="ItemsControl" x:Key="LogViewerStyle">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate>
-                                <ScrollViewer CanContentScroll="True">
-                                    <ItemsPresenter/>
-                                </ScrollViewer>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="ItemsPanel">
-                        <Setter.Value>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel IsItemsHost="True"/>
-                            </ItemsPanelTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Grid.Resources>
-            <DockPanel Background="Black">
-                <ItemsControl ItemsSource="{Binding LogEntries}" Style="{StaticResource LogViewerStyle}" RenderTransformOrigin="0.5,0.5">
-                    <ItemsControl.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform/>
-                            <SkewTransform/>
-                            <RotateTransform Angle="1.253"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </ItemsControl.RenderTransform>
-                    <ItemsControl.Template>
-                        <ControlTemplate>
-                            <ScrollViewer CanContentScroll="True" ScrollChanged="ScrollViewer_ScrollChanged">
-                                <ItemsPresenter/>
-                            </ScrollViewer>
-                        </ControlTemplate>
-                    </ItemsControl.Template>
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel IsItemsHost="True"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-            </DockPanel>
-        </Grid>
-
     </Grid>
 </Page>

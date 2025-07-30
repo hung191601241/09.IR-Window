@@ -19,7 +19,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using VisionInspection;
-using VisionTCPClient;
 using VisionTools.ToolDesign;
 using VisionTools.ToolEdit;
 using Point = System.Windows.Point;
@@ -77,12 +76,11 @@ namespace VisionInspection
         {
             this.clock = new System.Timers.Timer(1000);
             this.clock.AutoReset = true;
-            this.clock.Elapsed += this.Clock_Elapsed; 
+            this.clock.Elapsed += this.Clock_Elapsed;
 
             StartRun();
             CallReadPLC();
             clock.Start();
-            LoadMatrixPoint();
         }
         private void PgMainVision_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -451,8 +449,6 @@ namespace VisionInspection
 
                     IsRunning = true;
                     RunThread();
-                    ClearAll();
-                    Step = STEP.GetPrdPos;
                 }
                 catch (Exception ex)
                 {
@@ -477,171 +473,37 @@ namespace VisionInspection
                 logger.Create("Start thread Auto loop Err : " + ex.ToString());
             }
         }
-        private bool ResetJobPLC()
-        {
-            bool ret = true;
-            try
-            {
-                ret &= UiManager.PLC1.device.WriteWord(UiManager.appSettings.commProperty.selectDevJob, int.Parse(UiManager.appSettings.commProperty.addrJob), 0);
-                ret &= UiManager.PLC1.device.WriteWord(UiManager.appSettings.commProperty.selectDevJigPos, int.Parse(UiManager.appSettings.commProperty.addrJigPos), 0);
-                if (ret)
-                {
-                    AddLog($"Product Point: {UiManager.appSettings.commProperty.selectDevJob}{UiManager.appSettings.commProperty.addrJob} = 0");
-                    AddLog($"Jig Point: {UiManager.appSettings.commProperty.selectDevJigPos}{UiManager.appSettings.commProperty.addrJigPos} = 0");
-                    AddLog("----------------------");
-                }
-                else
-                {
-                    AddLog($"Clear Data Error!");
-                    AddLog($"Check Connect to PLC!");
-                    AddLog("----------------------");
-                }    
-                    
-            }
-            catch (Exception ex)
-            {
-                logger.Create(String.Format("Reset Change Job Device in PLC Error: " + ex.Message));
-                return false;
-            }
-            return ret;
-        }
 
         private bool vsComplete = false;
-        private int idxOldJob = 0, prdPos = 0, jigPosPLC = 0;
-        private int countImg = 0;
-        private List<int> JigPosLst = new List<int>();
-        private DataVsFormat[] DataVsBuffs = new DataVsFormat[5];
-        private List<DataVsFormat> DataVsSearches = new List<DataVsFormat>();
-        private STEP Step = 0;
-        private async void RunManager()
+        private void RunManager()
         {
             try
             {
-                //Kiểm tra bit Clear từ PLC ở đầu mỗi vòng lặp
-                if (GetBitClrAll(out bool res) && res)
+                DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[0].selectDevIn;
+                string addrIn = pgCamera.curVsProgram.vsProgramNs[0].addrIn;
+                GetTriggerVision(devIn, addrIn, out READ_VISION_TRIG);
+                if (READ_VISION_TRIG && !Flag1)
                 {
-                    Step = STEP.ClearAll;
-                }    
-                switch (Step)
-                {
-                    case STEP.ClearAll:
-                        ClearAll();
-                        AddLog("CLEAR ALL!");
-                        if(SetBitClrAllOK(false))
-                        {
-                            Step = STEP.Wait;
-                        }    
-                        break;
-                    case STEP.Wait:
-                        if (GetChangeJob(out prdPos) && prdPos != 0)
-                        {
-                            DataVsSearches.Clear();
-                            GC.Collect();
-                            Step = STEP.GetPrdPos;
-                        }
-                        break;
-                    case STEP.GetPrdPos:
-                        if (GetChangeJob(out prdPos) && prdPos != 0)
-                        {
-                            if (idxOldJob != prdPos)
-                            {
-                                Step = STEP.SetVisionJob;
-                                this.Dispatcher.Invoke(() =>
-                                {
-                                    foreach (var ele in gridView.Children)
-                                    {
-                                        (ele as Border).Background = (Brush)new BrushConverter().ConvertFromString("#fff8dc");
-                                    }
-                                });
-                            }    
-                            else
-                                Step = STEP.GetJigPosPLC;
-                        }
-                        break;
-                    case STEP.GetJigPosPLC:
-                        AddLog($"Check Point: {UiManager.appSettings.commProperty.selectDevJob}{UiManager.appSettings.commProperty.addrJob} = {prdPos}");
-                        if(GetJigPos(out jigPosPLC) && jigPosPLC != 0)
-                        {
-                            AddLog($"Jig Pos: {UiManager.appSettings.commProperty.selectDevJigPos}{UiManager.appSettings.commProperty.addrJigPos} = {jigPosPLC}");
-                            CreateImageBuff();
-                            ClearImageView();
-                            Step = STEP.TriggerVision;
-                        }
-                        break;
-                    case STEP.SetVisionJob:
-                        SetVisionJob();
-                        Step = STEP.GetJigPosPLC;
-                        break;
-                    case STEP.TriggerVision:
-                        if (pgCamera.curVsProgram.vsProgramNs.Count == 0)
-                        {
-                            AddLog("Have no VP in Current Job");
-                            Step = STEP.VisionComplete;
-                        }
-                        //Quét qua tất cả Input Trigger
-                        for (int i = 0; i < pgCamera.curVsProgram.vsProgramNs.Count; i++)
-                        {
-                            DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[i].selectDevIn;
-                            string addrIn = pgCamera.curVsProgram.vsProgramNs[i].addrIn;
-                            GetTriggerVision(devIn, addrIn, out READ_VISION_TRIG);
-                            if (READ_VISION_TRIG && !Flag1)
-                            {
-                                AddLog($"TRIGGER: {devIn}{addrIn} = ON");
-                                vsComplete = false;
-                                Flag1 = true;
-                                await Task.Run(() =>
-                                {
-                                    this.RunManagerVision_S26(i);
-                                    Flag1 = false;
-                                    countImg++;
-                                });
-                                while (!vsComplete) ;
-                                //Clear Bit Trigger Vision
-                                if (SetTriggerVision(devIn, addrIn, false))
-                                    AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
-                                //Clear thanh ghi chứa giá trị Check Point trên PLC khi nhận đủ 5 ảnh
-                                if (countImg == JigPosLst.Count)
-                                {
-                                    Step = STEP.VisionComplete;
-                                }
-                            }
-                        }
-                        break;
-                    case STEP.VisionComplete:
-                        DATACheck DataCheck = await GetDataVision(DataVsBuffs);
-                        var Ready = await UiManager.MesVsService.SendReady(DataCheck);
-                        if (!Ready)
-                        {
-                            AddLog("Connect Fail. Server no Responding");
-                            goto EndMesVs;
-                        }
-                        bool SendData = await UiManager.MesVsService.SendDataVision(DataCheck);
-                        if (SendData)
-                        {
-                            AddLog("Data sent successfully.");
-                        }
-                        else
-                        {
-                            AddLog("Data sent Fail.");
-                        }
-                    EndMesVs:
-                        Thread.Sleep(1000);
-                        if (GetBitClrAll(out bool val) && val)
-                            Step = STEP.ClearAll;
-                        else
-                        {
-                            ResetJobPLC();
-                            countImg = 0;
-                            Step = STEP.GetPrdPos;
-                        }    
-                        break;
-                }    
+                    AddLog($"TRIGGER: {devIn}{addrIn} = ON");
+                    vsComplete = false;
+                    Flag1 = true;
+                    Task.Run(() =>
+                    {
+                        this.RunManagerVision_Align(0);
+                        vsComplete = true;
+                        Flag1 = false;
+                    });
+                    while (!vsComplete) ;
+                    //Clear Bit Trigger Vision
+                    if (SetTriggerVision(devIn, addrIn, false))
+                        AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
+                }
                 Thread.Sleep(10);
                 CallThreadStart();
             }
             catch (Exception ex)
             {
-                logger.Create($"Auto Run Manager Error : +{ex}");
+                logger.Create($"Auto Run Manager Error : {ex}");
                 Thread.Sleep(10);
                 CallThreadStart();
             }
@@ -770,7 +632,7 @@ namespace VisionInspection
                 }
             });
         }
-        private void RunManagerVision_S26(int idxVPn = 0)
+        private void RunManagerVision_Align(int idxVPn = 0)
         {
             //Gửi kết quả sau khi chụp xong
             Dispatcher.Invoke(() =>
@@ -780,421 +642,24 @@ namespace VisionInspection
             // Chạy phần xử lý ảnh ở luồng khác
             Task.Run(() =>
             {
-                int index = idxVPn;
                 Dispatcher.Invoke(() =>
                 {
-                    OutVidiCogResTool outVidiCogResTool = pgCamera.toolAreaGrs[index].ToolAreaMain.Children.OfType<OutVidiCogResTool>().FirstOrDefault();
-                    if (outVidiCogResTool == null)
+                    TempMatchZeroTool visionTool = pgCamera.toolAreaGrs[idxVPn].ToolAreaMain.Children.OfType<TempMatchZeroTool>().FirstOrDefault();
+                    if (visionTool == null)
                         return;
-                    OutVidiCogResEdit toolEdit = outVidiCogResTool.toolEdit;
+                    TempMatchZeroEdit toolEdit = visionTool.toolEdit;
                     if (toolEdit.OutputImage.Mat == null || toolEdit.OutputImage.Mat.Width == 0 || toolEdit.OutputImage.Mat.Height == 0)
                     {
                         AddLog("Image Capture NULL!");
                         return;
-                    }    
-                    //Cv2.ImEncode(".jpg", toolEdit.OutputImage.Mat, out byte[] imageBytes);
-                    byte[] imageBytes = CompressJpeg(toolEdit.OutputImage.Mat, 0.5);
-                    DataVsFormat dataVs = new();
-                    if (pgCamera.curVsProgram.NameDisp.ToLower().Contains("qr code"))
-                    {
-                        dataVs = new DataVsFormat(prdPos, JigPosLst[index], imageBytes, JigPosLst.Count, toolEdit.StrResult);
                     }
-                    else
-                    {
-                        dataVs = new DataVsFormat(prdPos, JigPosLst[index], imageBytes, JigPosLst.Count, "", toolEdit.JudgeVal, toolEdit.StrResult);
-                    }
-                    DataVsSearches.Add(dataVs);
-                    DataVsBuffs[index] = dataVs;
-                    vsComplete = true;
-                    switch (index)
-                    {
-                        case 0:
-                            imgView1.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
-                            break;
-                        case 1:
-                            imgView2.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
-                            break;
-                        case 2:
-                            imgView3.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
-                            break;
-                        case 3:
-                            imgView4.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
-                            break;
-                        case 4:
-                            imgView5.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
-                            break;
-                    }
-                    Border bd = gridView.Children.OfType<Border>().FirstOrDefault(b => b.Name == $"bd_{JigPosLst[index]}");
-                    if (bd == null) return;
-                    bd.Background = (Brush)new BrushConverter().ConvertFromString("#FFB7E4FF");
+                    AddLog($"Score = {toolEdit.OutScore}");
+                    AddLog($"Offset X = {toolEdit.OutOffsetX} mm");
+                    AddLog($"Offset Y = {toolEdit.OutOffsetY} mm");
+                    imgView1.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
+                    toolEdit.OutputImage.Mat.SaveImage($"D:\\LogImageAlign\\AlignGrap {DateTime.Now:yyyy-MM-dd HH-mm-ss-fff}.bmp");
                 });
             });
-        }
-
-        private void SetVisionJob()
-        {
-            Dispatcher.Invoke(() =>
-            {
-                switch (prdPos)
-                {
-                    //QR Code
-                    case 1:
-                        pgCamera.curVsProgram = UiManager.appSettings.vsPrograms[4];
-                        break;
-                    //Point 1
-                    case 2:
-                        pgCamera.curVsProgram = UiManager.appSettings.vsPrograms[0];
-                        break;
-                    //Point 2
-                    case 3:
-                        pgCamera.curVsProgram = UiManager.appSettings.vsPrograms[1];
-                        break;
-                    //Point 3
-                    case 4:
-                        pgCamera.curVsProgram = UiManager.appSettings.vsPrograms[2];
-                        break;
-                    //Point 4
-                    case 5:
-                        pgCamera.curVsProgram = UiManager.appSettings.vsPrograms[3];
-                        break;
-                    default:
-                        return;
-                }
-                pgCamera.LoadJob();
-                idxOldJob = prdPos;
-                AddLog($"*** {pgCamera.curVsProgram.NameDisp.ToUpper()} ***");
-            });
-        }
-        private void CreateImageBuff()
-        {
-            var matrixPoint = UiManager.appSettings.commProperty.mtrxPoint;
-            int targetRow = 0;
-            int startCol = 0;
-            switch (jigPosPLC)
-            {
-                case 1: targetRow = 0; startCol = 0; break; // r1c1, r1c3...
-                case 2: targetRow = 0; startCol = 1; break; // r1c2, r1c4...
-                case 3: targetRow = 1; startCol = 0; break; // r2c1, r2c3...
-                case 4: targetRow = 1; startCol = 1; break; // r2c2, r2c4...
-            }
-            JigPosLst.Clear();
-            string str = "";
-            foreach (var kv in matrixPoint)
-            {
-                if (kv.Value.Y == targetRow && (kv.Value.X % 2 == startCol % 2))
-                {
-                    str += kv.Key + " ";
-                    JigPosLst.Add(kv.Key);
-                }
-            }
-            AddLog("Point: " + str);
-        }
-        private void LoadMatrixPoint()
-        {
-            //Hiển thị ma trận
-            var matrixPoint = UiManager.appSettings.commProperty.mtrxPoint;
-            if (matrixPoint == null) 
-                return;
-            int rows = matrixPoint.Where(k => k.Value.X == 1).Count();
-            int cols = matrixPoint.Where(k => k.Value.Y == 1).Count();
-            AddLog($"Matrix: {rows}x{cols}");
-
-            DataVsSearches.Clear();
-            gridView.Children.Clear();
-            gridView.ColumnDefinitions.Clear();
-            gridView.RowDefinitions.Clear();
-            for (int row = 0; row < rows; row++)
-            {
-                string str = "";
-                for (int col = 0; col < cols; col++)
-                {
-                    int val = matrixPoint.First(kv => kv.Value.X == col && kv.Value.Y == row).Key;
-                    str += val.ToString().PadLeft(3);
-                    if (row != 0)
-                        continue;
-                    gridView.ColumnDefinitions.Add(new ColumnDefinition());
-                }
-                AddLog(str);
-                gridView.RowDefinitions.Add(new RowDefinition());
-            }
-
-            for (int row = 0; row < rows; row++)
-            {
-                for (int col = 0; col < cols; col++)
-                {
-                    Label lb = new Label
-                    {
-                        Content = matrixPoint.First(k => k.Value.X == col && k.Value.Y == row).Key,
-                        HorizontalContentAlignment = HorizontalAlignment.Center,
-                        VerticalContentAlignment = VerticalAlignment.Center,
-                        FontSize = 20, 
-                        FontWeight = FontWeights.Bold,
-                    };
-                    Border bdBound = new Border
-                    {
-                        Child = lb,
-                        Name = "bd_" + matrixPoint.First(k => k.Value.X == col && k.Value.Y == row).Key.ToString(),
-
-                        BorderBrush = Brushes.Gray,
-                        BorderThickness = new Thickness(0.5),
-                    };
-                    bdBound.MouseMove += BdBound_MouseMove;
-                    bdBound.MouseLeftButtonDown += BdBound_MouseLeftButtonDown;
-
-                    gridView.Children.Add(bdBound);
-                    Grid.SetRow(bdBound, row);
-                    Grid.SetColumn(bdBound, col);
-                }
-            }
-        }
-        private void ClearAll()
-        {
-            try
-            {
-                ResetJobPLC();
-                countImg = 0;
-            }
-            catch (Exception ex)
-            {
-                logger.Create($"Clear All Error : {ex}");
-            } 
-            
-        }
-        private void ClearImageView()
-        {
-            this.Dispatcher.Invoke(() =>
-            {
-                imgView1.Source = null;
-                imgView2.Source = null;
-                imgView3.Source = null;
-                imgView4.Source = null;
-                imgView5.Source = null;
-            });
-        }
-        private BitmapImage ByteArrToBitmapImg(byte[] imageBytes)
-        {
-            using (var ms = new MemoryStream(imageBytes))
-            {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.StreamSource = ms;
-                bitmap.EndInit();
-                bitmap.Freeze(); // Quan trọng nếu dùng trong thread khác
-                return bitmap;
-            }
-        }
-        private byte[] CompressJpeg(Mat mat, double quality)
-        {
-            // Clamp quality từ 0–1 → 0–100
-            int jpegQuality = Math.Min(100, Math.Max(0, (int)(quality * 100)));
-            // Thiết lập thông số nén JPEG
-            var parameters = new ImageEncodingParam(ImwriteFlags.JpegQuality, jpegQuality);
-            // Nén ảnh Mat thành byte[] JPEG
-            return mat.ImEncode(".jpg", parameters);
-        }
-        private string ConvertImageToBase64(byte[] imageBytes)
-        {
-            if (imageBytes == null || imageBytes.Length == 0)
-                return "";
-            return $"data:image/jpeg;base64,{Convert.ToBase64String(imageBytes)}";
-        }
-        private string ConvertStrJudge(int judge)
-        {
-            string strJudge = "";
-            switch (judge)
-            {
-                case 1:
-                    strJudge = "OK";
-                    break;
-                case 2:
-                    strJudge = "NG";
-                    break;
-                case 3:
-                    strJudge = "Empty";
-                    break;
-            }    
-            return strJudge;
-        }
-        private async Task<DATACheck> GetDataVision(DataVsFormat[] dataVsBuffs)
-        {
-            DATACheck DataCheck = new DATACheck();
-
-            DataCheck.EquipmentId = "DATAVISION";
-            DataCheck.Status = "AUTO10";
-            int dataCount = dataVsBuffs.Length;
-            DataCheck.FormatVision.DATA_PCB_CAM_01 = DateTime.Now.ToString("yyyy-MM HH:mm:ss");
-            DataCheck.FormatVision.INDEX_PCB_CAM_01 = dataVsBuffs[0].JigPos.ToString();
-            DataCheck.FormatVision.BARCODE_PCB_CAM_01 = dataVsBuffs[0].QrCode;
-            DataCheck.FormatVision.LIST_PCB_CAM_01 = dataVsBuffs[0].TotalCam.ToString();
-            DataCheck.FormatVision.NUMBER_IN_LIST_PCB_CAM_01 = dataVsBuffs[0].PrdPos.ToString();
-            DataCheck.FormatVision.RESULT_PCB_CAM_01 = ConvertStrJudge(dataVsBuffs[0].JudgeResult);
-            DataCheck.FormatVision.MESSENGER_PCB_CAM_01 = dataVsBuffs[0].MessResult;
-
-            DataCheck.FormatVision.DATA_PCB_CAM_02 = DateTime.Now.ToString("yyyy-MM HH:mm:ss");
-            DataCheck.FormatVision.INDEX_PCB_CAM_02 = dataVsBuffs[1].JigPos.ToString();
-            DataCheck.FormatVision.BARCODE_PCB_CAM_02 = dataVsBuffs[1].QrCode;
-            DataCheck.FormatVision.LIST_PCB_CAM_02 = dataVsBuffs[1].TotalCam.ToString();
-            DataCheck.FormatVision.NUMBER_IN_LIST_PCB_CAM_02 = dataVsBuffs[1].PrdPos.ToString();
-            DataCheck.FormatVision.RESULT_PCB_CAM_02 = ConvertStrJudge(dataVsBuffs[1].JudgeResult);
-            DataCheck.FormatVision.MESSENGER_PCB_CAM_02 = dataVsBuffs[1].MessResult;
-
-            DataCheck.FormatVision.DATA_PCB_CAM_03 = DateTime.Now.ToString("yyyy-MM HH:mm:ss");
-            DataCheck.FormatVision.INDEX_PCB_CAM_03 = dataVsBuffs[2].JigPos.ToString();
-            DataCheck.FormatVision.BARCODE_PCB_CAM_03 = dataVsBuffs[2].QrCode;
-            DataCheck.FormatVision.LIST_PCB_CAM_03 = dataVsBuffs[2].TotalCam.ToString();
-            DataCheck.FormatVision.NUMBER_IN_LIST_PCB_CAM_03 = dataVsBuffs[2].PrdPos.ToString();
-            DataCheck.FormatVision.RESULT_PCB_CAM_03 = ConvertStrJudge(dataVsBuffs[1].JudgeResult);
-            DataCheck.FormatVision.MESSENGER_PCB_CAM_03 = dataVsBuffs[2].MessResult;
-
-            DataCheck.FormatVision.DATA_PCB_CAM_04 = DateTime.Now.ToString("yyyy-MM HH:mm:ss");
-            DataCheck.FormatVision.INDEX_PCB_CAM_04 = dataVsBuffs[3].JigPos.ToString();
-            DataCheck.FormatVision.BARCODE_PCB_CAM_04 = dataVsBuffs[3].QrCode;
-            DataCheck.FormatVision.LIST_PCB_CAM_04 = dataVsBuffs[3].TotalCam.ToString();
-            DataCheck.FormatVision.NUMBER_IN_LIST_PCB_CAM_04 = dataVsBuffs[3].PrdPos.ToString();
-            DataCheck.FormatVision.RESULT_PCB_CAM_04 = ConvertStrJudge(dataVsBuffs[1].JudgeResult);
-            DataCheck.FormatVision.MESSENGER_PCB_CAM_04 = dataVsBuffs[3].MessResult;
-
-            DataCheck.FormatVision.DATA_PCB_CAM_05 = DateTime.Now.ToString("yyyy-MM HH:mm:ss");
-            DataCheck.FormatVision.INDEX_PCB_CAM_05 = dataVsBuffs[4].JigPos.ToString();
-            DataCheck.FormatVision.BARCODE_PCB_CAM_05 = dataVsBuffs[4].QrCode;
-            DataCheck.FormatVision.LIST_PCB_CAM_05 = dataVsBuffs[4].TotalCam.ToString();
-            DataCheck.FormatVision.NUMBER_IN_LIST_PCB_CAM_05 = dataVsBuffs[4].PrdPos.ToString();
-            DataCheck.FormatVision.RESULT_PCB_CAM_05 = ConvertStrJudge(dataVsBuffs[1].JudgeResult);
-            DataCheck.FormatVision.MESSENGER_PCB_CAM_05 = dataVsBuffs[4].MessResult;
-
-            try
-            {
-                // Chạy các tác vụ ConvertImageToBase64 song song
-                Task<string>[] tasks = new Task<string>[]
-                {
-                    Task.Run(() => ConvertImageToBase64(dataVsBuffs[0].DataImg)),
-                    Task.Run(() => ConvertImageToBase64(dataVsBuffs[1].DataImg)),
-                    Task.Run(() => ConvertImageToBase64(dataVsBuffs[2].DataImg)),
-                    Task.Run(() => ConvertImageToBase64(dataVsBuffs[3].DataImg)),
-                    Task.Run(() => ConvertImageToBase64(dataVsBuffs[4].DataImg))
-                };
-
-
-                string[] results = await Task.WhenAll(tasks);
-
-
-                DataCheck.FormatVision.IMAGE_PCB_CAM_01 = results[0];
-                DataCheck.FormatVision.IMAGE_PCB_CAM_02 = results[1];
-                DataCheck.FormatVision.IMAGE_PCB_CAM_03 = results[2];
-                DataCheck.FormatVision.IMAGE_PCB_CAM_04 = results[3];
-                DataCheck.FormatVision.IMAGE_PCB_CAM_05 = results[4];
-            }
-            catch (Exception ex)
-            {
-                DataCheck.FormatVision.IMAGE_PCB_CAM_01 = "";
-                DataCheck.FormatVision.IMAGE_PCB_CAM_02 = "";
-                DataCheck.FormatVision.IMAGE_PCB_CAM_03 = "";
-                DataCheck.FormatVision.IMAGE_PCB_CAM_04 = "";
-                DataCheck.FormatVision.IMAGE_PCB_CAM_05 = "";
-            }
-
-            return DataCheck;
-        }
-
-        private void BdBound_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            Border bdSelected = sender as Border;
-            SelectBorder(bdSelected);
-        }
-        private void BdBound_MouseMove(object sender, MouseEventArgs e)
-        {
-            Border bdSelected = sender as Border;
-            List<Border> bdLst = gridView.Children.OfType<Border>().ToList();
-            foreach (var bd in bdLst)
-            {
-                if (bd.BorderBrush == Brushes.Red)
-                    continue;
-                bd.BorderBrush = (Brush)new BrushConverter().ConvertFromString("#FFCCCCCC");
-            }
-            if (bdSelected.BorderBrush != Brushes.Red)
-                bdSelected.BorderBrush = (Brush)new BrushConverter().ConvertFromString("#FF489E37");
-        }
-        private void SelectBorder(Border bdSelected)
-        {
-            try
-            {
-                List<Border> bdLst = gridView.Children.OfType<Border>().ToList();
-                bdLst.ForEach(border => border.BorderBrush = (Brush)new BrushConverter().ConvertFromString("#FFCCCCCC"));
-                bdSelected.BorderBrush = Brushes.Red;
-
-                string[] bdNameSpl = bdSelected.Name.Split('_');
-                if (bdNameSpl.Length <= 1) return;
-                int jigPos = int.Parse(bdNameSpl[1]);
-
-                tblJigPos.Text = jigPos.ToString();
-                stImgLink.Children.Clear();
-                for(int pt = 1; pt <= 5; pt++)
-                {
-                    TextBlock tbl = new TextBlock
-                    {
-                        Text = (pt <= UiManager.appSettings.vsPrograms.Length) ? UiManager.appSettings.vsPrograms[pt - 1].NameDisp : "NULL",
-                        Name = $"tb_{pt}_{jigPos}",
-                        Padding = new Thickness(5, 3, 0, 0),
-                        FontSize = 13,
-                        Foreground = Brushes.Gray,
-                        FontStyle = FontStyles.Italic,
-                        TextDecorations = TextDecorations.Underline,
-                        Cursor = Cursors.Hand,
-                    };
-                    foreach(var dataVs in DataVsSearches)
-                    {
-                        if(pt == dataVs.PrdPos && jigPos == dataVs.JigPos)
-                        {
-                            tbl.Foreground = dataVs.JudgeResult switch
-                            {
-                                1 => (Brush)new BrushConverter().ConvertFromString("#FF489E37"),
-                                2 => (Brush)new BrushConverter().ConvertFromString("#FFE90E0E"),
-                                _ => Brushes.Gray,
-                            };
-                            break;
-                        }    
-                    } 
-                    tbl.MouseLeftButtonDown += Tbl_MouseLeftButtonDown;
-                    stImgLink.Children.Add(tbl);
-                }    
-            }
-            catch (Exception ex)
-            {
-                logger.Create("Select Image Log Error: " + ex.Message, ex);
-            }
-        }
-        private void Tbl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            TextBlock tbl = sender as TextBlock;
-            string[] tblNameSpl = tbl.Name.Split('_');
-            if (tblNameSpl.Length <= 2) return;
-
-            int pointSp = int.Parse(tblNameSpl[1]);
-            int jigPos = int.Parse(tblNameSpl[2]);
-
-            DataVsFormat dataVs;
-            dataVs = DataVsSearches.FirstOrDefault(d => (d.PrdPos == pointSp && d.JigPos == jigPos));
-            if(dataVs == null) return;  
-
-            switch ((jigPos - 1) % 5)
-            {
-                case 0:
-                    imgView1.Source = ByteArrToBitmapImg(dataVs.DataImg);
-                    break;
-                case 1:
-                    imgView2.Source = ByteArrToBitmapImg(dataVs.DataImg);
-                    break;
-                case 2:
-                    imgView3.Source = ByteArrToBitmapImg(dataVs.DataImg);
-                    break;
-                case 3:
-                    imgView4.Source = ByteArrToBitmapImg(dataVs.DataImg);
-                    break;
-                case 4:
-                    imgView5.Source = ByteArrToBitmapImg(dataVs.DataImg);
-                    break;
-            }
         }
 
         private bool String2Enum(string strDev, out DeviceCode _devType, out string _strDevNo)
@@ -1269,8 +734,8 @@ namespace VisionInspection
             catch (Exception ex)
             {
                 AddLog($"Lỗi lưu ảnh: {ex.Message}");
-            } 
-            
+            }
+
         }
         private void DeleteOldestFile(string folderPath)
         {
@@ -1608,7 +1073,7 @@ namespace VisionInspection
     }
 
     public enum STEP
-    { 
+    {
         ClearAll = 0,
         GetPrdPos = 1,
         GetJigPosPLC = 2,
@@ -1619,27 +1084,30 @@ namespace VisionInspection
         Wait = 7,
     }
     public class DataVsFormat
-    { 
+    {
+        public string VisionTime { get; set; }
         public int PrdPos { get; set; }
         public int JigPos { get; set; }
         public byte[] DataImg { get; set; }
-        public string QrCode {  get; set; }
+        public string QrCode { get; set; }
         public int TotalCam { get; set; }
         public int JudgeResult { get; set; }
         public string MessResult { get; set; }
 
         public DataVsFormat()
         {
+            this.VisionTime = "";
             this.PrdPos = 0;
             this.JigPos = 0;
             this.DataImg = [];
             this.QrCode = "";
             this.TotalCam = 5;
-            this.JudgeResult = 0;
+            this.JudgeResult = 1;
             this.MessResult = "";
         }
-        public DataVsFormat(int prdPos, int jigPos, byte[] dataImg, int totalCam = 5, string qrCode = "", int judgeResult = 1, string messResult = "")
+        public DataVsFormat(string vsTime, int prdPos, int jigPos, byte[] dataImg, int totalCam = 5, string qrCode = "", int judgeResult = 1, string messResult = "")
         {
+            this.VisionTime = vsTime;
             this.PrdPos = prdPos;
             this.JigPos = jigPos;
             this.DataImg = dataImg;
@@ -1653,6 +1121,7 @@ namespace VisionInspection
         {
             return new DataVsFormat
             {
+                VisionTime = this.VisionTime,
                 PrdPos = this.PrdPos,
                 JigPos = this.JigPos,
                 DataImg = this.DataImg,

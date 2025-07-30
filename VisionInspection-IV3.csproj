@@ -345,11 +345,17 @@
     <Compile Include="src\ui\VisionTools\ToolDesign\FixtureTool.xaml.cs">
       <DependentUpon>FixtureTool.xaml</DependentUpon>
     </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\ImageBuffTool.xaml.cs">
+      <DependentUpon>ImageBuffTool.xaml</DependentUpon>
+    </Compile>
     <Compile Include="src\ui\VisionTools\ToolDesign\ImageProcessTool.xaml.cs">
       <DependentUpon>ImageProcessTool.xaml</DependentUpon>
     </Compile>
     <Compile Include="src\ui\VisionTools\ToolDesign\OutAcquisResTool.xaml.cs">
       <DependentUpon>OutAcquisResTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolDesign\OutCheckProductTool.xaml.cs">
+      <DependentUpon>OutCheckProductTool.xaml</DependentUpon>
     </Compile>
     <Compile Include="src\ui\VisionTools\ToolDesign\OutVidiCogResTool.xaml.cs">
       <DependentUpon>OutVidiCogResTool.xaml</DependentUpon>
@@ -403,8 +409,14 @@
     <Compile Include="src\ui\VisionTools\ToolEdit\FixtureEdit.xaml.cs">
       <DependentUpon>FixtureEdit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\OutCheckProductEdit.xaml.cs">
+      <DependentUpon>OutCheckProductEdit.xaml</DependentUpon>
+    </Compile>
     <Compile Include="src\ui\VisionTools\ToolEdit\OutVidiCogResEdit.xaml.cs">
       <DependentUpon>OutVidiCogResEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="src\ui\VisionTools\ToolEdit\ImageBuffEdit.xaml.cs">
+      <DependentUpon>ImageBuffEdit.xaml</DependentUpon>
     </Compile>
     <Compile Include="src\ui\VisionTools\ToolEdit\ZGridBase.cs" />
     <Compile Include="src\ui\VisionTools\ToolEdit\ImageProcessEdit.xaml.cs">
@@ -454,9 +466,6 @@
     </Compile>
     <Compile Include="src\ui\Windows\WindowPopUpCh2-3.xaml.cs">
       <DependentUpon>WindowPopUpCh2-3.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="src\ui\Windows\WindowPopUpCh2.xaml.cs">
-      <DependentUpon>WindowPopUpCh2.xaml</DependentUpon>
     </Compile>
     <Compile Include="src\ui\Windows\WndChangePassword.xaml.cs">
       <DependentUpon>WndChangePassword.xaml</DependentUpon>
@@ -558,11 +567,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\ImageBuffTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="src\ui\VisionTools\ToolDesign\ImageProcessTool.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="src\ui\VisionTools\ToolDesign\OutAcquisResTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolDesign\OutCheckProductTool.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -642,6 +659,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\OutCheckProductEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="src\ui\VisionTools\ToolEdit\OutVidiCogResEdit.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -651,6 +672,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="src\ui\VisionTools\ToolEdit\OutBlobResEdit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="src\ui\VisionTools\ToolEdit\ImageBuffEdit.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -699,10 +724,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="src\ui\Windows\WindowPopUpCh2-3.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="src\ui\Windows\WindowPopUpCh2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

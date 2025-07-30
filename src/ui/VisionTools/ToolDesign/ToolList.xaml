@@ -24,6 +24,7 @@
     <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <Label x:Name="lbAcquisitionTool" Content="Acquisition" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbImageBuffTool" Content="ImageBuffer" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbSaveImageTool" Content="SaveImage" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbEditRegionTool" Content="EditRegion" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbTemplateMatchTool" Content="TemplateMatch" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
@@ -33,12 +34,13 @@
             <Label x:Name="lbImageProcessTool" Content="ImageProcess" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbBlobTool" Content="Blob" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbSegmentNeuroTool" Content="SegmentNeuro" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
-            <Label x:Name="lbVisionProTool" Content="VisionPro" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
-            <Label x:Name="lbVidiCognexTool" Content="VidiCognex" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <!--<Label x:Name="lbVisionProTool" Content="VisionPro" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbVidiCognexTool" Content="VidiCognex" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>-->
             <Label x:Name="lbOutAcquisResTool" Content="OutAcquisRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbOutBlobResTool" Content="OutBlobRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <Label x:Name="lbOutCheckProductTool" Content="OutCheckProduct" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbOutSegNeuroResTool" Content="OutSegNeuroRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
-            <Label x:Name="lbOutVidiCogResTool" Content="OutVidiCogRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
+            <!--<Label x:Name="lbOutVidiCogResTool" Content="OutVidiCogRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>-->
         </StackPanel>
     </ScrollViewer>
 </Grid>

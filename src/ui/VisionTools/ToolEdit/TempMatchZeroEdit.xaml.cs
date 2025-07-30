@@ -195,7 +195,9 @@ namespace VisionTools.ToolEdit
             ImgView.MouseLeave += ImgView_MouseLeave;
             toolBase.btnRun.Click += BtnRun_Click;
             toolBase.OnLoadImage += ToolBase_OnLoadImage;
+            toolBase.OnPropertyRoi += ToolBase_OnPropertyRoi;
         }
+
         public void CreatRect(float left, float top, float width, float height, float angle, Brush stroke, Brush Fill, string name, List<UIElement> eleLst)
         {
             try
@@ -341,8 +343,7 @@ namespace VisionTools.ToolEdit
                 logger.Create("Move ROI Error: " + ex.Message, ex);
             }
         }
-
-        private void PropertyItem_Click(object sender, RoutedEventArgs e)
+        private void ToolBase_OnPropertyRoi(object sender, RoutedEventArgs e)
         {
             var Point = Mouse.GetPosition(this);
             new RegionProperty().DoConfirmMatrix(new System.Windows.Point(Point.X, Point.Y - 200));
@@ -367,7 +368,7 @@ namespace VisionTools.ToolEdit
                 rect.Name = (oldSelect == 0) ? "S" : "T";
                 var converter = new BrushConverter();
                 RotateTransform rotTrans = rect.RenderTransform as RotateTransform ?? new RotateTransform(0);
-                CreatRect((float)Canvas.GetLeft(rect), (float)Canvas.GetTop(rect), (float)rect.Width, (float)rect.Height, (float)rotTrans.Angle, (oldSelect == 0) ? colorSearchStroke : colorTrainStroke, (oldSelect == 0) ? colorSearchFill : colorTrainFill, Name, (oldSelect == 0) ? inEle : trainEle);
+                CreatRect((float)Canvas.GetLeft(rect), (float)Canvas.GetTop(rect), (float)rect.Width, (float)rect.Height, (float)rotTrans.Angle, (oldSelect == 0) ? colorSearchStroke : colorTrainStroke, (oldSelect == 0) ? colorSearchFill : colorTrainFill, rect.Name, (oldSelect == 0) ? inEle : trainEle);
                 if (oldSelect == 0) { rectSearchCv = new Rect((int)Canvas.GetLeft(rect), (int)Canvas.GetTop(rect), (int)rect.Width, (int)rect.Height); }
                 else if (oldSelect == 1) { rectTrainCv = new Rect((int)Canvas.GetLeft(rect), (int)Canvas.GetTop(rect), (int)rect.Width, (int)rect.Height); }
             }

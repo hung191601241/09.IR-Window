@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:VisionTools.ToolEdit" 
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="500">
+             d:DesignHeight="600" d:DesignWidth="500" Background="#FF8A8A8A">
     <TabControl Background="White">
         <TabControl.ItemContainerStyle>
             <Style TargetType="TabItem">
@@ -16,13 +16,6 @@
             </Style>
         </TabControl.ItemContainerStyle>
         <TabControl.Resources>
-            <ContextMenu x:Key="cmRegion">
-                <MenuItem Background="Transparent" Foreground="Black" Header="Property" Click="PropertyItem_Click">
-                    <MenuItem.Icon>
-                        <Image></Image>
-                    </MenuItem.Icon>
-                </MenuItem>
-            </ContextMenu>
             <Style TargetType="{x:Type Label}">
                 <Setter Property="FontSize" Value="15"/>
             </Style>

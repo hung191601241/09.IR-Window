@@ -1091,11 +1091,18 @@ namespace VisionInspection
         }
         private void RCover_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ContextMenu cm = this.FindResource("cmRegion") as ContextMenu;
-            if (cm != null)
+            try
             {
-                cm.PlacementTarget = sender as UIElement; // Đặt đúng kiểu dữ liệu
-                cm.IsOpen = true; // Mở ContextMenu
+                ContextMenu cm = this.FindResource("cmRegion") as ContextMenu;
+                if (cm != null)
+                {
+                    cm.PlacementTarget = sender as UIElement; // Đặt đúng kiểu dữ liệu
+                    cm.IsOpen = true; // Mở ContextMenu
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("RCover ShapeEditor Error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         // End editing shape

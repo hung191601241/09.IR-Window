@@ -98,6 +98,9 @@ namespace VisionTools.ToolDesign
                             return;
                         newEle = (VisionTool)Activator.CreateInstance(typeof(AcquisitionTool));
                         break;
+                    case VisionToolType.IMAGEBUFF:
+                        newEle = (VisionTool)Activator.CreateInstance(typeof(ImageBuffTool));
+                        break;
                     case VisionToolType.TEMPLATEMATCH:
                         newEle = (VisionTool)Activator.CreateInstance(typeof(TemplateMatchTool));
                         break;
@@ -154,6 +157,13 @@ namespace VisionTools.ToolDesign
                         IsOutTool = true;
                         IsBlockOut = true;
                         newEle = (VisionTool)Activator.CreateInstance(typeof(OutAcquisResTool));
+                        break;
+                    case VisionToolType.OUTCHECKPRODUCT:
+                        OnToolDrop?.Invoke(this, null);
+                        //if (IsOutTool || IsBlockOut) return;
+                        IsOutTool = true;
+                        IsBlockOut = true;
+                        newEle = (VisionTool)Activator.CreateInstance(typeof(OutCheckProductTool));
                         break;
                     case VisionToolType.OUTSEGNEURORES:
                         OnToolDrop?.Invoke(this, null);
@@ -212,6 +222,7 @@ namespace VisionTools.ToolDesign
                 {
                     case VisionToolType.OUTACQUISRES:
                     case VisionToolType.OUTBLOBRES:
+                    case VisionToolType.OUTCHECKPRODUCT:
                     case VisionToolType.OUTSEGNEURORES:
                     case VisionToolType.OUTVIDICOGRES:
                         OnChildrenChanged?.Invoke(receivedData, new RoutedEventArgs());
@@ -323,6 +334,7 @@ namespace VisionTools.ToolDesign
                         break;
                     case VisionToolType.OUTACQUISRES:
                     case VisionToolType.OUTBLOBRES:
+                    case VisionToolType.OUTCHECKPRODUCT:
                     case VisionToolType.OUTSEGNEURORES:
                     case VisionToolType.OUTVIDICOGRES:
                         OnChildrenChanged?.Invoke(receivedData, new RoutedEventArgs());
@@ -371,6 +383,7 @@ namespace VisionTools.ToolDesign
                 switch (sourceTool.ToolType)
                 {
                     case VisionToolType.ACQUISITION:
+                    case VisionToolType.IMAGEBUFF:
                     case VisionToolType.FIXTURE:
                     case VisionToolType.EDITREGION:
                     case VisionToolType.CONTRASTnBRIGHTNESS:
@@ -480,6 +493,7 @@ namespace VisionTools.ToolDesign
                     case VisionToolType.IMAGEPROCESS:
                     case VisionToolType.CONTRASTnBRIGHTNESS:
                     case VisionToolType.BLOB:
+                    case VisionToolType.IMAGEBUFF:
                     case VisionToolType.SAVEIMAGE:
                     case VisionToolType.SEGMENTNEURO:
                     case VisionToolType.VIDICOGNEX:
@@ -537,6 +551,22 @@ namespace VisionTools.ToolDesign
                                 if (sourceType != typeof(List<BlobObject>)) { return; }
                                 break;
                             case "lbBlobs2":
+                                if (sourceType != typeof(List<BlobObject>)) { return; }
+                                break;
+                            default:
+                                return;
+                        }
+                        break;
+                    case VisionToolType.OUTCHECKPRODUCT:
+                        switch (lbTarget.Name)
+                        {
+                            case "lbInputImage":
+                                if (sourceType != typeof(SvImage)) { return; }
+                                break;
+                            case "lbScore":
+                                if (sourceType != typeof(double)) { return; }
+                                break;
+                            case "lbBlobs":
                                 if (sourceType != typeof(List<BlobObject>)) { return; }
                                 break;
                             default:
@@ -736,7 +766,7 @@ namespace VisionTools.ToolDesign
                         {
                             Canvas.SetTop(tools[i], heightAllTool);
                             heightToolLst.Add(heightAllTool);
-                            heightAllTool += (tools[i] as VisionTool).ActualHeight;
+                            heightAllTool += tools[i].ActualHeight;
                             if (i == tools.Count - 1)
                                 heightToolLst.Add(heightAllTool);
                         }
@@ -767,6 +797,7 @@ namespace VisionTools.ToolDesign
                         //Phần này kiểm soát việc chặn OutTool
                         case VisionToolType.OUTBLOBRES:
                         case VisionToolType.OUTACQUISRES:
+                        case VisionToolType.OUTCHECKPRODUCT:
                         case VisionToolType.OUTSEGNEURORES:
                         case VisionToolType.OUTVIDICOGRES:
                             //Tạm thời bỏ chặn OutTool

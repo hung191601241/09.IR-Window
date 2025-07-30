@@ -145,6 +145,8 @@ namespace VisionInspection
             catch (Exception ex)
             {
                 logger.Create("Startup error:" + ex.Message);
+                Application.Current.Shutdown();
+                return;
             }
         }
 

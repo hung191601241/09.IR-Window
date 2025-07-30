@@ -46,7 +46,6 @@ namespace VisionInspection
 
         private void BtnOK_Click(object sender, RoutedEventArgs e)
         {
-
             property.StrokeThickness = (int)xctStrokeThickness.Value;
             property.labelFontSize = (int)xctlabelFontSize.Value;
             property.rectSize = new OpenCvSharp.Size((int)xctCursorsRectSize.Value, (int)xctCursorsRectSize.Value);

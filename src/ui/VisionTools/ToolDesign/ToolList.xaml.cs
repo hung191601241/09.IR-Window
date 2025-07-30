@@ -51,6 +51,10 @@ namespace VisionTools.ToolDesign
                         tool.ToolType = VisionToolType.ACQUISITION;
                         data.SetData(typeof(VisionTool), tool); // đăng theo kiểu cha
                         break;
+                    case "lbImageBuffTool":
+                        tool.ToolType = VisionToolType.IMAGEBUFF;
+                        data.SetData(typeof(VisionTool), tool); // đăng theo kiểu cha
+                        break;
                     case "lbSaveImageTool":
                         tool.ToolType = VisionToolType.SAVEIMAGE;
                         data.SetData(typeof(VisionTool), tool); // đăng theo kiểu cha
@@ -103,6 +107,10 @@ namespace VisionTools.ToolDesign
                         tool.ToolType = VisionToolType.OUTACQUISRES;
                         data.SetData(typeof(VisionTool), tool); // đăng theo kiểu cha
                         break;
+                    case "lbOutCheckProductTool":
+                        tool.ToolType = VisionToolType.OUTCHECKPRODUCT;
+                        data.SetData(typeof(VisionTool), tool); // đăng theo kiểu cha
+                        break;
                     case "lbOutSegNeuroResTool":
                         tool.ToolType = VisionToolType.OUTSEGNEURORES;
                         data.SetData(typeof(VisionTool), tool); // đăng theo kiểu cha
@@ -135,6 +143,7 @@ namespace VisionTools.ToolDesign
                     //Tool Out
                     case "lbOutBlobResTool":
                     case "lbOutAcquisResTool":
+                    case "lbOutCheckProductTool":
                     case "lbOutSegNeuroResTool":
                     case "lbOutVidiCogResTool":
                         lb.Foreground = (Brush)new BrushConverter().ConvertFromString("#FF0C88DA");

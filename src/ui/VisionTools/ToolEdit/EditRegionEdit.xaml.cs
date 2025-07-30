@@ -117,19 +117,15 @@ namespace VisionTools.ToolEdit
         }
         protected override void RegisterEvent()
         {
-            btnCreateROI.Click += BtnCreateROI_Click;
-            btnDeleteAllROI.Click += BtnDeleteAllROI_Click;
-            btnMoveROILeft.Click += BtnMoveROILeft_Click;
-            btnMoveROIRight.Click += BtnMoveROIRight_Click;
-            btnMoveROIUp.Click += BtnMoveROIUp_Click;
-            btnMoveROIDown.Click += BtnMoveROIDown_Click;
             this.KeyDown += EditRegionEdit_KeyDown;
             ImgView.MouseLeftButtonDown += ImgView_MouseLeftButtonDown;
             ImgView.MouseLeave += ImgView_MouseLeave;
             ImgView.MouseRightButtonDown += ImgView_MouseRightButtonDown;
             toolBase.btnRun.Click += BtnRun_Click;
             toolBase.cbxImage.SelectionChanged += CbxImage_SelectionChanged;
-            btnRefresh.Click += BtnRefresh_Click;
+            toolBase.OnDeleteRoi += ToolBase_OnDeleteRoi;
+            toolBase.OnMatrixRoi += ToolBase_OnMatrixRoi;
+            toolBase.OnPropertyRoi += ToolBase_OnPropertyRoi;
             dataGrid.MouseLeave += DataGrid_MouseLeave;
         }
 
@@ -380,12 +376,13 @@ namespace VisionTools.ToolEdit
             }
         }
 
-        private void DeleteItem_Click(object sender, RoutedEventArgs e)
+        private void ToolBase_OnPropertyRoi(object sender, RoutedEventArgs e)
         {
-            DeleteRegion();
+            var Point = Mouse.GetPosition(this);
+            new RegionProperty().DoConfirmMatrix(new System.Windows.Point(Point.X, Point.Y - 200));
+            UpdateProperty();
         }
-
-        private void CreateMatrixItem_Click(object sender, RoutedEventArgs e)
+        private void ToolBase_OnMatrixRoi(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -426,12 +423,9 @@ namespace VisionTools.ToolEdit
                 logger.Create("Create Matrix Error: " + ex.Message, ex);
             }
         }
-
-        private void PropertyItem_Click(object sender, RoutedEventArgs e)
+        private void ToolBase_OnDeleteRoi(object sender, RoutedEventArgs e)
         {
-            var Point = Mouse.GetPosition(this);
-            new RegionProperty().DoConfirmMatrix(new System.Windows.Point(Point.X, Point.Y - 200));
-            UpdateProperty();
+            DeleteRegion();
         }
 
         private void UpdateProperty()

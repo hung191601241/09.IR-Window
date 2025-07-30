@@ -144,6 +144,7 @@ namespace VisionTools.ToolEdit
             ImgView.MouseLeave += ImgView_MouseLeave;
             toolBase.btnRun.Click += BtnRun_Click;
             toolBase.OnLoadImage += ToolBase_OnLoadImage;
+            toolBase.OnPropertyRoi += ToolBase_OnPropertyRoi;
         }
 
         private void ToolBase_OnLoadImage(object sender, RoutedEventArgs e)
@@ -268,7 +269,7 @@ namespace VisionTools.ToolEdit
             }
         }
 
-        private void PropertyItem_Click(object sender, RoutedEventArgs e)
+        private void ToolBase_OnPropertyRoi(object sender, RoutedEventArgs e)
         {
             var Point = Mouse.GetPosition(toolBase);
             new RegionProperty().DoConfirmMatrix(new System.Windows.Point(Point.X, Point.Y - 200));

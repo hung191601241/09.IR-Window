@@ -1386,14 +1386,17 @@ namespace VisionInspection
             Dictionary<int, string[]> connectTags = toolArea.CreateConnectTags(toolArea.arrowCntLst);
             foreach (VisionTool tool in tools)
             {
-                if (tool.ToolType == VisionToolType.ACQUISITION)
+                bool resRun = true;
+                switch (tool.ToolType)
                 {
-                    AcquisitionTool Tool = (tool as AcquisitionTool);
-                    bool resRun = Tool.RunToolInOut(toolArea.arrowCntLst, connectTags);
-                    if (!resRun) { toolArea.resRunTools += 1; toolArea.sttRunTools += "AcquisitionTool Error | "; }
-                }
-                else
-                    ToolRun(tool, toolArea, connectTags);   
+                    case VisionToolType.ACQUISITION:
+                        resRun = tool.RunToolInOut(toolArea.arrowCntLst, connectTags);
+                        if (!resRun) { toolArea.resRunTools += 1; toolArea.sttRunTools += "AcquisitionTool Error | "; }
+                        break;
+                    default:
+                        ToolRun(tool, toolArea, connectTags);
+                        break;
+                }    
             }
 
         }
@@ -1494,12 +1497,13 @@ namespace VisionInspection
                         toolArea.sttRunTools += "VidiCognexTool Error | ";
                         break;
                     case VisionToolType.OUTACQUISRES:
+                    case VisionToolType.OUTCHECKPRODUCT:
                     case VisionToolType.OUTSEGNEURORES:
+                    case VisionToolType.OUTVIDICOGRES:
                         CbxDisplayResult_SelectionChanged(null, null);
                         break;
                 }
-            }    
-            
+            }   
         }
 
         private void DeleteAllVP()
@@ -1742,6 +1746,21 @@ namespace VisionInspection
                 toolEdit.WidthCam = Math.Min(nTemp, toolSetting.WidthCam);
                 toolEdit.Camera.GetIntMaxValue("Height", out nTemp);
                 toolEdit.HeightCam = Math.Min(nTemp, toolSetting.HeightCam);
+            }
+            else if (nameTool.Contains("ImageBuffTool"))
+            {
+                if (vsMnSb.imageBuffSettings.Count == 0 || vsMnSb.imageBuffSettings[idxToolType] == null)
+                    return;
+                ImageBuffTool imgBuffTool = new ImageBuffTool() { Name = nameTool };
+                toolArea.InitLabelTool(imgBuffTool);
+                toolArea.LoadTool(imgBuffTool, toolArea.heightToolLst[indexTools]);
+
+                ImageBuffSetting toolSetting = vsMnSb.imageBuffSettings[idxToolType];
+                ImageBuffEdit toolEdit = imgBuffTool.toolEdit;
+
+                toolEdit.SelectDevReset = toolSetting.selectDevReset;
+                toolEdit.txtAddrReset.Text = toolSetting.addrReset;
+                toolEdit.txtCacheNum.Text = toolSetting.cacheQuantity.ToString();
             }
             else if (nameTool.Contains("SaveImageTool"))
             {
@@ -2069,6 +2088,19 @@ namespace VisionInspection
                 toolEdit.SelectDevOutOK = toolSetting.selectDevOutOK;
                 toolEdit.SelectDevOutNG = toolSetting.selectDevOutNG;
             }
+            else if (nameTool.Contains("OutCheckProductTool"))
+            {
+                if (vsMnSb.outCheckProductSettings.Count == 0 || vsMnSb.outCheckProductSettings[idxToolType] == null)
+                    return;
+                OutCheckProductTool outResultTool = new OutCheckProductTool() { Name = nameTool };
+                toolArea.InitLabelTool(outResultTool);
+                toolArea.LoadTool(outResultTool, toolArea.heightToolLst[indexTools]);
+
+                OutCheckProductSetting toolSetting = vsMnSb.outCheckProductSettings[idxToolType];
+                OutCheckProductEdit toolEdit = outResultTool.toolEdit;
+                toolEdit.arrAddr = toolSetting.arrAddr;
+                toolEdit.UpdateDataGrid();
+            }
             else if(nameTool.Contains("OutSegNeuroResTool"))
             {
                 if (vsMnSb.outSegNeuroResSettings.Count == 0 || vsMnSb.outSegNeuroResSettings[idxToolType] == null)
@@ -2160,6 +2192,19 @@ namespace VisionInspection
                         }
                     }
                     vsMnSb.aquisitionSettings.Add(toolSetting);
+                }
+                else if (tool.ToolType == VisionToolType.IMAGEBUFF)
+                {
+                    ImageBuffTool Tool = (tool as ImageBuffTool);
+                    if (Tool == null) { continue; }
+                    ImageBuffEdit toolEdit = Tool.toolEdit;
+                    ImageBuffSetting toolSetting = new ImageBuffSetting()
+                    {
+                        selectDevReset = toolEdit.SelectDevReset,
+                        addrReset = toolEdit.txtAddrReset.Text,
+                        cacheQuantity = int.Parse(toolEdit.txtCacheNum.Text)
+                    };
+                    vsMnSb.imageBuffSettings.Add(toolSetting);
                 }
                 else if (tool.ToolType == VisionToolType.SAVEIMAGE)
                 {
@@ -2393,6 +2438,16 @@ namespace VisionInspection
                         addrOutNG = Tool.toolEdit.txtAddrOutNG.Text,
                     };
                     vsMnSb.outAcquisResSettings.Add(toolSetting);
+                }
+                else if (tool.ToolType == VisionToolType.OUTCHECKPRODUCT)
+                {
+                    OutCheckProductTool Tool = (tool as OutCheckProductTool);
+                    if (Tool == null) { continue; }
+                    OutCheckProductSetting toolSetting = new OutCheckProductSetting()
+                    {
+                        arrAddr = Tool.toolEdit.arrAddr,
+                    };
+                    vsMnSb.outCheckProductSettings.Add(toolSetting);
                 }
                 else if (tool.ToolType == VisionToolType.OUTSEGNEURORES)
                 {

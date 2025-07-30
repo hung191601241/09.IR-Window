@@ -7,7 +7,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              d:DataContext="{d:DesignInstance Type=local:SegmentNeuroEdit}"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="500">
+             d:DesignHeight="600" d:DesignWidth="500" Background="#FF8A8A8A">
     <TabControl Background="White">
         <TabControl.ItemContainerStyle>
             <Style TargetType="TabItem">

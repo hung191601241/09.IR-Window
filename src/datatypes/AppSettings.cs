@@ -1129,6 +1129,7 @@ namespace ITM_Semiconductor
         public bool isBlockOut { get; set; }
         public List<ArrowConnectSetting> arrowConnect { get; set; }
         public List<AcquisitionSetting> aquisitionSettings { get; set; }
+        public List<ImageBuffSetting> imageBuffSettings { get; set; }
         public List<SaveImageSetting> saveImageSettings { get; set; }
         public List<TemplateMatchSetting> templateMatchSettings { get; set; }
         public List<FixtureSetting> fixtureSettings { get; set; }
@@ -1141,7 +1142,8 @@ namespace ITM_Semiconductor
         public List<VidiCognexSetting> vidiCognexSettings { get; set; }
         public List<VisionProSetting> visionProSettings { get; set; }
         public List<OutBlobResSetting> outBlobResSettings { get; set; }    
-        public List<OutAcquisResSetting> outAcquisResSettings { get; set; }  
+        public List<OutAcquisResSetting> outAcquisResSettings { get; set; } 
+        public List<OutCheckProductSetting> outCheckProductSettings { get; set; }
         public List<OutSegNeuroResSetting> outSegNeuroResSettings { get; set; }
         public List<OutVidiCogResSetting> outVidiCogResSettings { get; set; }
         public VisionMainSub()
@@ -1154,6 +1156,7 @@ namespace ITM_Semiconductor
             this.isBlockOut = false;
             this.arrowConnect = new List<ArrowConnectSetting>();
             this.aquisitionSettings = new List<AcquisitionSetting>();
+            this.imageBuffSettings = new List<ImageBuffSetting>();
             this.saveImageSettings = new List<SaveImageSetting>();
             this.templateMatchSettings = new List<TemplateMatchSetting>();
             this.fixtureSettings = new List<FixtureSetting>();
@@ -1167,6 +1170,7 @@ namespace ITM_Semiconductor
             this.visionProSettings = new List<VisionProSetting>();
             this.outBlobResSettings = new List<OutBlobResSetting>();
             this.outAcquisResSettings = new List<OutAcquisResSetting>();
+            this.outCheckProductSettings = new List<OutCheckProductSetting>();
             this.outSegNeuroResSettings = new List<OutSegNeuroResSetting>();
             this.outVidiCogResSettings = new List<OutVidiCogResSetting>();
         }
@@ -1182,6 +1186,7 @@ namespace ITM_Semiconductor
                 isBlockOut = this.isBlockOut,
                 arrowConnect = this.arrowConnect,
                 aquisitionSettings = this.aquisitionSettings,
+                imageBuffSettings = this.imageBuffSettings,
                 saveImageSettings = this.saveImageSettings,
                 templateMatchSettings = this.templateMatchSettings,
                 fixtureSettings = this.fixtureSettings,
@@ -1195,6 +1200,7 @@ namespace ITM_Semiconductor
                 visionProSettings = this.visionProSettings,
                 outBlobResSettings = this.outBlobResSettings,
                 outAcquisResSettings= this.outAcquisResSettings,
+                outCheckProductSettings = this.outCheckProductSettings,
                 outSegNeuroResSettings = this.outSegNeuroResSettings,
                 outVidiCogResSettings = this.outVidiCogResSettings,
             };
@@ -1274,6 +1280,27 @@ namespace ITM_Semiconductor
                 Gain = this.Gain,
                 WidthCam = this.WidthCam,
                 HeightCam = this.HeightCam,
+            };
+        }
+    }
+    public class ImageBuffSetting
+    {
+        public DeviceCode selectDevReset { get; set; }
+        public string addrReset { get; set; }
+        public int cacheQuantity { get; set; }
+        public ImageBuffSetting()
+        {
+            selectDevReset = DeviceCode.M;
+            addrReset = "0";
+            cacheQuantity = 1;
+        }
+        public ImageBuffSetting Clone()
+        {
+            return new ImageBuffSetting
+            {
+                addrReset = this.addrReset,
+                cacheQuantity = this.cacheQuantity,
+                selectDevReset = this.selectDevReset,
             };
         }
     }
@@ -1690,6 +1717,22 @@ namespace ITM_Semiconductor
             };
         }
     }
+    public class OutCheckProductSetting
+    {
+        public string[] arrAddr { get; set; }
+        public OutCheckProductSetting()
+        {
+            this.arrAddr = new string[3];
+        }
+
+        public OutCheckProductSetting Clone()
+        {
+            return new OutCheckProductSetting()
+            {
+                arrAddr = this.arrAddr,
+            };
+        }
+    }
     public class OutSegNeuroResSetting
     {
         public string addrOut { get; set; }
@@ -1723,7 +1766,7 @@ namespace ITM_Semiconductor
         public OutVidiCogResSetting()
         {
             this.addrOut = "0";
-            this.selectDevOut = DeviceCode.D;
+            this.selectDevOut = DeviceCode.M;
             this.arrAddr = new string[3];
         }
 
