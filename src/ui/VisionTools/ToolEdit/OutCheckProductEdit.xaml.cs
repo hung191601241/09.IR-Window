@@ -297,8 +297,19 @@ namespace VisionTools.ToolEdit
                 return;
             }
             runImage = InputImage.Clone(true);
-
-
+            switch(Blobs.Count)
+            {
+                case 0:
+                    JudgeVal = 3;
+                    break;
+                case 1:
+                    JudgeVal = 1;
+                    break;
+                default:
+                    JudgeVal = 2;
+                    break;
+            }    
+            txtScore.Text = Score.ToString();
             OutputImage = runImage.Clone(true);
             toolBase.imgView.Source = OutputImage.Mat.ToBitmapSource();
         }

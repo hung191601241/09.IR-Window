@@ -382,8 +382,6 @@ namespace VisionTools.ToolEdit
         {
             toolBase.cbxImage.SelectedIndex = 0;
             oldSelect = 0;
-            CanvasImg.Children.RemoveRange(1, CanvasImg.Children.Count - 1);
-            outEle.RemoveRange(0, outEle.Count);
         }
 
         public void BtnRun_Click(object sender, RoutedEventArgs e)
@@ -662,6 +660,18 @@ namespace VisionTools.ToolEdit
                 shEdit.ReleaseElement();
                 shEdit.KeyDown -= ShEditTrain_KeyDown;
                 shEdit.LostKeyboardFocus -= ShEditTrain_LostKeyboardFocus;
+
+                Rectangle rect = CanvasImg.Children.OfType<Rectangle>().FirstOrDefault();
+                if (rect == null) return;
+                switch(oldSelect)
+                {
+                    case 0:
+                        rectSearchCv = new OpenCvSharp.Rect((int)Canvas.GetLeft(rect), (int)Canvas.GetTop(rect), (int)rect.Width, (int)rect.Height);
+                        break;
+                    case 1:
+                        rectTrainCv = new OpenCvSharp.Rect((int)Canvas.GetLeft(rect), (int)Canvas.GetTop(rect), (int)rect.Width, (int)rect.Height);
+                        break;
+                }    
             }
         }
         private void ImgView_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

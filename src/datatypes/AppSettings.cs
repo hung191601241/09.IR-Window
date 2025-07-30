@@ -1719,9 +1719,13 @@ namespace ITM_Semiconductor
     }
     public class OutCheckProductSetting
     {
+        public string addrOut { get; set; }
+        public DeviceCode selectDevOut { get; set; }
         public string[] arrAddr { get; set; }
         public OutCheckProductSetting()
         {
+            this.addrOut = "0";
+            this.selectDevOut = DeviceCode.M;
             this.arrAddr = new string[3];
         }
 
@@ -1729,6 +1733,8 @@ namespace ITM_Semiconductor
         {
             return new OutCheckProductSetting()
             {
+                addrOut = this.addrOut,
+                selectDevOut = this.selectDevOut,
                 arrAddr = this.arrAddr,
             };
         }

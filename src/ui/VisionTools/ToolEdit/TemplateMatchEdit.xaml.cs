@@ -151,8 +151,6 @@ namespace VisionTools.ToolEdit
         {
             toolBase.cbxImage.SelectedIndex = 0;
             oldSelect = 0;
-            CanvasImg.Children.RemoveRange(1, CanvasImg.Children.Count - 1);
-            outEle.RemoveRange(0, outEle.Count);
         }
 
         public void BtnRun_Click(object sender, RoutedEventArgs e)

@@ -65,9 +65,16 @@ namespace VisionTools.ToolDesign
                 //Trường hợp có 1 Tool báo lỗi
                 if (toolArea.resRunTools > 0)
                 {
-                    toolEdit.JudgeVal = 2;
-                    //Gửi NG đến PLC
-                    toolEdit.SendVisionResult(2);
+                    if(toolEdit.Blobs.Count == 0)
+                    {
+                        toolEdit.JudgeVal = 3;
+                    }   
+                    else
+                    {
+                        toolEdit.JudgeVal = 2;
+                    }    
+                    //Gửi Kết quả đến PLC
+                    toolEdit.SendVisionResult(toolEdit.JudgeVal);
 
                     if (toolEdit.InputImage == null || toolEdit.InputImage.Mat == null || toolEdit.InputImage.Mat.Height <= 0 || toolEdit.InputImage.Mat.Width <= 0)
                     {
@@ -76,7 +83,7 @@ namespace VisionTools.ToolDesign
                         logger.Create("InputImage is null or error!");
                         return false;
                     }
-
+                    toolEdit.txtScore.Text = toolEdit.Score.ToString();
                     toolEdit.OutputImage = toolEdit.InputImage.Clone(true);
                     if (toolEdit.OutputImage.Mat.Channels() == 1)
                     {

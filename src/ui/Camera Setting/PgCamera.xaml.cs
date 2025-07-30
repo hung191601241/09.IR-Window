@@ -2098,6 +2098,8 @@ namespace VisionInspection
 
                 OutCheckProductSetting toolSetting = vsMnSb.outCheckProductSettings[idxToolType];
                 OutCheckProductEdit toolEdit = outResultTool.toolEdit;
+                toolEdit.TxtAddrOut = toolSetting.addrOut;
+                toolEdit.SelectDevOut = toolSetting.selectDevOut;
                 toolEdit.arrAddr = toolSetting.arrAddr;
                 toolEdit.UpdateDataGrid();
             }
@@ -2445,6 +2447,8 @@ namespace VisionInspection
                     if (Tool == null) { continue; }
                     OutCheckProductSetting toolSetting = new OutCheckProductSetting()
                     {
+                        selectDevOut = Tool.toolEdit.SelectDevOut,
+                        addrOut = Tool.toolEdit.TxtAddrOut,
                         arrAddr = Tool.toolEdit.arrAddr,
                     };
                     vsMnSb.outCheckProductSettings.Add(toolSetting);
