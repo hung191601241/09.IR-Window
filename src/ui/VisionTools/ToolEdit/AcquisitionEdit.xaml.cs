@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Development;
+using Microsoft.Win32;
 using MVSDK_Net;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
@@ -47,6 +48,11 @@ namespace VisionTools.ToolEdit
 
         //Binding
         public event PropertyChangedEventHandler PropertyChanged;
+        public Array DeviceCodes => Enum.GetValues(typeof(DeviceCode));
+
+        private DeviceCode _selectDevOK = DeviceCode.M, _selectDevNG = DeviceCode.M;
+        public DeviceCode SelectDevOK { get => _selectDevOK; set => _selectDevOK = value; }
+        public DeviceCode SelectDevNG { get => _selectDevNG; set => _selectDevNG = value; }
         public enum RotateMode { Rotate0, Rotate90, Rotate180, Rotate270 }
         public Array RotateModes => Enum.GetValues(typeof(RotateMode));
         public enum GrayMode { BGR2Gray, RGB2Gray, BGR2RGB }
@@ -180,6 +186,7 @@ namespace VisionTools.ToolEdit
         private void AcquisitionEdit_Unloaded(object sender, RoutedEventArgs e)
         {
             IsStopCamera = true;
+            CheckAddrUse();
         }
 
         private void CbxCamDevice_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -460,16 +467,107 @@ namespace VisionTools.ToolEdit
                 logger.Create("Fit Image Error: " + ex.Message, ex);
             }
         }
+        #region PLC
+        public void CheckAddrUse()
+        {
+            if ((bool)ckbxIsUseBitOK.IsChecked)
+            {
+                if (string.IsNullOrEmpty(txtAddrOK.Text) || !IsPositiveInteger(txtAddrOK.Text))
+                {
+                    MessageBox.Show("PLC Address OK is Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    logger.Create("PLC Address OK is Empty or Error Syntax!");
+                    return;
+                }
+            }
+            if((bool)ckbxIsUseBitNG.IsChecked)
+            {
+
+                if (string.IsNullOrEmpty(txtAddrNG.Text) || !IsPositiveInteger(txtAddrNG.Text))
+                {
+                    MessageBox.Show("PLC Address NG is Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    logger.Create("PLC Address NG is Empty or Error Syntax!");
+                    return;
+                }
+            }    
+        }
+        public bool String2Enum(string strDev, out DeviceCode _devType, out string _strDevNo)
+        {
+            bool isDefined = false;
+            string letters = "";
+            _devType = DeviceCode.M;
+            _strDevNo = "";
+            try
+            {
+                foreach (char synx in strDev)
+                {
+                    if (char.IsLetter(synx)) { letters += synx; }
+                    else if (char.IsDigit(synx)) { _strDevNo += synx; }
+                }
+
+                isDefined = Enum.IsDefined(typeof(DeviceCode), letters);
+                if (isDefined)
+                {
+                    _devType = (DeviceCode)Enum.Parse(typeof(DeviceCode), letters);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Convert syntax error: " + ex.Message);
+            }
+            return isDefined;
+        }
+        bool IsPositiveInteger(string input)
+        {
+            return int.TryParse(input, out int number) && number >= 0;
+        }
+        private bool SendResultOK(bool value)
+        {
+            try
+            {
+                return UiManager.PLC1.device.WriteBit(SelectDevOK, int.Parse(txtAddrOK.Text), value);
+            }
+            catch (Exception ex)
+            {
+                logger.Create(String.Format("TRIGGER_OK Error: " + ex.Message));
+                return false;
+            }
+        }
+        private bool SendResultNG(bool value)
+        {
+            try
+            {
+                return UiManager.PLC1.device.WriteBit(SelectDevNG, int.Parse(txtAddrNG.Text), value);
+            }
+            catch (Exception ex)
+            {
+                logger.Create(String.Format("TRIGGER_NG Error: " + ex.Message));
+                return false;
+            }
+        }
+        private void SendTriggerCpl(bool value)
+        {
+            if ((bool)ckbxIsUseBitOK.IsChecked)
+            {
+                SendResultOK(value);
+            }
+            if ((bool)ckbxIsUseBitNG.IsChecked)
+            {
+                SendResultNG(!value);
+            }
+        }
+        #endregion
         public override void Run()
         {
             Mat img = null;
             OutputImage = new SvImage(new Mat());
             try
             {
+                CheckAddrUse();
                 if (isImageFolder && !isImageCam)
                 {
                     if (imgFolderLst.Count <= 0)
                     {
+                        SendTriggerCpl(false);
                         meaRunTime.Stop();
                         toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Can't find any image is imported from folder image!");
                         return;
@@ -478,10 +576,12 @@ namespace VisionTools.ToolEdit
                     img = ImgRunPara(imgFolderLst[countNxBk]);
                     if (img == null)
                     {
+                        SendTriggerCpl(false);
                         meaRunTime.Stop();
                         toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Image From Folder Path Error!");
                         return;
                     }
+                    SendTriggerCpl(true);
                     ImgViewSource = img.ToBitmapSource();
                     OutputImage.Mat = img;
                 }
@@ -491,15 +591,18 @@ namespace VisionTools.ToolEdit
                     img = this.Camera.CaptureImage();
                     if (img == null)
                     {
+                        SendTriggerCpl(false);
                         meaRunTime.Stop();
                         toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Camera Grab Image Fail!");
                         return;
                     }
+                    SendTriggerCpl(true);
                     ImgViewSource = img.ToBitmapSource();
                     OutputImage.Mat = img;
                 }
                 if (img == null)
                 {
+                    SendTriggerCpl(false);
                     meaRunTime.Stop();
                     toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Have no Image Source!");
                     return;

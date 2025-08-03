@@ -115,40 +115,6 @@ namespace VisionTools.ToolEdit
                 return false;
             }
         }
-        private bool String2Enum(string strDev, out DeviceCode _devType, out string _strDevNo)
-        {
-            bool isDefined = false;
-            string letters = "";
-            _devType = DeviceCode.M;
-            _strDevNo = "";
-            try
-            {
-                foreach (char synx in strDev)
-                {
-                    if (char.IsLetter(synx)) { letters += synx; }
-                    else if (char.IsDigit(synx)) { _strDevNo += synx; }
-                }
-
-                isDefined = Enum.IsDefined(typeof(DeviceCode), letters);
-                if (isDefined)
-                {
-                    _devType = (DeviceCode)Enum.Parse(typeof(DeviceCode), letters);
-                }
-            }
-            catch (Exception ex)
-            {
-                //MessageBox.Show(ex.Message);
-                logger.Create("Convert syntax error: " + ex.Message, ex);
-            }
-            return isDefined;
-        }
-        public void SendResultToPLC(string addrOK, string addrNG, bool result)
-        {
-            String2Enum(addrOK, out DeviceCode devCodeOK, out string devNoOK);
-            SetResultOK(devCodeOK, devNoOK, result);
-            String2Enum(addrNG, out DeviceCode devCodeNG, out string devNoNG);
-            SetResultNG(devCodeNG, devNoNG, !result);
-        }
         public void BtnRun_Click(object sender, RoutedEventArgs e)
         {
             OnBtnRunClicked?.Invoke(sender, e);

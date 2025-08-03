@@ -51,13 +51,19 @@ namespace VisionInspection
         Boolean IsRunning = false;
         Boolean Camera1IsConnect = false;
         //List Result Communication
-        private bool READ_VISION_TRIG = false;
-        private bool READ_CHANGE_JOB1 = false;
-        private bool READ_CHANGE_JOB2 = false;
-        private bool READ_CHANGE_JOB3 = false;
+        private bool READ_VISION_TRIG1 = false;
+        private bool READ_VISION_TRIG2 = false;
+        private bool READ_VISION_TRIG3 = false;
+        private bool READ_VISION_TRIG4 = false;
+        private bool READ_VISION_RESET1 = false;
+        private bool READ_VISION_RESET2 = false;
+        private Thread runThread0;
         private Thread runThread1;
         private Thread runThread2;
-        private bool Flag1 = false;
+        private Thread runThread3;
+        private Thread runThread4;
+        private bool vsComplete1 = false, vsComplete2 = false, vsComplete3 = false, vsComplete4;
+        private bool Flag1 = false, Flag2 = false, Flag3 = false, Flag4 = false;
 
         public PgMainVision()
         {
@@ -371,9 +377,9 @@ namespace VisionInspection
         {
             try
             {
-                runThread2 = new Thread(ReadPLC);
-                runThread2.IsBackground = true;
-                runThread2.Start();
+                runThread0 = new Thread(ReadPLC);
+                runThread0.IsBackground = true;
+                runThread0.Start();
             }
             catch (Exception ex)
             {
@@ -458,54 +464,223 @@ namespace VisionInspection
         }
         private void RunThread()
         {
-            CallThreadStart();
+            CallThreadStart1();
+            CallThreadStart2();
+            CallThreadStart3();
+            CallThreadStart4();
         }
-        private void CallThreadStart()
+        private void CallThreadStart1()
         {
             try
             {
-                runThread1 = new Thread(RunManager);
+                runThread1 = new Thread(RunManager1);
                 runThread1.IsBackground = true;
                 runThread1.Start();
             }
             catch (Exception ex)
             {
-                logger.Create("Start thread Auto loop Err : " + ex.ToString());
+                logger.Create("Start thread Auto loop 1 Err : " + ex.ToString());
+            }
+        }
+        private void CallThreadStart2()
+        {
+            try
+            {
+                runThread2 = new Thread(RunManager2);
+                runThread2.IsBackground = true;
+                runThread2.Start();
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Start thread Auto loop 2 Err : " + ex.ToString());
+            }
+        }
+        private void CallThreadStart3()
+        {
+            try
+            {
+                runThread3 = new Thread(RunManager3);
+                runThread3.IsBackground = true;
+                runThread3.Start();
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Start thread Auto loop 3 Err : " + ex.ToString());
+            }
+        }
+        private void CallThreadStart4()
+        {
+            try
+            {
+                runThread4 = new Thread(RunManager4);
+                runThread4.IsBackground = true;
+                runThread4.Start();
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Start thread Auto loop 4 Err : " + ex.ToString());
             }
         }
 
-        private bool vsComplete = false;
-        private void RunManager()
+        private void RunManager1()
         {
             try
             {
                 DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[0].selectDevIn;
                 string addrIn = pgCamera.curVsProgram.vsProgramNs[0].addrIn;
-                GetTriggerVision(devIn, addrIn, out READ_VISION_TRIG);
-                if (READ_VISION_TRIG && !Flag1)
+                GetTriggerVision(devIn, addrIn, out READ_VISION_TRIG1);
+                if (READ_VISION_TRIG1 && !Flag1)
                 {
                     AddLog($"TRIGGER: {devIn}{addrIn} = ON");
-                    vsComplete = false;
+                    vsComplete1 = false;
                     Flag1 = true;
                     Task.Run(() =>
                     {
-                        this.RunManagerVision_Align(0);
-                        vsComplete = true;
+                        this.RunManagerVision_Align();
+                        vsComplete1 = true;
                         Flag1 = false;
                     });
-                    while (!vsComplete) ;
+                    while (!vsComplete1) ;
                     //Clear Bit Trigger Vision
                     if (SetTriggerVision(devIn, addrIn, false))
                         AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
                 }
                 Thread.Sleep(10);
-                CallThreadStart();
+                CallThreadStart1();
             }
             catch (Exception ex)
             {
-                logger.Create($"Auto Run Manager Error : {ex}");
+                logger.Create($"Auto Run Manager 1 Error : {ex}");
                 Thread.Sleep(10);
-                CallThreadStart();
+                CallThreadStart1();
+            }
+        }
+        private void RunManager2()
+        {
+            try
+            {
+                DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[1].selectDevIn;
+                string addrIn = pgCamera.curVsProgram.vsProgramNs[1].addrIn;
+                GetTriggerVision(devIn, addrIn, out READ_VISION_TRIG2);
+                if (READ_VISION_TRIG2 && !Flag2)
+                {
+                    AddLog($"TRIGGER: {devIn}{addrIn} = ON");
+                    vsComplete2 = false;
+                    Flag2 = true;
+                    Task.Run(() =>
+                    {
+                        this.RunManagerVision_CheckProduct();
+                        vsComplete2 = true;
+                        Flag2 = false;
+                    });
+                    while (!vsComplete2) ;
+                    //Clear Bit Trigger Vision
+                    if (SetTriggerVision(devIn, addrIn, false))
+                        AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
+                }
+                Thread.Sleep(10);
+                CallThreadStart2();
+            }
+            catch (Exception ex)
+            {
+                logger.Create($"Auto Run Manager 2 Error : {ex}");
+                Thread.Sleep(10);
+                CallThreadStart2();
+            }
+        }
+        private void RunManager3()
+        {
+            try
+            {
+                //Reset Vision
+                var vsMain = pgCamera.toolAreaGrs[2].ToolAreaMain;
+                bool cpl = false;
+                this.Dispatcher.Invoke(() =>
+                {
+                    SegmentNeuroEdit toolOutEdit = vsMain.Children.OfType<SegmentNeuroTool>().FirstOrDefault().toolEdit;
+                    toolOutEdit.ReceiveBitReset(out READ_VISION_RESET1);
+                    if (READ_VISION_RESET1)
+                    {
+                        AddLog($"BIT RESET 1 ON");
+                        Task.Run(toolOutEdit.ResetBuffer);
+                        toolOutEdit.SendBitReset(false);
+                    }
+                    cpl = true;
+                });
+                while (!cpl) ;
+                //Trigger Vision
+                DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[2].selectDevIn;
+                string addrIn = pgCamera.curVsProgram.vsProgramNs[2].addrIn;
+                GetTriggerVision(devIn, addrIn, out READ_VISION_TRIG3);
+                if (READ_VISION_TRIG3 && !Flag3)
+                {
+                    AddLog($"TRIGGER: {devIn}{addrIn} = ON");
+                    vsComplete3 = false;
+                    Flag3 = true;
+                    Task.Run(() =>
+                    {
+                        this.RunManagerVision_Inspection1();
+                        vsComplete3 = true;
+                        Flag3 = false;
+                    });
+                    while (!vsComplete3) ;
+                    //Clear Bit Trigger Vision
+                    if (SetTriggerVision(devIn, addrIn, false))
+                        AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
+                }
+                Thread.Sleep(10);
+                CallThreadStart3();
+            }
+            catch (Exception ex)
+            {
+                logger.Create($"Auto Run Manager 3 Error : {ex}");
+                Thread.Sleep(10);
+                CallThreadStart3();
+            }
+        }
+        private void RunManager4()
+        {
+            try
+            {
+                //Reset Vision
+                var vsMain = pgCamera.toolAreaGrs[3].ToolAreaMain;
+                SegmentNeuroEdit toolOutEdit = vsMain.Children.OfType<SegmentNeuroTool>().FirstOrDefault().toolEdit;
+                toolOutEdit.ReceiveBitReset(out READ_VISION_RESET1);
+                if (READ_VISION_RESET2)
+                {
+                    AddLog($"BIT RESET 2 ON");
+                    Task.Run(toolOutEdit.ResetBuffer);
+                    toolOutEdit.SendBitReset(false);
+                }
+
+                //Trigger Vision
+                DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[3].selectDevIn;
+                string addrIn = pgCamera.curVsProgram.vsProgramNs[3].addrIn;
+                GetTriggerVision(devIn, addrIn, out READ_VISION_TRIG4);
+                if (READ_VISION_TRIG4 && !Flag4)
+                {
+                    AddLog($"TRIGGER: {devIn}{addrIn} = ON");
+                    vsComplete4 = false;
+                    Flag4 = true;
+                    Task.Run(() =>
+                    {
+                        this.RunManagerVision_Inspection2();
+                        vsComplete4 = true;
+                        Flag4 = false;
+                    });
+                    while (!vsComplete4) ;
+                    //Clear Bit Trigger Vision
+                    if (SetTriggerVision(devIn, addrIn, false))
+                        AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
+                }
+                Thread.Sleep(10);
+                CallThreadStart4();
+            }
+            catch (Exception ex)
+            {
+                logger.Create($"Auto Run Manager 4 Error : {ex}");
+                Thread.Sleep(10);
+                CallThreadStart4();
             }
         }
         private void RunManagerVision_IV3(int idxVPn = 0)
@@ -632,25 +807,25 @@ namespace VisionInspection
                 }
             });
         }
-        private void RunManagerVision_Align(int idxVPn = 0)
+        private void RunManagerVision_Align()
         {
             //Gửi kết quả sau khi chụp xong
             Dispatcher.Invoke(() =>
             {
-                pgCamera.RunTreeToolVP(pgCamera.toolAreaGrs[idxVPn]);
+                pgCamera.RunTreeToolVP(pgCamera.toolAreaGrs[0]);
             });
             // Chạy phần xử lý ảnh ở luồng khác
             Task.Run(() =>
             {
                 Dispatcher.Invoke(() =>
                 {
-                    TempMatchZeroTool visionTool = pgCamera.toolAreaGrs[idxVPn].ToolAreaMain.Children.OfType<TempMatchZeroTool>().FirstOrDefault();
+                    TempMatchZeroTool visionTool = pgCamera.toolAreaGrs[0].ToolAreaMain.Children.OfType<TempMatchZeroTool>().FirstOrDefault();
                     if (visionTool == null)
                         return;
                     TempMatchZeroEdit toolEdit = visionTool.toolEdit;
                     if (toolEdit.OutputImage.Mat == null || toolEdit.OutputImage.Mat.Width == 0 || toolEdit.OutputImage.Mat.Height == 0)
                     {
-                        AddLog("Image Capture NULL!");
+                        AddLog("Image Capture Align NULL!");
                         return;
                     }
                     AddLog($"Score = {toolEdit.OutScore}");
@@ -658,6 +833,83 @@ namespace VisionInspection
                     AddLog($"Offset Y = {toolEdit.OutOffsetY} mm");
                     imgView1.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
                     toolEdit.OutputImage.Mat.SaveImage($"D:\\LogImageAlign\\AlignGrap {DateTime.Now:yyyy-MM-dd HH-mm-ss-fff}.bmp");
+                });
+            });
+        }
+        private void RunManagerVision_CheckProduct()
+        {
+            //Gửi kết quả sau khi chụp xong
+            Dispatcher.Invoke(() =>
+            {
+                pgCamera.RunTreeToolVP(pgCamera.toolAreaGrs[1]);
+            });
+            // Chạy phần xử lý ảnh ở luồng khác
+            Task.Run(() =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    OutCheckProductTool visionTool = pgCamera.toolAreaGrs[1].ToolAreaMain.Children.OfType<OutCheckProductTool>().FirstOrDefault();
+                    if (visionTool == null)
+                        return;
+                    OutCheckProductEdit toolEdit = visionTool.toolEdit;
+                    if (toolEdit.OutputImage.Mat == null || toolEdit.OutputImage.Mat.Width == 0 || toolEdit.OutputImage.Mat.Height == 0)
+                    {
+                        AddLog("Image Capture Check Product NULL!");
+                        return;
+                    }
+                    AddLog($"Score = {toolEdit.Score}");
+                    AddLog($"Blob Count = {toolEdit.Blobs.Count}");
+                    imgView2.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
+                });
+            });
+        }
+        private void RunManagerVision_Inspection1()
+        {
+            //Gửi kết quả sau khi chụp xong
+            Dispatcher.Invoke(() =>
+            {
+                pgCamera.RunTreeToolVP(pgCamera.toolAreaGrs[2]);
+            });
+            // Chạy phần xử lý ảnh ở luồng khác
+            Task.Run(() =>
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    SegmentNeuroTool visionTool = pgCamera.toolAreaGrs[2].ToolAreaMain.Children.OfType<SegmentNeuroTool>().FirstOrDefault();
+                    if (visionTool == null)
+                        return;
+                    SegmentNeuroEdit toolEdit = visionTool.toolEdit;
+                    if (toolEdit.OutputImage.Mat == null || toolEdit.OutputImage.Mat.Width == 0 || toolEdit.OutputImage.Mat.Height == 0)
+                    {
+                        AddLog("Image Capture Inspection 1 NULL!");
+                        return;
+                    }
+                    imgView3.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
+                });
+            });
+        }
+        private void RunManagerVision_Inspection2()
+        {
+            //Gửi kết quả sau khi chụp xong
+            Dispatcher.Invoke(() =>
+            {
+                pgCamera.RunTreeToolVP(pgCamera.toolAreaGrs[3]);
+            });
+            // Chạy phần xử lý ảnh ở luồng khác
+            Task.Run(() =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    SegmentNeuroTool visionTool = pgCamera.toolAreaGrs[3].ToolAreaMain.Children.OfType<SegmentNeuroTool>().FirstOrDefault();
+                    if (visionTool == null)
+                        return;
+                    SegmentNeuroEdit toolEdit = visionTool.toolEdit;
+                    if (toolEdit.OutputImage.Mat == null || toolEdit.OutputImage.Mat.Width == 0 || toolEdit.OutputImage.Mat.Height == 0)
+                    {
+                        AddLog("Image Capture Inspection 2 NULL!");
+                        return;
+                    }
+                    imgView4.Source = toolEdit.OutputImage.Mat.ToBitmapSource();
                 });
             });
         }

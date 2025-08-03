@@ -351,9 +351,6 @@
     <Compile Include="src\ui\VisionTools\ToolDesign\ImageProcessTool.xaml.cs">
       <DependentUpon>ImageProcessTool.xaml</DependentUpon>
     </Compile>
-    <Compile Include="src\ui\VisionTools\ToolDesign\OutAcquisResTool.xaml.cs">
-      <DependentUpon>OutAcquisResTool.xaml</DependentUpon>
-    </Compile>
     <Compile Include="src\ui\VisionTools\ToolDesign\OutCheckProductTool.xaml.cs">
       <DependentUpon>OutCheckProductTool.xaml</DependentUpon>
     </Compile>
@@ -572,10 +569,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="src\ui\VisionTools\ToolDesign\ImageProcessTool.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="src\ui\VisionTools\ToolDesign\OutAcquisResTool.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

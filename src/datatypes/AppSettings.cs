@@ -1142,7 +1142,6 @@ namespace ITM_Semiconductor
         public List<VidiCognexSetting> vidiCognexSettings { get; set; }
         public List<VisionProSetting> visionProSettings { get; set; }
         public List<OutBlobResSetting> outBlobResSettings { get; set; }    
-        public List<OutAcquisResSetting> outAcquisResSettings { get; set; } 
         public List<OutCheckProductSetting> outCheckProductSettings { get; set; }
         public List<OutSegNeuroResSetting> outSegNeuroResSettings { get; set; }
         public List<OutVidiCogResSetting> outVidiCogResSettings { get; set; }
@@ -1169,7 +1168,6 @@ namespace ITM_Semiconductor
             this.vidiCognexSettings = new List<VidiCognexSetting>();
             this.visionProSettings = new List<VisionProSetting>();
             this.outBlobResSettings = new List<OutBlobResSetting>();
-            this.outAcquisResSettings = new List<OutAcquisResSetting>();
             this.outCheckProductSettings = new List<OutCheckProductSetting>();
             this.outSegNeuroResSettings = new List<OutSegNeuroResSetting>();
             this.outVidiCogResSettings = new List<OutVidiCogResSetting>();
@@ -1199,7 +1197,6 @@ namespace ITM_Semiconductor
                 vidiCognexSettings = this.vidiCognexSettings,
                 visionProSettings = this.visionProSettings,
                 outBlobResSettings = this.outBlobResSettings,
-                outAcquisResSettings= this.outAcquisResSettings,
                 outCheckProductSettings = this.outCheckProductSettings,
                 outSegNeuroResSettings = this.outSegNeuroResSettings,
                 outVidiCogResSettings = this.outVidiCogResSettings,
@@ -1246,6 +1243,12 @@ namespace ITM_Semiconductor
         public double Gain { get; set; }
         public long WidthCam { get; set; }
         public long HeightCam { get; set; }
+        public string addrOK { get; set; }
+        public string addrNG { get; set; }
+        public DeviceCode selectDevOK { get; set; }
+        public DeviceCode selectDevNG { get; set; }
+        public bool isUseBitOK { get; set; }
+        public bool isUseBitNG { get; set; }
         public AcquisitionSetting()
         {
             this.eCamDevType = ECamDevType.Hikrobot;
@@ -1262,6 +1265,13 @@ namespace ITM_Semiconductor
             this.Gain = 0d;
             this.WidthCam = 500;
             this.HeightCam = 500;
+
+            this.addrOK = "0";
+            this.addrNG = "1";
+            this.selectDevOK = DeviceCode.M;
+            this.selectDevNG = DeviceCode.M;
+            this.isUseBitOK = false;
+            this.isUseBitNG = false;
         }
         public AcquisitionSetting Clone()
         {
@@ -1280,6 +1290,12 @@ namespace ITM_Semiconductor
                 Gain = this.Gain,
                 WidthCam = this.WidthCam,
                 HeightCam = this.HeightCam,
+                addrOK = this.addrOK,
+                addrNG = this.addrNG,
+                selectDevOK = this.selectDevOK,
+                selectDevNG = this.selectDevNG,
+                isUseBitOK = this.isUseBitOK,
+                isUseBitNG = this.isUseBitNG,
             };
         }
     }
@@ -1562,10 +1578,19 @@ namespace ITM_Semiconductor
         public Point3d cpPattern { get; set; }
         public PatternData patternDataSetting { get; set; }
         public List<PatternData> patternLst { get; set; }
-        public int numPattern {  get; set; }
+        public int numPattern { get; set; }
         public bool isUseROI { get; set; }
         public Rect rectSearch { get; set; }
         public Rect rectTrain { get; set; }
+
+        //Alignment
+        public bool isUsePx2Mm { get; set; }
+        public bool isSendData2PLC { get; set; }
+        public double mmPixelVal { get; set; }
+        public string addrOffsetX { get; set; }
+        public string addrOffsetY { get; set; }
+        public string addrCpl { get; set; }
+        public string valCpl { get; set; }
         public TempMatchZeroSetting()
         {
             this.priorityCreteria = 0.75;
@@ -1573,10 +1598,18 @@ namespace ITM_Semiconductor
             this.cpPattern = new Point3d();
             this.patternDataSetting = new PatternData();
             this.patternLst = new List<PatternData>();
-            numPattern = 0;
-            isUseROI = true;
-            rectSearch = new Rect(10, 10, 100, 100);
-            rectTrain = new Rect(10, 10, 100, 100);
+            this.numPattern = 0;
+            this.isUseROI = true;
+            this.rectSearch = new Rect(10, 10, 100, 100);
+            this.rectTrain = new Rect(10, 10, 100, 100);
+
+            this.isUsePx2Mm = false;
+            this.isSendData2PLC = false;
+            this.mmPixelVal = 1d;
+            this.addrOffsetX = "D0";
+            this.addrOffsetY = "D2";
+            this.addrCpl = "M0";
+            this.valCpl = "True";
         }
 
         public TempMatchZeroSetting Clone()
@@ -1592,20 +1625,97 @@ namespace ITM_Semiconductor
                 isUseROI = this.isUseROI,
                 rectSearch = this.rectSearch,
                 rectTrain = this.rectTrain,
+
+                isUsePx2Mm = this.isUsePx2Mm,
+                isSendData2PLC = this.isSendData2PLC,
+                mmPixelVal = this.mmPixelVal,
+                addrOffsetX = this.addrOffsetX,
+                addrOffsetY = this.addrOffsetY,
+                addrCpl = this.addrCpl,
+                valCpl = this.valCpl,
             };
         }
     }
     public class SegmentNeuroSetting
     {
+        //Save Image 
+        public bool isUseSaveImage { get; set; }
+        public string fileName { get; set; }
+        public string folderPath { get; set; }
+        public string imageFormat { get; set; }
+        public bool isAddDateTime { get; set; }
+        public bool isAddCounter { get; set; }
+        public int counter { get; set; }
+        public double imageStorage { get; set; }
+        //PLC
+        public string addrReset { get; set; }
+        public string addrOK { get; set; }
+        public string addrNG { get; set; }
+        public string addrRcvImg { get; set; }
+        public DeviceCode selectDevReset { get; set; }
+        public DeviceCode selectDevOK { get; set; }
+        public DeviceCode selectDevNG { get; set; }
+        public DeviceCode selectDevRcvImg { get; set; }
+        public List<string> addrOKLst { get; set; }
+        public List<string> addrNGLst { get; set; }
+        public bool isUseBitRcvImg { get; set; }
+        public bool isUseBitReset { get; set; }
+        public int numberPos { get; set; }
         public List<NeuroModel> modelNeuroes { get; set; }
         public SegmentNeuroSetting()
         {
+            this.isUseSaveImage = false;
+            this.fileName = "ImageName";
+            this.folderPath = @"C:\";
+            this.imageFormat = "BMP";
+            this.isAddDateTime = false;
+            this.isAddCounter = false;
+            this.counter = 0;
+            this.imageStorage = 5d;
+
+            this.addrReset = "0";
+            this.addrOK = "1";
+            this.addrNG = "2";
+            this.addrRcvImg = "3";
+            this.selectDevReset = DeviceCode.M;
+            this.selectDevOK = DeviceCode.M;
+            this.selectDevNG = DeviceCode.M;
+            this.selectDevRcvImg = DeviceCode.M;
+            this.addrOKLst = new List<string>();
+            this.addrNGLst = new List<string>();
+            this.isUseBitRcvImg = false;
+            this.isUseBitRcvImg = false;
+            this.numberPos = 1;
+
             this.modelNeuroes = new List<NeuroModel>();
         }
         public SegmentNeuroSetting Clone()
         {
             return new SegmentNeuroSetting()
             {
+                isUseSaveImage = this.isUseSaveImage,
+                fileName = this.fileName,
+                folderPath = this.folderPath,
+                imageFormat = this.imageFormat,
+                isAddDateTime = this.isAddDateTime,
+                isAddCounter = this.isAddCounter,
+                counter = this.counter,
+                imageStorage = this.imageStorage,
+
+                addrReset = this.addrReset,
+                addrOK = this.addrOK,
+                addrNG = this.addrNG,
+                addrRcvImg = this.addrRcvImg,
+                selectDevOK = this.selectDevOK,
+                selectDevNG = this.selectDevNG,
+                selectDevReset = this.selectDevReset,
+                selectDevRcvImg = this.selectDevRcvImg,
+                addrOKLst = this.addrOKLst,
+                addrNGLst = this.addrNGLst,
+                isUseBitRcvImg = this.isUseBitRcvImg,
+                isUseBitReset = this.isUseBitReset,
+                numberPos = this.numberPos,
+
                 modelNeuroes = this.modelNeuroes,
             };
         }
@@ -1683,37 +1793,6 @@ namespace ITM_Semiconductor
                 addrNGLst = this.addrNGLst,
                 indexImgs = this.indexImgs,
                 distanceSet = this.distanceSet,
-            };
-        }
-    }
-    public class OutAcquisResSetting
-    {
-        public string addrOutOK { get; set; }
-        public string addrOutNG { get; set; }
-        public DeviceCode selectDevOutOK { get; set; }
-        public DeviceCode selectDevOutNG { get; set; }
-        public List<string> addrOKLst { get; set; }
-        public List<string> addrNGLst { get; set; }
-        public OutAcquisResSetting()
-        {
-            this.addrOutOK = "0";
-            this.addrOutNG = "1";
-            this.selectDevOutOK = DeviceCode.M;
-            this.selectDevOutNG = DeviceCode.M;
-            this.addrOKLst = new List<string>();
-            this.addrNGLst = new List<string>();
-        }
-
-        public OutAcquisResSetting Clone()
-        {
-            return new OutAcquisResSetting()
-            {
-                addrOutOK = this.addrOutOK,
-                addrOutNG = this.addrOutNG,
-                selectDevOutOK = this.selectDevOutOK,
-                selectDevOutNG = this.selectDevOutNG,
-                addrOKLst = this.addrOKLst,
-                addrNGLst = this.addrNGLst,
             };
         }
     }

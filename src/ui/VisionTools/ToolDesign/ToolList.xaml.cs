@@ -103,10 +103,6 @@ namespace VisionTools.ToolDesign
                         tool.ToolType = VisionToolType.OUTBLOBRES;
                         data.SetData(typeof(VisionTool), tool); // đăng theo kiểu cha
                         break;
-                    case "lbOutAcquisResTool":
-                        tool.ToolType = VisionToolType.OUTACQUISRES;
-                        data.SetData(typeof(VisionTool), tool); // đăng theo kiểu cha
-                        break;
                     case "lbOutCheckProductTool":
                         tool.ToolType = VisionToolType.OUTCHECKPRODUCT;
                         data.SetData(typeof(VisionTool), tool); // đăng theo kiểu cha
