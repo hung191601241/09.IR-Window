@@ -34,7 +34,6 @@ namespace VisionTools.ToolDesign
         //Output Tool
         OUTIMAGESUB = 100,
         OUTBLOBRES = 101,
-        OUTACQUISRES = 102,
         OUTSEGNEURORES = 103,
         OUTVIDICOGRES = 104,
         OUTCHECKPRODUCT = 105,

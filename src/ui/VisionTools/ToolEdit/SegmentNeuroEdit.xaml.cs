@@ -1,4 +1,6 @@
-﻿using nrt;
+﻿using AutoLaserCuttingInput;
+using Development;
+using nrt;
 using OpenCvSharp;
 using OpenCvSharp.Cuda;
 using OpenCvSharp.Extensions;
@@ -6,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -32,6 +35,10 @@ namespace VisionTools.ToolEdit
     {
         //Variables
         private MyLogger logger = new MyLogger("SegmentNeuro Edit");
+        private DataTable dataTable = new DataTable();
+        private DataView dataView = new DataView();
+        public List<string> addrOKLst = new List<string>();
+        public List<string> addrNGLst = new List<string>();
         public event RoutedEventHandler OnBtnRunClicked;
         private Dictionary<int, nrt.Predictor> predictors = new Dictionary<int, Predictor>();
         private Dictionary<int, nrt.Flowchart> flowcharts = new Dictionary<int, nrt.Flowchart>();
@@ -40,6 +47,16 @@ namespace VisionTools.ToolEdit
         public List<NeuroModel> modelList = new List<NeuroModel>();
         public bool isPdInitCompl = true;
         public bool isFcInitCompl = true;
+
+        private SvImage runImage = new SvImage();
+        public List<float> ScoreLst = new List<float>();
+        public List<int> JudgeLst = new List<int>();
+        public List<string> MessLst = new List<string>();
+
+        public List<Mat> RunImageLst = new List<Mat>();
+        public List<Mat> OutputImageLst = new List<Mat>();
+        private nrt.Input inputs = new nrt.Input();
+        public int Inc = 0;
 
         //InOut
         private SvImage _inputImage = new SvImage();
@@ -61,10 +78,39 @@ namespace VisionTools.ToolEdit
         public int Judge { get; set; } = 0;
         //[*********************************** BINDING ***********************************]
         public event PropertyChangedEventHandler PropertyChanged;
+        #region Fields
+        public Array DeviceCodes => Enum.GetValues(typeof(DeviceCode));
+        private DeviceCode _selectDevOK = DeviceCode.M, _selectDevNG = DeviceCode.M, _selectDevReset = DeviceCode.M, _selectDevRcvImg = DeviceCode.M;
+        private double _numUDImgStorage = 0d, _maxImgStorage = 10d;
+        private int _numUDCounter = 0, _indexImage = 0;
+        #endregion
+
+        #region Properties
+        public string ImageFormatSelected { get; set; } = "BMP";
+        public bool IsAddDateTime { get; set; } = false;
+        public bool IsAddCounter { get; set; } = false;
+        public string DiskSize { get; set; } = "GB";
+        public int IndexImage { get => _indexImage; set { _indexImage = value; OnPropertyChanged(nameof(IndexImage)); } }
+        public int NumUDCounter { get => _numUDCounter; set { _numUDCounter = value; OnPropertyChanged(nameof(NumUDCounter)); } }
+        public double NumUDImageStorage { get => _numUDImgStorage; set { _numUDImgStorage = value; OnPropertyChanged(nameof(NumUDImageStorage)); } }
+        public double MaxImageStorage { get => _maxImgStorage; set { _maxImgStorage = value; OnPropertyChanged(nameof(MaxImageStorage)); } }
+        public DeviceCode SelectDevOK { get => _selectDevOK; set => _selectDevOK = value; }
+        public DeviceCode SelectDevNG { get => _selectDevNG; set => _selectDevNG = value; }
+        public DeviceCode SelectDevReset { get => _selectDevReset; set => _selectDevReset = value; }
+        public DeviceCode SelectDevRcvImg { get => _selectDevRcvImg; set => _selectDevRcvImg = value; }
+        public int NumberPos { get; set; } = 0;
+        public string TxtAddrOK { get; set; } = "";
+        public string TxtAddrNG { get; set; } = "";
+        public string TxtAddrReset { get; set; } = ""; 
+        public string TxtAddrRcvImg { get; set; } = ""; 
+        public DataView DataView { get => dataView; set { dataView = value; OnPropertyChanged(nameof(DataView)); } }
         public ObservableCollection<string> BindableDevices { get; set; } = new ObservableCollection<string>();
         public string DeviceSelected { get; set; } = "";
         public int DevCbxIdx { get; set; } = 0;
         public int xctScore { get; set; } = 0;
+        public int xctBatchSize { get; set; } = 0;
+        #endregion
+
         protected void OnPropertyChanged(string pptName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(pptName));
@@ -103,8 +149,8 @@ namespace VisionTools.ToolEdit
         {
             toolBase.btnRun.Click += BtnRun_Click;
             toolBase.cbxImage.SelectionChanged += CbxImage_SelectionChanged;
+            this.Unloaded += SegmentNeuroEdit_Unloaded;
         }
-
         private void CbxImage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -152,10 +198,10 @@ namespace VisionTools.ToolEdit
                 MessageBox.Show("Score is Empty!!!");
                 return;
             }
-            CreatNewModel(txtModelName.Text, txtModelPath.Text, "", DeviceSelected, DevCbxIdx-1, Convert.ToInt32(xctScore), modelList.Count);
+            CreatNewModel(txtModelName.Text, txtModelPath.Text, "", DeviceSelected, DevCbxIdx-1, Convert.ToInt32(xctScore), Convert.ToInt32(xctBatchSize), modelList.Count);
         }
         private List<TextBox> txtModelNameList = new List<TextBox>();
-        public void CreatNewModel(string name, string path, string pathRuntime, string devSelected, int deviceIdx, int Score, int index)
+        public void CreatNewModel(string name, string path, string pathRuntime, string devSelected, int deviceIdx, int Score, int BatchSize, int index)
         {
             try
             {
@@ -339,9 +385,28 @@ namespace VisionTools.ToolEdit
                     Width = 100,
                     Name = String.Format("xctModelScore00{0}", index.ToString())
                 };
+                Label lbBatch = new Label
+                {
+                    Content = "Batch Size",
+                    Width = 90,
+                    Foreground = Brushes.Black,
+                    Margin = new Thickness(45, 0, 0, 0)
+                };
+                Xceed.Wpf.Toolkit.IntegerUpDown xctBatchSize = new Xceed.Wpf.Toolkit.IntegerUpDown
+                {
+                    Minimum = 0,
+                    Maximum = 100,
+                    Value = BatchSize,
+                    Width = 100,
+                    IsReadOnly = true,
+                    Name = String.Format("xctModelBatchSize00{0}", index.ToString())
+                };
                 xct.ValueChanged += Xct_ValueChanged;
+                xctBatchSize.ValueChanged += XctBatchSize_ValueChanged;
                 st2.Children.Add(lb2);
                 st2.Children.Add(xct);
+                st2.Children.Add(lbBatch);
+                st2.Children.Add(xctBatchSize);
 
                 //Expander
                 st.Children.Add(st1);
@@ -349,7 +414,7 @@ namespace VisionTools.ToolEdit
                 st.Children.Add(st4);
                 st.Children.Add(st2);
                 expander.Content = st;
-                NeuroModel neuroModel = new NeuroModel(name, path, pathRuntime, devSelected, deviceIdx, Score);
+                NeuroModel neuroModel = new NeuroModel(name, path, pathRuntime, devSelected, deviceIdx, Score, BatchSize);
                 modelList.Add(neuroModel);
                 //Chạy khởi tạo lại các Predictor & Flowchart
                 if (path.Contains(".net")) { PredictInit(); }
@@ -438,6 +503,12 @@ namespace VisionTools.ToolEdit
             int index = Convert.ToInt32(xct.Name.Replace("xctModelScore00", string.Empty));
             modelList[index].Score = Convert.ToInt32(xct.Value);
         }
+        private void XctBatchSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            Xceed.Wpf.Toolkit.IntegerUpDown xct = sender as Xceed.Wpf.Toolkit.IntegerUpDown;
+            int index = Convert.ToInt32(xct.Name.Replace("xctModelBatchSize00", string.Empty));
+            modelList[index].BatchSize = Convert.ToInt32(xct.Value);
+        }
         private Mat NrtInput2Mat(nrt.Input input, int batchIdx)
         {
             nrt.Shape shape = input.get_org_input_shape(batchIdx);
@@ -471,12 +542,12 @@ namespace VisionTools.ToolEdit
                             {
                                 // The default device setting for the Predictor is CPU(-1), nrt.DEVICE_CPU.
                                 // predictor = new nrt.Predictor(modelPath);
-                                curPredict = new nrt.Predictor(modelList[i].Path, nrt.Model.MODELIO_OUT_PROB, modelList[i].DeviceIdx);
+                                curPredict = new nrt.Predictor(modelList[i].Path, nrt.Model.MODELIO_OUT_PROB, modelList[i].DeviceIdx, modelList[i].BatchSize);
                                 predictors.Add(i, curPredict);
                             }
                             else
                             {
-                                curPredict = new nrt.Predictor(modelList[i].Path, nrt.Model.MODELIO_OUT_PROB, modelList[i].DeviceIdx, 1, false, false, nrt.DevType.DEVICE_CUDA_GPU);
+                                curPredict = new nrt.Predictor(modelList[i].Path, nrt.Model.MODELIO_OUT_PROB, modelList[i].DeviceIdx, modelList[i].BatchSize, false, false, nrt.DevType.DEVICE_CUDA_GPU);
                                 predictors.Add(i, curPredict);
 
                                 // Save the predictor information optimized for this device,
@@ -557,7 +628,7 @@ namespace VisionTools.ToolEdit
                             {
                                 // The default device setting for the Flowchart is CPU(-1), nrt.DEVICE_CPU.
                                 // flowchart = new nrt.flowchart(flowchartPath);
-                                curFlowchart = new nrt.Flowchart(modelList[i].Path, nrt.Model.MODELIO_OUT_PROB, modelList[i].DeviceIdx, 1, false, false);
+                                curFlowchart = new nrt.Flowchart(modelList[i].Path, nrt.Model.MODELIO_OUT_PROB, modelList[i].DeviceIdx, modelList[i].BatchSize, false, false);
                                 flowcharts.Add(i, curFlowchart);
                             }
                             else
@@ -565,7 +636,7 @@ namespace VisionTools.ToolEdit
                                 // CPU's device_idx = -1, GPU's device_idx = [0, num of device)
                                 // The default device setting for the Flowchart is CPU(-1).
                                 // flowchart = new nrt.Flowchart(flowchartPath);
-                                curFlowchart = new nrt.Flowchart(modelList[i].Path, nrt.Model.MODELIO_OUT_PROB, modelList[i].DeviceIdx, 1, false, false, nrt.DevType.DEVICE_CUDA_GPU);
+                                curFlowchart = new nrt.Flowchart(modelList[i].Path, nrt.Model.MODELIO_OUT_PROB, modelList[i].DeviceIdx, modelList[i].BatchSize, false, false, nrt.DevType.DEVICE_CUDA_GPU);
                                 flowcharts.Add(i, curFlowchart);
                                 // Save the flowchart information optimized for this device,
                                 // so if the same model is used in the same device environment later, the optimized flowchart can be reused.
@@ -612,11 +683,11 @@ namespace VisionTools.ToolEdit
                 
             });   
         }
+
         void CheckModelType(nrt.Result res, nrt.FlowchartNode node)
         {
             try
             {
-
                 nrt.Predictor predictor = node.get_predictor();
                 nrt.ModelType modelType = predictor.get_model_type();
                 neuroFcLst.Add(new NeuroFc(modelType, res, node));
@@ -795,12 +866,8 @@ namespace VisionTools.ToolEdit
                                 Cv2.BitwiseAnd(src.Clone(), src.Clone(), matRes, mask);
                                 // 4. Cắt vùng ảnh chứa sản phẩm 
                                 src = new Mat(matRes, rectBound);
-                                matRes.SaveImage("01. MatRes.bmp");
-                                src.SaveImage("01. src.bmp");
-                                mask.SaveImage("01. mask.bmp");
                             }
                         }
-                        src = GetROIRegion(src.Clone(), rectBound, degAngle);
                         break;
                     case OIConvertShape.BOX:
                         src = new Mat(src, rectBound);
@@ -976,9 +1043,68 @@ namespace VisionTools.ToolEdit
             
             return src.Clone();
         }
-        private Mat FcSegProces(Mat src, nrt.Result res, nrt.FlowchartNode node, out float score)
+        private void FcClaResult(nrt.Result res, nrt.FlowchartNode node, bool anc_flag = false)
         {
-            score = 0;
+            nrt.Predictor predictor = node.get_predictor();
+            for (int i = 0; i < (int)res.classes.get_count(); i++)
+            {
+                nrt.Class cla = res.classes.get(i);
+                int cla_idx = anc_flag ? 0 : cla.idx;
+                float prob = res.probs.get(i, cla_idx);
+                if (cla.has_child())
+                {
+                    //FlowchartOutput(cla.get_child_result(), node.get_child(cla.idx));
+                }
+            }
+        }
+        private void FcRotResult(nrt.Result res, nrt.FlowchartNode node)
+        {
+            nrt.Predictor predictor = node.get_predictor();
+            for (int i = 0; i < (int)res.angles.get_count(); i++)
+            {
+                nrt.Angle angle = res.angles.get(i);
+                int degree = angle.degree;
+                if (angle.has_child())
+                {
+                    foreach (nrt.FlowchartNode child_node in node.get_children())
+                    {
+                        //FlowchartOutput(angle.get_child_result(), child_node);
+                    }
+                }
+            }
+        }
+        private void FcDetResult(nrt.Result res, nrt.FlowchartNode node)
+        {
+            nrt.Predictor predictor = node.get_predictor();
+            for (int i = 0; i < (int)res.bboxes.get_count(); i++)
+            {
+                nrt.Bbox bbox = res.bboxes.get(i);
+                int batchIdx = bbox.batch_idx;
+                int clsIdx = bbox.class_idx;
+                float prob = res.probs.get(i, clsIdx);
+
+                if (bbox.has_child())
+                {
+                    //FlowchartOutput(bbox.get_child_result(), node.get_child(clsIdx));
+                }
+            }
+            // From version 4.1, the masking function has been updated to mask all areas of a predicted class in the predicted image.
+            // You can choose to copy either the entire image or only the predicted images for the next prediction step in the Inference Center.
+            // For more details, please refer to the Inference Center section of the Neuro-T Manual.
+            for (int i = 0; i < (int)res.images.get_count(); i++)
+            {
+                nrt.Image img = res.images.get(i);
+                if (img.has_child())
+                {
+                    foreach (nrt.FlowchartNode child_node in node.get_children())
+                    {
+                        //FlowchartOutput(img.get_child_result(), child_node);
+                    }
+                }
+            }
+        }
+        private void FcSegResult(nrt.Result res, nrt.FlowchartNode node, int depth, ref List<Mat> srcLst, ref Mat src, ref List<float> scoreLst, ref float score)
+        {
             try
             {
                 nrt.Predictor predictor = node.get_predictor();
@@ -992,6 +1118,11 @@ namespace VisionTools.ToolEdit
                     {
                         score = scoreI;
                     }
+                    if(depth == 0)
+                    {
+                        src = srcLst[blob.batch_idx].Clone();
+                        score = scoreLst[blob.batch_idx];
+                    }  
                     nrt.Points points = blob.get_contour();
                     List<OpenCvSharp.Point> contour = new List<OpenCvSharp.Point>();
                     List<List<OpenCvSharp.Point>> contoursList = new List<List<OpenCvSharp.Point>> { contour };
@@ -1000,17 +1131,26 @@ namespace VisionTools.ToolEdit
                         nrt.Point point = points.get(pi);
                         contour.Add(new OpenCvSharp.Point((int)point.x, (int)point.y));
                     }
+                    //Phần xử lý ảnh Mat
                     if (blob.has_child() || node.has_child(clsIdx))
                     {
-                        //Draw Image
-                        OIConverter oiConverter = node.get_child(clsIdx).get_oiconverter();
-                        ProcessImageSeg(src, contour, blob.rect, oiConverter, out src);
+                        foreach (nrt.FlowchartNode child_node in node.get_children())
+                        {
+                            //Draw Image
+                            OIConverter oiConverter = node.get_child(clsIdx).get_oiconverter();
+                            ProcessImageSeg(src.Clone(), contour, blob.rect, oiConverter, out src);
+                            FlowchartOutput(blob.get_child_result(), child_node, depth + 1, ref srcLst, ref src, ref scoreLst, ref score);
+                        }
                     }
                     else
                     {
                         //Draw Image
                         Cv2.DrawContours(src, contoursList, -1, Scalar.Red, 2, lineType: LineTypes.Link8);
-                        src.SaveImage("1.TestSeg.bmp");
+                    }
+                    if (depth == 0)
+                    {
+                        scoreLst[blob.batch_idx] = score;
+                        srcLst[blob.batch_idx] = src.Clone();
                     }
                 }
             }
@@ -1018,13 +1158,556 @@ namespace VisionTools.ToolEdit
             {
                 logger.Create("FcSeg Process Error: " + ex.Message, ex);
             }
-            return src.Clone();
         }
-        private SvImage runImage = new SvImage();
+
+        private void FlowchartOutput(nrt.Result res, nrt.FlowchartNode node, int depth, ref List<Mat> srcLst, ref Mat src, ref List<float> scoreLst, ref float score)
+        {
+            nrt.Predictor predictor = node.get_predictor();
+            nrt.ModelType modelType = predictor.get_model_type();
+            switch (modelType)
+            {
+                case nrt.ModelType.CLASSIFICATION:
+                    FcClaResult(res, node);
+                    break;
+                case nrt.ModelType.ANOMALY_CLASSIFICATION:
+                    FcClaResult(res, node, true);
+                    break;
+                case nrt.ModelType.DETECTION:
+                case nrt.ModelType.PATCHED_CLASSIFICATION:
+                case nrt.ModelType.OCR:
+                    FcDetResult(res, node);
+                    break;
+                case nrt.ModelType.SEGMENTATION:
+                case nrt.ModelType.ANOMALY_SEGMENTATION:
+                    FcSegResult(res, node, depth, ref srcLst, ref src, ref scoreLst, ref score);
+                    break;
+                case nrt.ModelType.ROTATION:
+                    FcRotResult(res, node);
+                    break;
+                default:
+                    break;
+            }
+        }
+        public void ResetBuffer()
+        {
+            Inc = 0;
+            RunImageLst.Clear();
+            ScoreLst.Clear();
+            JudgeLst.Clear();
+            MessLst.Clear();
+            inputs.clear();
+        }
+        private void SelectBorder(Border bdSelected)
+        {
+            try
+            {
+                toolBase.cbxImage.SelectedItem = 1;
+                List<Expander> expdLst = stViewImg.Children.OfType<Expander>().ToList();
+                List<Border> bdLst = expdLst.Select(exp => exp.Content as Border).Where(border => border != null).ToList();
+                bdLst.ForEach(border => border.BorderBrush = (Brush)new BrushConverter().ConvertFromString("#FFCCCCCC"));
+                bdSelected.BorderBrush = Brushes.Red;
+                Grid gridImg = (bdSelected.Child as StackPanel).Children.OfType<Grid>().FirstOrDefault();
+                toolBase.imgView.Source = gridImg.Children.OfType<Image>().FirstOrDefault().Source;
+                toolBase.FitImage();
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Select Image Log Error: " + ex.Message, ex);
+            }
+        }
+        private void CreateImgBuffView(int index, Mat matImg)
+        {
+            if (matImg == null || matImg.Width == 0 || matImg.Height == 0)
+                return;
+            Expander expd = new Expander
+            {
+                Background = (Brush)new BrushConverter().ConvertFromString("#FFCCCCCC")
+            };
+            Label lbHeader = new Label
+            {
+                FontStyle = FontStyles.Italic,
+                FontWeight = FontWeights.Bold,
+                Padding = new Thickness(3, 5, 0, 5),
+                Foreground = new SolidColorBrush(Color.FromRgb(72, 158, 55)), // #FF489E37
+                Content = $"Image {index}"
+            };
+            expd.Header = lbHeader;
+            StackPanel mainPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Background = Brushes.Cornsilk
+            };
+            // Grid with Image
+            Grid grid = new Grid
+            {
+                Background = new SolidColorBrush(Color.FromRgb(153, 153, 153)), // #FF999999
+                Width = 250,
+                Height = 150,
+                Margin = new Thickness(10, 0, 10, 0)
+            };
+            Image img = new Image { Source = matImg.ToBitmapSource() };
+            grid.Children.Add(img);
+
+            Border brdr = new Border() { Name = $"Bd{index}", BorderThickness = new Thickness(2), BorderBrush = (Brush)new BrushConverter().ConvertFromString("#FFCCCCCC"), };
+            brdr.MouseMove += (sender, e) =>
+            {
+                Border bdSelected = sender as Border;
+                List<Expander> expdLst = stViewImg.Children.OfType<Expander>().ToList();
+                List<Border> bdLst = expdLst.Select(exp => exp.Content as Border).Where(border => border != null).ToList();
+                foreach (var bd in bdLst)
+                {
+                    if (bd.BorderBrush == Brushes.Red)
+                        continue;
+                    bd.BorderBrush = (Brush)new BrushConverter().ConvertFromString("#FFCCCCCC");
+                }
+                if (bdSelected.BorderBrush != Brushes.Red)
+                    bdSelected.BorderBrush = (Brush)new BrushConverter().ConvertFromString("#FF489E37");
+            };
+            brdr.MouseLeftButtonDown += (sender, e) => SelectBorder(sender as Border);
+            // Right StackPanel
+            StackPanel rightPanel = new StackPanel();
+
+            // Shared Style for Label
+            Style labelStyle = new Style(typeof(Label));
+            labelStyle.Setters.Add(new Setter(Label.PaddingProperty, new Thickness(1)));
+            labelStyle.Setters.Add(new Setter(Label.ForegroundProperty, new SolidColorBrush(Color.FromRgb(72, 158, 55)))); // #FF489E37
+            labelStyle.Setters.Add(new Setter(Label.FontStyleProperty, FontStyles.Italic));
+
+            // Add labels with style
+            Label label1 = new Label { Content = $"Index : {index}", Padding = new Thickness(0, 5, 0, 1), Style = labelStyle };
+            Label label2 = new Label { Content = $"Time : {DateTime.Now: dd/MM/yyyy HH:mm:ss:fff}", Style = labelStyle };
+            Label label3 = new Label { Content = $"Width x Height : {matImg.Width} x {matImg.Height}", Style = labelStyle };
+
+            rightPanel.Children.Add(label1);
+            rightPanel.Children.Add(label2);
+            rightPanel.Children.Add(label3);
+
+            // Assemble
+            mainPanel.Children.Add(grid);
+            mainPanel.Children.Add(rightPanel);
+            brdr.Child = mainPanel;
+            expd.Content = brdr;
+
+            //Add Expander
+            stViewImg.Children.Add(expd);
+        }
+        #region Save Image
+        private bool IsValidPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                return false;
+
+            char[] invalidChars = Path.GetInvalidPathChars();
+            return !path.Any(c => invalidChars.Contains(c));
+        }
+        private void DeleteOldestFile(string folderPath, double maxSizeInGB)
+        {
+            try
+            {
+                var allFiles = Directory.GetFiles(folderPath);
+                double totalSizeInBytes = allFiles.Sum(file =>
+                {
+                    try
+                    {
+                        return new FileInfo(file).Length;
+                    }
+                    catch
+                    {
+                        return 0; // Bỏ qua nếu file đang bị khóa
+                    }
+                });
+
+                double totalSizeInGB = totalSizeInBytes / (1024 * 1024 * 1024);
+
+                if (totalSizeInGB >= maxSizeInGB)
+                {
+                    var oldestFile = allFiles
+                        .Select(f =>
+                        {
+                            try
+                            {
+                                return new FileInfo(f);
+                            }
+                            catch
+                            {
+                                return null;
+                            }
+                        })
+                        .Where(f => f != null)
+                        .OrderBy(f => f.LastWriteTime)
+                        .FirstOrDefault();
+
+                    if (oldestFile != null)
+                    {
+                        try
+                        {
+                            File.Delete(oldestFile.FullName);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Create("Delete File Error: " + ex.Message, ex);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                meaRunTime.Stop();
+                toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Delete file error: " + ex.Message);
+                logger.Create("Delete oldest file error: " + ex.Message, ex);
+            }
+        }
+
+        private string FormatBytes(long bytes, out string size)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+            double len = bytes;
+            int order = 0;
+            try
+            {
+                //Bỏ qua TB
+                while (len >= 1024 && order < sizes.Length - 1)
+                {
+                    order++;
+                    len /= 1024;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Format Bytes Error: " + ex.Message, ex);
+            }
+            //return $"{len:0.##} {sizes[order]}";
+            size = sizes[order];
+            return $"{len:0.##}";
+        }
+        private void BtnCheckDisk_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender != null)
+                {
+                    if (string.IsNullOrEmpty(txtFolderPath.Text))
+                    {
+                        MessageBox.Show("Folder Path is Empty!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    if (!IsValidPath(txtFolderPath.Text))
+                    {
+                        MessageBox.Show("FolderPath Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(txtFolderPath.Text) || !IsValidPath(txtFolderPath.Text))
+                        return;
+                }
+                string drive = Path.GetPathRoot(txtFolderPath.Text);
+                DriveInfo driveInfo = new DriveInfo(drive);
+                if (driveInfo.IsReady)
+                {
+                    long totalFree = driveInfo.AvailableFreeSpace;
+                    txtFreeDisk.Text = FormatBytes(totalFree, out string tempSize);
+                    this.DiskSize = tempSize;
+                    MaxImageStorage = double.Parse(txtFreeDisk.Text) - 1d;
+                }
+                else
+                {
+                    MessageBox.Show("Disk C is not Ready!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private void BtnResetIndex_Click(object sender, RoutedEventArgs e)
+        {
+            IndexImage = 0;
+        }
+        private void BtnChooseFolder_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                dialog.Description = "Select Folder";
+
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
+                {
+                    txtFolderPath.Text = dialog.SelectedPath;
+                }
+            }
+        }
+        private void SaveGraphicImage(Mat src)
+        {
+            // Kiểm tra folder tồn tại
+            if (!IsValidPath(txtFolderPath.Text))
+            {
+                meaRunTime.Stop();
+                toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "FolderPath Error Syntax!");
+                return;
+            }
+            if (!Directory.Exists(txtFolderPath.Text))
+                Directory.CreateDirectory(txtFolderPath.Text);
+
+            // Xử lý tên file
+            if (IsAddCounter)
+            {
+                if (IndexImage >= NumUDCounter)
+                    IndexImage = 0;
+                IndexImage++;
+            }
+            string timestamp = IsAddDateTime
+                ? $"{DateTime.Now:yyyy-MM-dd HH-mm-ss-fff}"
+                : "";
+            string strIndex = IsAddCounter ? $"-{IndexImage}" : "";
+            if (string.IsNullOrEmpty(txtFileName.Text))
+                txtFileName.Text = "Default";
+            if (string.IsNullOrEmpty(ImageFormatSelected))
+                ImageFormatSelected = "BMP";
+            string finalFileName = $"{txtFileName.Text}{strIndex} {timestamp}.{ImageFormatSelected.ToLower()}";
+            string fullPath = Path.Combine(txtFolderPath.Text, finalFileName);
+
+            //Kiểm tra và xóa file ảnh cũ nhất trong trường hợp folder đầy dung lượng cho phép
+            DeleteOldestFile(txtFolderPath.Text, NumUDImageStorage);
+            // Lưu ảnh
+            if (!Cv2.ImWrite(fullPath, src))
+            {
+                meaRunTime.Stop();
+                toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Save Image Fail!");
+                return;
+            }
+        }
+        #endregion
+
+        #region PLC
+        public void CheckAddrUse()
+        {
+            if ((bool)ckbxIsUseBitRcvImg.IsChecked)
+            {
+                if (string.IsNullOrEmpty(TxtAddrRcvImg) || !IsPositiveInteger(TxtAddrRcvImg))
+                {
+                    MessageBox.Show("PLC Address RcvImage is Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    logger.Create("PLC Address RcvImage is Empty or Error Syntax!");
+                    return;
+                }
+            }
+            if ((bool)ckbxIsUseBitReset.IsChecked)
+            {
+
+                if (string.IsNullOrEmpty(TxtAddrReset) || !IsPositiveInteger(TxtAddrReset))
+                {
+                    MessageBox.Show("PLC Address Reset is Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    logger.Create("PLC Address Reset is Empty or Error Syntax!");
+                    return;
+                }
+            }
+        }
+        public bool String2Enum(string strDev, out DeviceCode _devType, out string _strDevNo)
+        {
+            bool isDefined = false;
+            string letters = "";
+            _devType = DeviceCode.M;
+            _strDevNo = "";
+            try
+            {
+                foreach (char synx in strDev)
+                {
+                    if (char.IsLetter(synx)) { letters += synx; }
+                    else if (char.IsDigit(synx)) { _strDevNo += synx; }
+                }
+
+                isDefined = Enum.IsDefined(typeof(DeviceCode), letters);
+                if (isDefined)
+                {
+                    _devType = (DeviceCode)Enum.Parse(typeof(DeviceCode), letters);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Convert syntax error: " + ex.Message);
+            }
+            return isDefined;
+        }
+        bool IsPositiveInteger(string input)
+        {
+            return int.TryParse(input, out int number) && number >= 0;
+        }
+        public bool SendBitRcvImg(bool value)
+        {
+            try
+            {
+                return UiManager.PLC1.device.WriteBit(SelectDevRcvImg, int.Parse(TxtAddrRcvImg), value);
+            }
+            catch (Exception ex)
+            {
+                logger.Create(String.Format("SEND_TRIGGER_COMPLETE Error: " + ex.Message));
+                return false;
+            }
+        }
+        public bool ReceiveBitReset(out bool value)
+        {
+            value = false;
+            try
+            {
+                return UiManager.PLC1.device.ReadBit(SelectDevReset, int.Parse(TxtAddrReset), out value);
+            }
+            catch (Exception ex)
+            {
+                logger.Create(String.Format("RECEIVE_RESET Error: " + ex.Message));
+                return false;
+            }
+        }
+        public bool SendBitReset(bool value)
+        {
+            try
+            {
+                return UiManager.PLC1.device.WriteBit(SelectDevReset, int.Parse(TxtAddrReset), value);
+            }
+            catch (Exception ex)
+            {
+                logger.Create(String.Format("SEND_RESET Error: " + ex.Message));
+                return false;
+            }
+        }
+        public void SendJudge(int index, bool value)
+        {
+            try
+            {
+                String2Enum(addrOKLst[index], out DeviceCode devTypeOK, out string strDevNoOK);
+                Task.Run(() => UiManager.PLC1.device.WriteBit(devTypeOK, int.Parse(strDevNoOK), value)); 
+                String2Enum(addrNGLst[index], out DeviceCode devTypeNG, out string strDevNoNG);
+                Task.Run(() => UiManager.PLC1.device.WriteBit(devTypeNG, int.Parse(strDevNoNG), !value));
+            }
+            catch (Exception ex)
+            {
+                logger.Create(String.Format("SEND_JUDGE Error: " + ex.Message));
+            }
+        }
+        public void UpdateAddrOut()
+        {
+            try
+            {
+                for (int col = 1; col < dataTable.Columns.Count; col++)
+                {
+                    // Lấy và parse giá trị từ DataTable
+                    if (string.IsNullOrEmpty(dataTable.Rows[0][col].ToString()) || string.IsNullOrEmpty(dataTable.Rows[1][col].ToString()))
+                    {
+                        MessageBox.Show("Address PLC can not empty!");
+                        return;
+                    }
+                    else
+                    {
+                        addrOKLst[col - 1] = dataTable.Rows[0][col]?.ToString().TrimEnd('\t');
+                        addrNGLst[col - 1] = dataTable.Rows[1][col]?.ToString().TrimEnd('\t');
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Update Addr Out Error: " + ex.Message, ex);
+            }
+        }
+        public void UpdateDataGrid()
+        {
+            try
+            {
+                dataTable.Columns.Clear();
+                dataTable.Rows.Clear();
+                // Tạo cột đầu tiên là row header
+                dataTable.Columns.Add("Position");
+                // Tạo cột tương ứng với các phần tử trong img
+                for (int i = 0; i < NumberPos; i++)
+                {
+                    string columnHeader = $"Pos {i + 1}";
+                    dataTable.Columns.Add(columnHeader);
+                }
+
+                // Thêm dòng Address
+                if (!string.IsNullOrEmpty(TxtAddrOK))
+                {
+                    DataRow rowOK = dataTable.NewRow();
+                    rowOK["Position"] = "Address OK";
+                    for (int i = 0; i < NumberPos; i++)
+                    {
+                        rowOK[$"Pos {i + 1}"] = addrOKLst[i] + "\t";
+                    }
+                    dataTable.Rows.Add(rowOK);
+                }
+                if (!string.IsNullOrEmpty(TxtAddrNG))
+                {
+                    DataRow rowNG = dataTable.NewRow();
+                    rowNG["Position"] = "Address NG";
+                    for (int i = 0; i < NumberPos; i++)
+                    {
+                        rowNG[$"Pos {i + 1}"] = addrNGLst[i] + "\t";
+                    }
+                    dataTable.Rows.Add(rowNG);
+                }
+
+                // Gán vào DataGrid
+                DataView = null;
+                DataView = dataTable.DefaultView;
+                if (dtgdAddr.Columns.Count > 0 && dtgdAddr.Columns[0] != null)
+                {
+                    dtgdAddr.Columns[0].IsReadOnly = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Update PLC Addr Table Error: " + ex.Message, ex);
+            }
+        }
+        private void BtnRefreshTb_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(TxtAddrOK) || !IsPositiveInteger(TxtAddrOK))
+                {
+                    MessageBox.Show("PLC Address OK is Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                if (string.IsNullOrEmpty(TxtAddrNG) || !IsPositiveInteger(TxtAddrNG))
+                {
+                    MessageBox.Show("PLC Address NG is Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                if (NumberPos <= 0)
+                {
+                    MessageBox.Show("Number Position must be > 0!");
+                    return;
+                }
+                addrOKLst.Clear();
+                addrNGLst.Clear();
+                for (int i = 0; i < NumberPos; i++)
+                {
+                    if (!string.IsNullOrEmpty(TxtAddrOK))
+                    {
+                        addrOKLst.Add(String.Format($"{SelectDevOK.ToString()}{int.Parse(TxtAddrOK) + i}"));
+                    }
+                    if (!string.IsNullOrEmpty(TxtAddrNG))
+                    {
+                        addrNGLst.Add(String.Format($"{SelectDevNG.ToString()}{int.Parse(TxtAddrNG) + i}"));
+                    }
+                }
+                UpdateDataGrid();
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Button Refresh PLC Addr Table Error: " + ex.Message, ex);
+            }
+        }
+        private void SegmentNeuroEdit_Unloaded(object sender, RoutedEventArgs e)
+        {
+            UpdateAddrOut();
+            CheckAddrUse();
+        }
+        #endregion
+
         public override void Run()
         {
             try
             {
+                CheckAddrUse();
                 if (this.InputImage == null || this.InputImage.Mat == null || this.InputImage.Mat.Width <= 0 || this.InputImage.Mat.Height <= 0)
                 {
                     if (toolBase.isImgPath && isEditMode)
@@ -1057,197 +1740,132 @@ namespace VisionTools.ToolEdit
                 else if (InputImage.Mat != null && InputImage.Mat.Width > 0 && InputImage.Mat.Height > 0 && !toolBase.isImgPath)
                 {
                     runImage = this.InputImage.Clone(true);
+                    if (runImage.Mat.Channels() != 3)
+                    {
+                        runImage.Mat = runImage.Mat.CvtColor(ColorConversionCodes.BGR2RGB);
+                        runImage.Mat = runImage.Mat.CvtColor(ColorConversionCodes.RGB2BGR);
+                    }
                 }
-
-                //Conver OpencvSharp.Mat data to nrt.Input
-                nrt.Input input = new nrt.Input();
-                IntPtr frameData = runImage.Mat.Data;
-                int batchSize = 1;
-                int inputH = runImage.Mat.Height;
-                int inputW = runImage.Mat.Width;
-                // Extend memory address value to input
-                status = input.extend(frameData, new nrt.Shape(batchSize, inputH, inputW, 3), nrt.DType.DTYPE_UINT8);
-                if (status != nrt.Status.STATUS_SUCCESS)
-                {
-                    meaRunTime.Stop();
-                    toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, String.Format("Input extend failed. : " + nrt.nrt.get_last_error_msg()));
-                }
-
-
-
-                bool isFcComplete = false;
-                bool isPdComplete = false;
-                float maxScore1 = 0, maxScore2 = 0;
-                string strRes1 = "OK", strRes2 = "OK";
-                int judge1 = 1, judge2 = 1;
-
-                nrt.Result maxResult = new Result();
-                Mat imgGraphic = runImage.Mat.Clone();
-                StrResult = "OK";
-                Judge = 1;
-                Score = 0d;
 
                 while (!isFcInitCompl || !isPdInitCompl) ;
-                //Kiểm tra các Flowchart
-                Task.Run(() =>
+                if (Inc < NumberPos)
                 {
+                    if(Inc == 0)
+                    {
+                        ResetBuffer();
+                    }
+                    //Khởi tạo các List phán định
+                    RunImageLst.Add(runImage.Mat);
+                    ScoreLst.Add(0);
+                    JudgeLst.Add(0);
+                    MessLst.Add("");
+                    //Convert OpencvSharp.Mat data to nrt.Input
+                    IntPtr frameData = runImage.Mat.Data;
+                    int batchSize = 1;
+                    int inputH = runImage.Mat.Height;
+                    int inputW = runImage.Mat.Width;
+                    // Extend memory address value to input
+                    status = inputs.extend(frameData, new nrt.Shape(batchSize, inputH, inputW, 3), nrt.DType.DTYPE_UINT8);
+                    if (status != nrt.Status.STATUS_SUCCESS)
+                    {
+                        meaRunTime.Stop();
+                        toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, String.Format("Input extend failed. : " + nrt.nrt.get_last_error_msg()));
+                        logger.Create(String.Format("Input extend failed. : " + nrt.nrt.get_last_error_msg()));
+                    }
+                    Inc++;
+                    //Gửi Bit chụp ảnh hoàn thành cho PLC
+                    if((bool)ckbxIsUseBitRcvImg.IsChecked)
+                    {
+                        SendBitRcvImg(false);
+                    }    
+                    OutputImage.Mat = runImage.Mat.Clone();
+                }    
+                if(Inc == NumberPos)
+                {
+                    Inc = 0;
+                    //Kiểm tra các Flowchart
                     try
                     {
                         foreach (var flowchart in flowcharts)
                         {
-                            float score = 0;
                             nrt.FlowchartNode root = flowchart.Value.get_node(0);
-                            nrt.Result result = flowchart.Value.predict(input);
+                            nrt.Result result = flowchart.Value.predict(inputs);
                             if (result.get_status() != nrt.Status.STATUS_SUCCESS)
                             {
                                 meaRunTime.Stop();
                                 toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, String.Format("Predict failed. : " + nrt.nrt.get_last_error_msg()));
+                                logger.Create(String.Format("Predict failed. : " + nrt.nrt.get_last_error_msg()));
                                 return;
                             }
-                            //Clear toàn bộ các Model cũ trước khi nhận Model mới
-                            neuroFcLst.Clear();
-                            CheckModelType(result, root);
-                            Mat imgMat = runImage.Mat.Clone();
-                            for (int id = 0; id < neuroFcLst.Count; id++)
+                            float score = 0;
+                            Mat src = new Mat();
+                            FlowchartOutput(result, root, 0, ref RunImageLst, ref src, ref ScoreLst, ref score);
+                            for (int i = 0; i < ScoreLst.Count; i++)
                             {
-                                switch (neuroFcLst[id].ModelType)
+                                int rangeScore = modelList[flowchart.Key].Score;
+                                if (ScoreLst[i] == 0)
                                 {
-                                    case nrt.ModelType.ROTATION:
-                                        imgMat = FcRotProcess(imgMat, neuroFcLst[id].Result, neuroFcLst[id].FlowchartNode);
-                                        break;
-                                    case nrt.ModelType.CLASSIFICATION:
-                                        break;
-                                    case nrt.ModelType.DETECTION:
-                                    case nrt.ModelType.PATCHED_CLASSIFICATION:
-                                        imgMat = FcDetProcess(imgMat, neuroFcLst[id].Result, neuroFcLst[id].FlowchartNode, out score);
-                                        break;
-                                    case nrt.ModelType.SEGMENTATION:
-                                        imgMat = FcSegProces(imgMat, neuroFcLst[id].Result, neuroFcLst[id].FlowchartNode, out score);
-                                        break;
-                                    default:
-                                        break;
+                                    JudgeLst[i] = 2;
+                                    MessLst[i] = "Empty";
+                                    RunImageLst[i].PutText(String.Format($"Status: {MessLst[i]}"), new OpenCvSharp.Point(20, 40), HersheyFonts.HersheyDuplex, 1d, Scalar.Red, 2);
+                                    RunImageLst[i].PutText(String.Format($"Score:  {(ScoreLst[i] * 100).ToString("F2")}{rangeScore}"), new OpenCvSharp.Point(20, 70), HersheyFonts.HersheyDuplex, 1d, Scalar.Red, 2);
                                 }
+                                else if (ScoreLst[i] > (float)modelList[flowchart.Key].Score / 100f)
+                                {
+                                    JudgeLst[i] = 2;
+                                    MessLst[i] = "NG";
+                                    RunImageLst[i].PutText(String.Format($"Status: {MessLst[i]}"), new OpenCvSharp.Point(20, 40), HersheyFonts.HersheyDuplex, 1d, Scalar.Red, 2);
+                                    RunImageLst[i].PutText(String.Format($"Score:  {(ScoreLst[i] * 100).ToString("F2")}/{rangeScore}"), new OpenCvSharp.Point(20, 70), HersheyFonts.HersheyDuplex, 1d, Scalar.Red, 2);
+                                }
+                                else
+                                {
+                                    JudgeLst[i] = 1;
+                                    MessLst[i] = "OK";
+                                    RunImageLst[i].PutText(String.Format($"Status: {MessLst[i]}"), new OpenCvSharp.Point(20, 40), HersheyFonts.HersheyDuplex, 1d, Scalar.LightGreen, 2);
+                                    RunImageLst[i].PutText(String.Format($"Score:  {(ScoreLst[i] * 100).ToString("F2")}/{rangeScore}"), new OpenCvSharp.Point(20, 70), HersheyFonts.HersheyDuplex, 1d, Scalar.LightGreen, 2);
+                                }
+                                //Gửi phán định OK/NG cho PLC
+                                SendJudge(i, (JudgeLst[i] == 1)); 
                             }
-                            if (score > maxScore1)
+                            Task.Run(() =>
                             {
-                                maxScore1 = score;
-                                if (score > (float)modelList[flowchart.Key].Score / 100f)
+                                Dispatcher.Invoke(() =>
                                 {
-                                    imgGraphic = imgMat.Clone();
-                                    strRes1 = modelList[flowchart.Key].Name;
-                                    judge1 = 2;
-                                }
-                            }
+                                    //stViewImg.Children.Clear();
+                                    for (int i = 0; i < RunImageLst.Count; i++)
+                                    {
+                                        //CreateImgBuffView(i, RunImageLst[i].Clone());
+                                        if (!(bool)ckbxIsSaveImg.IsChecked)
+                                            continue;
+                                        SaveGraphicImage(RunImageLst[i]);
+                                    }
+                                });
 
+                            });
                         }
                     }
                     catch (Exception ex)
                     {
                         logger.Create($"Process Flowchart Error :{ex}", ex);
-                        Judge = 3;
-                        Score = -1d;
-                        StrResult = "Error";
                         meaRunTime.Stop();
                         toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, $"Process Flowchart Error :{ex}");
                         return;
                     }
-                    isFcComplete = true;
-                });
-
-
-                //Kiểm tra các Predict đơn lẻ
-                Task.Run(() =>
-                {
-                    try
+                    this.Dispatcher?.Invoke(() =>
                     {
-                        foreach (var predictor in predictors)
-                        {
-                            float score = 0;
-                            nrt.Result result = predictor.Value.predict(input);
-                            if (result.get_status() != nrt.Status.STATUS_SUCCESS)
-                            {
-                                meaRunTime.Stop();
-                                toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, String.Format("Predict failed. : " + nrt.nrt.get_last_error_msg()));
-                                return;
-                            }
-                            for (int j = 0; j < (int)result.blobs.get_count(); j++)
-                            {
-                                nrt.Blob blob = result.blobs.get(j);
-                                score = blob.prob;
-                                if (score > maxScore2)
-                                {
-                                    maxScore2 = score;
-                                    if (score > (float)modelList[predictor.Key].Score / 100f)
-                                    {
-                                        maxResult = result;
-                                        strRes2 = modelList[predictor.Key].Name;
-                                        judge2 = 2;
-                                    }
-                                }
-
-                            }
-
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Create($"Process Predict Error :{ex}", ex);
-                        Judge = 3;
-                        Score = -1d;
-                        StrResult = "Error";
-                        meaRunTime.Stop();
-                        toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, $"Process Predict Error :{ex}");
-                        return;
-                    }
-                    isPdComplete = true;
-                });
-
-                while (!isFcComplete || !isPdComplete) ;
-                if (maxScore2 > maxScore1)
+                        OutputImage.Mat = RunImageLst[RunImageLst.Count - 1].Clone();
+                        toolBase.cbxImage.SelectedIndex = isEditMode ? 1 : 0;
+                        toolBase.FitImage();
+                    });
+                }   
+                else
                 {
-                    Score = maxScore2;
-                    Judge = judge2;
-                    StrResult = strRes2;
-                    imgGraphic = runImage.Mat.Clone();
-                    for (int i = 0; i < (int)maxResult.blobs.get_count(); i++)
-                    {
-                        // Get contour
-                        nrt.Blob blob = maxResult.blobs.get(i);
-                        nrt.Points points = blob.get_contour();
-                        List<OpenCvSharp.Point> contour = new List<OpenCvSharp.Point>();
-                        List<List<OpenCvSharp.Point>> contoursList = new List<List<OpenCvSharp.Point>> { contour };
-
-                        for (int pi = 0; pi < (int)points.get_count(); pi++)
-                        {
-                            nrt.Point point = points.get(pi);
-                            contour.Add(new OpenCvSharp.Point((int)point.x, (int)point.y));
-                        }
-                        Cv2.DrawContours(imgGraphic, contoursList, -1, Scalar.Red, 2, lineType: LineTypes.Link8);
-                    }
-                }
-                else if(maxScore2 < maxScore1)
-                {
-                    Score = maxScore1; 
-                    Judge = judge1;
-                    StrResult = strRes1;
+                    return;
                 }    
-                OutputImage = runImage.Clone(true);
-                if (maxScore2 == 0 && maxScore1 == 0)
-                {
-                    //meaRunTime.Stop();
-                    //toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Have no model match!");
-                    //return;
-                }  
-                OutputImage.Mat = imgGraphic;
-                toolBase.cbxImage.SelectedIndex = isEditMode ? 1 : 0;
-                toolBase.FitImage();
             }
             catch (Exception ex)
             {
                 logger.Create("Run Error: " + ex.Message, ex);
-                Judge = 3;
-                Score = -1d;
-                StrResult = "Error";
             }
         }
     }
@@ -1259,6 +1877,7 @@ namespace VisionTools.ToolEdit
         public string Device { get; set; } = "";
         public int DeviceIdx { get; set; } = -1;
         public int Score { get; set; } = 0;
+        public int BatchSize { get; set; } = 1;
 
         public NeuroModel()
         {
@@ -1268,8 +1887,9 @@ namespace VisionTools.ToolEdit
             Device = "";
             DeviceIdx = -1;
             Score = 0;
+            BatchSize = 1;
         }
-        public NeuroModel(string name = "", string path = "", string pathRuntime = "", string device = "", int deviceIdx = -1, int score = 0)
+        public NeuroModel(string name = "", string path = "", string pathRuntime = "", string device = "", int deviceIdx = -1, int score = 0, int batchSize = 1)
         {
             this.Name = name;
             this.Path = path;
@@ -1277,6 +1897,7 @@ namespace VisionTools.ToolEdit
             this.Device = device;
             this.DeviceIdx = deviceIdx;
             this.Score = score;
+            this.BatchSize = batchSize;
         }
         public NeuroModel Clone()
         {
@@ -1287,7 +1908,8 @@ namespace VisionTools.ToolEdit
                 PathRuntime = this.PathRuntime,
                 Device = this.Device,
                 DeviceIdx = this.DeviceIdx,
-                Score = this.Score
+                Score = this.Score,
+                BatchSize = this.BatchSize
             };
         }
     }

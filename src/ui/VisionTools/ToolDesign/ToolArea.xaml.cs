@@ -151,13 +151,6 @@ namespace VisionTools.ToolDesign
                         IsBlockOut = true;
                         newEle = (VisionTool)Activator.CreateInstance(typeof(OutBlobResTool));
                         break;
-                    case VisionToolType.OUTACQUISRES:
-                        OnToolDrop?.Invoke(this, null);
-                        //if (IsOutTool || IsBlockOut) return;
-                        IsOutTool = true;
-                        IsBlockOut = true;
-                        newEle = (VisionTool)Activator.CreateInstance(typeof(OutAcquisResTool));
-                        break;
                     case VisionToolType.OUTCHECKPRODUCT:
                         OnToolDrop?.Invoke(this, null);
                         //if (IsOutTool || IsBlockOut) return;
@@ -220,7 +213,6 @@ namespace VisionTools.ToolDesign
                 //Link để Hàm Check OutResult tool để hiển thị ra PgCamera
                 switch (receivedData.ToolType)
                 {
-                    case VisionToolType.OUTACQUISRES:
                     case VisionToolType.OUTBLOBRES:
                     case VisionToolType.OUTCHECKPRODUCT:
                     case VisionToolType.OUTSEGNEURORES:
@@ -332,7 +324,6 @@ namespace VisionTools.ToolDesign
                     case VisionToolType.VISIONPRO:
                         (receivedData as VisionProTool).OnOutputChanged += VisionProTool_OnOutputChanged;
                         break;
-                    case VisionToolType.OUTACQUISRES:
                     case VisionToolType.OUTBLOBRES:
                     case VisionToolType.OUTCHECKPRODUCT:
                     case VisionToolType.OUTSEGNEURORES:
@@ -497,7 +488,6 @@ namespace VisionTools.ToolDesign
                     case VisionToolType.SAVEIMAGE:
                     case VisionToolType.SEGMENTNEURO:
                     case VisionToolType.VIDICOGNEX:
-                    case VisionToolType.OUTACQUISRES:
                         switch (lbTarget.Name)
                         {
                             case "lbInputImage":
@@ -796,7 +786,6 @@ namespace VisionTools.ToolDesign
                     {
                         //Phần này kiểm soát việc chặn OutTool
                         case VisionToolType.OUTBLOBRES:
-                        case VisionToolType.OUTACQUISRES:
                         case VisionToolType.OUTCHECKPRODUCT:
                         case VisionToolType.OUTSEGNEURORES:
                         case VisionToolType.OUTVIDICOGRES:

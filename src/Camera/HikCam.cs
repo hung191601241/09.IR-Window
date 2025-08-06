@@ -98,8 +98,9 @@ namespace VisionInspection
         public int Open()
         {
             int ret = m_pOperator.Open(ref device);
-            m_pOperator.SetEnumValue("AcquisitionMode", 2);
-            m_pOperator.SetEnumValue("TriggerMode", 0);
+            //m_pOperator.SetEnumValue("AcquisitionMode", 2);
+            //m_pOperator.SetEnumValue("TriggerMode", 0);
+
             ret = StartGrab();
             if (ret == MyCamera.MV_OK)
             {
@@ -224,9 +225,13 @@ namespace VisionInspection
 
             return src;
         }
-
         public Mat CaptureImage()
         {
+            int nRet = m_pOperator.ExcuteTrigger();
+            if (MyCamera.MV_OK != nRet)
+            {
+                return null;
+            }
             UInt32 nPayloadSize = 0;
             // Lấy kích thước payload
             if (m_pOperator.GetIntValue("PayloadSize", ref nPayloadSize) != MyCamera.MV_OK)

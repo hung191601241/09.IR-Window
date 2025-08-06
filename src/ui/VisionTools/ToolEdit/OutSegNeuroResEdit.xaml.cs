@@ -56,17 +56,6 @@ namespace VisionTools.ToolEdit
 
         private DeviceCode _selectDevOut = DeviceCode.D;
         public DeviceCode SelectDevOut { get => _selectDevOut; set => _selectDevOut = value; }
-        private List<BlobObject> blobs = new List<BlobObject>();
-        public List<BlobObject> Blobs
-        {
-            get
-            {
-                if (blobs == null)
-                    return new List<BlobObject>();
-                return blobs;
-            }
-            set { blobs = value; OnPropertyChanged(nameof(Blobs)); }
-        }
         public string TxtAddrOut { get; set; } = "";
         public int NumberPos { get; set; } = 0;
         public DataView DataView { get => dataView; set { dataView = value; OnPropertyChanged(nameof(DataView)); } }
@@ -219,7 +208,7 @@ namespace VisionTools.ToolEdit
         }
         private bool CheckIntSyntax(string num)
         {
-            return System.Text.RegularExpressions.Regex.IsMatch(num, @"^[1-9]\d*$");
+            return System.Text.RegularExpressions.Regex.IsMatch(num, @"^[0-9]\d*$");
         }
         private void OutBlobResultEdit_Loaded(object sender, RoutedEventArgs e)
         {

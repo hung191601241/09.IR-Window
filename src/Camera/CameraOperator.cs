@@ -66,6 +66,18 @@ namespace DeviceSource
             {
                 return CO_FAIL;
             }
+
+            //Hung Edit
+            //Continuous
+            nRet += m_pCSI.MV_CC_SetAcquisitionMode_NET(2);
+            //Trigger On
+            nRet += m_pCSI.MV_CC_SetTriggerMode_NET(1);
+            //Trigger Software
+            nRet += m_pCSI.MV_CC_SetTriggerSource_NET(7);
+            if (MyCamera.MV_OK != nRet)
+            {
+                return CO_FAIL;
+            }
             return CO_OK;
         }
 
@@ -179,6 +191,16 @@ namespace DeviceSource
          * @param        pFrameInfo            OUT               Data Information
          * @return       Success:0; Fail:-1
          ****************************************************************************/
+        public int ExcuteTrigger()
+        {
+            int nRet;
+            nRet = m_pCSI.MV_CC_TriggerSoftwareExecute_NET();
+            if (MyCamera.MV_OK != nRet)
+            {
+                return CO_FAIL;
+            }
+            return CO_OK;
+        }
         public int GetOneFrame(IntPtr pData, ref UInt32 pnDataLen, UInt32 nDataSize, ref MyCamera.MV_FRAME_OUT_INFO pFrameInfo)
         {
             pnDataLen = 0;

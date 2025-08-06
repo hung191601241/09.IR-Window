@@ -36,7 +36,6 @@
             <Label x:Name="lbSegmentNeuroTool" Content="SegmentNeuro" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <!--<Label x:Name="lbVisionProTool" Content="VisionPro" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbVidiCognexTool" Content="VidiCognex" Foreground="#FFDD798B" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>-->
-            <Label x:Name="lbOutAcquisResTool" Content="OutAcquisRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbOutBlobResTool" Content="OutBlobRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbOutCheckProductTool" Content="OutCheckProduct" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>
             <Label x:Name="lbOutSegNeuroResTool" Content="OutSegNeuroRes" Foreground="#FF0C88DA" MouseDown="Lb_MouseDown" MouseMove="Lb_MouseMove"/>

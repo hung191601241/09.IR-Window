@@ -196,29 +196,60 @@ namespace VisionTools.ToolEdit
         {
             try
             {
-                double totalSize = Directory.GetFiles(folderPath).Sum(file => new System.IO.FileInfo(file).Length);
-                double totalSizeInMB = (totalSize / (1024 * 1024 * 1024)); // Đổi sang GB
-
-                if (totalSizeInMB >= maxSizeInGB)
+                var allFiles = Directory.GetFiles(folderPath);
+                double totalSizeInBytes = allFiles.Sum(file =>
                 {
-                    var oldestFile = Directory.GetFiles(folderPath)
-                        .Select(f => new System.IO.FileInfo(f))
+                    try
+                    {
+                        return new FileInfo(file).Length;
+                    }
+                    catch
+                    {
+                        return 0; // Bỏ qua nếu file đang bị khóa
+                    }
+                });
+
+                double totalSizeInGB = totalSizeInBytes / (1024 * 1024 * 1024);
+
+                if (totalSizeInGB >= maxSizeInGB)
+                {
+                    var oldestFile = allFiles
+                        .Select(f =>
+                        {
+                            try
+                            {
+                                return new FileInfo(f);
+                            }
+                            catch
+                            {
+                                return null;
+                            }
+                        })
+                        .Where(f => f != null)
                         .OrderBy(f => f.LastWriteTime)
                         .FirstOrDefault();
 
                     if (oldestFile != null)
                     {
-                        File.Delete(oldestFile.FullName);
+                        try
+                        {
+                            File.Delete(oldestFile.FullName);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Create("Delete File Error: " + ex.Message, ex);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 meaRunTime.Stop();
-                toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Delete oldest Logs file error: " + ex.Message);
-                logger.Create("Delete oldest Logs file Error: " + ex.Message, ex);
+                toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Delete file error: " + ex.Message);
+                logger.Create("Delete oldest file error: " + ex.Message, ex);
             }
         }
+
 
         private SvImage runImage = new SvImage();
         public override void Run()
@@ -250,47 +281,92 @@ namespace VisionTools.ToolEdit
             {
                 Task.Run(() =>
                 {
-                    this.Dispatcher.Invoke(() =>
+                    string folderPath = "";
+                    string fileName = "";
+                    string imageFormat = "";
+                    bool isAddCounter = IsAddCounter;
+                    bool isAddDateTime = IsAddDateTime;
+                    int indexImage = IndexImage;
+                    int numUDCounter = NumUDCounter;
+                    double numUDImageStorage = NumUDImageStorage;
+                    Mat matToSave = runImage.Mat.Clone(); // Clone ảnh để tránh dùng reference
+
+                    Dispatcher.Invoke(() =>
                     {
-                        // Kiểm tra folder tồn tại
-                        if (!IsValidPath(txtFolderPath.Text))
+                        folderPath = txtFolderPath.Text;
+                        fileName = txtFileName.Text;
+                        imageFormat = ImageFormatSelected;
+                    });
+
+                    if (!IsValidPath(folderPath))
+                    {
+                        Dispatcher.Invoke(() =>
                         {
                             meaRunTime.Stop();
                             toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "FolderPath Error Syntax!");
-                            return;
-                        }
-                        if (!Directory.Exists(txtFolderPath.Text))
-                            Directory.CreateDirectory(txtFolderPath.Text);
+                        });
+                        return;
+                    }
 
-                        // Xử lý tên file
-                        if (IsAddCounter)
-                        {
-                            if (IndexImage >= NumUDCounter)
-                                IndexImage = 0;
-                            IndexImage++;
-                        }
-                        string timestamp = IsAddDateTime
-                            ? $"{DateTime.Now:yyyy-MM-dd HH-mm-ss-fff}"
-                            : "";
-                        string strIndex = IsAddCounter ? $"-{IndexImage}" : "";
-                        if (string.IsNullOrEmpty(txtFileName.Text))
-                            txtFileName.Text = "Default";
-                        if (string.IsNullOrEmpty(ImageFormatSelected))
-                            ImageFormatSelected = "BMP";
-                        string finalFileName = $"{txtFileName.Text}{strIndex} {timestamp}.{ImageFormatSelected.ToLower()}";
-                        string fullPath = Path.Combine(txtFolderPath.Text, finalFileName);
-
-                        //Kiểm tra và xóa file ảnh cũ nhất trong trường hợp folder đầy dung lượng cho phép
-                        DeleteOldestFile(txtFolderPath.Text, NumUDImageStorage);
-                        // Lưu ảnh
-                        if (!Cv2.ImWrite(fullPath, runImage.Mat))
+                    try
+                    {
+                        if (!Directory.Exists(folderPath))
+                            Directory.CreateDirectory(folderPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Dispatcher.Invoke(() =>
                         {
                             meaRunTime.Stop();
+                            toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Cannot create folder: " + ex.Message);
+                        });
+                        return;
+                    }
+
+                    if (isAddCounter)
+                    {
+                        if (indexImage >= numUDCounter)
+                            indexImage = 0;
+                        indexImage++;
+                    }
+
+                    string timestamp = isAddDateTime ? $"{DateTime.Now:yyyy-MM-dd HH-mm-ss-fff}" : "";
+                    string strIndex = isAddCounter ? $"-{indexImage}" : "";
+
+                    if (string.IsNullOrEmpty(fileName)) fileName = "Default";
+                    if (string.IsNullOrEmpty(imageFormat)) imageFormat = "bmp";
+
+                    string finalFileName = $"{fileName}{strIndex} {timestamp}.{imageFormat.ToLower()}";
+                    string fullPath = Path.Combine(folderPath, finalFileName);
+
+                    DeleteOldestFile(folderPath, numUDImageStorage);
+
+                    bool saveSuccess = false;
+                    try
+                    {
+                        saveSuccess = Cv2.ImWrite(fullPath, matToSave);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Create("Image save error: " + ex.Message, ex);
+                    }
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        meaRunTime.Stop();
+                        if (!saveSuccess)
+                        {
                             toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Save Image Fail!");
-                            return;
+                        }
+                        else
+                        {
+                            IndexImage = indexImage;
+                            toolBase.SetLbTime(true, meaRunTime.ElapsedMilliseconds, "Image Saved");
                         }
                     });
                 });
+
+
             }
             catch (Exception ex)
             {

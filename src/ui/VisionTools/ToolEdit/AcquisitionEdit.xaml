@@ -134,7 +134,7 @@
         </TabItem>
         <TabItem>
             <TabItem.Header>
-                <TextBlock FontSize="15" Background="Transparent" Text="Setting"></TextBlock>
+                <TextBlock FontSize="15" Background="Transparent" Text="Setting Filter"></TextBlock>
             </TabItem.Header>
             <Grid>
                 <Grid.RowDefinitions>
@@ -170,6 +170,51 @@
                 <Border Grid.Row="3" BorderBrush="#FF8A8A8A" BorderThickness="1">
                     <ComboBox Width="250" Margin="50,0,0,0" ItemsSource="{Binding GrayModes}" SelectedItem="{Binding SelectedGrayMode, Mode=TwoWay}" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalAlignment="Center"/>
                 </Border>
+            </Grid>
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock FontSize="15" Background="Transparent" Text="Setting PLC"></TextBlock>
+            </TabItem.Header>
+            <Grid Background="#999999" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="150"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.Resources>
+                    <Style TargetType="{x:Type Label}">
+                        <Setter Property="FontSize" Value="15"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="{x:Type TextBox}">
+                        <Setter Property="FontSize" Value="15"/>
+                        <Setter Property="Background" Value="#555555"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="TextAlignment" Value="Left"/>
+                    </Style>
+                    <Style TargetType="{x:Type ComboBox}">
+                        <Setter Property="FontSize" Value="15"/>
+                        <Setter Property="Width" Value="100"/>
+                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                        <Setter Property="IsEditable" Value="False"/>
+                    </Style>
+                </Grid.Resources>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Background="#CCCCCC" Margin="20,0,15,0">
+                    <Label Width="50" Margin="10,0,0,0">OK :</Label>
+                    <ComboBox Width="70" ItemsSource="{Binding DeviceCodes}" SelectedItem="{Binding SelectDevOK, Mode=TwoWay}" Margin="0,5,0,5"/>
+                    <TextBox x:Name="txtAddrOK" Width="150" Margin="0,5,0,5"  Padding="3"/>
+                    <CheckBox x:Name="ckbxIsUseBitOK" Margin="5,0,0,0" VerticalContentAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Background="#CCCCCC" Margin="20,0,15,0">
+                    <Label Width="50" Margin="10,0,0,0">NG:</Label>
+                    <ComboBox Width="70" ItemsSource="{Binding DeviceCodes}" SelectedItem="{Binding SelectDevNG, Mode=TwoWay}" Margin="0,5,0,5"/>
+                    <TextBox x:Name="txtAddrNG" Width="150" Margin="0,5,0,5"  Padding="3"/>
+                    <CheckBox x:Name="ckbxIsUseBitNG" Margin="5,0,0,0" VerticalContentAlignment="Center"/>
+                </StackPanel>
             </Grid>
         </TabItem>
     </TabControl>
