@@ -542,9 +542,6 @@ namespace VisionInspection
                         Flag1 = false;
                     });
                     while (!vsComplete1) ;
-                    //Clear Bit Trigger Vision
-                    //if (SetTriggerVision(devIn, addrIn, false))
-                    //    AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
                 }
                 else { CallThreadStart1(); }
             }
@@ -574,9 +571,6 @@ namespace VisionInspection
                         Flag2 = false;
                     });
                     while (!vsComplete2) ;
-                    //Clear Bit Trigger Vision
-                    //if (SetTriggerVision(devIn, addrIn, false))
-                    //    AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
                 }
                 else { CallThreadStart2(); }
             }
@@ -593,7 +587,8 @@ namespace VisionInspection
             {
                 //Reset Vision
                 var vsMain = pgCamera.toolAreaGrs[2].ToolAreaMain;
-                bool cpl = false;
+                DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[2].selectDevIn;
+                string addrIn = pgCamera.curVsProgram.vsProgramNs[2].addrIn;
                 this.Dispatcher.Invoke(() =>
                 {
                     SegmentNeuroEdit toolOutEdit = vsMain.Children.OfType<SegmentNeuroTool>().FirstOrDefault().toolEdit;
@@ -604,12 +599,8 @@ namespace VisionInspection
                         Task.Run(toolOutEdit.ResetBuffer);
                         toolOutEdit.SendBitReset(false);
                     }
-                    cpl = true;
                 });
-                while (!cpl) ;
                 //Trigger Vision
-                DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[2].selectDevIn;
-                string addrIn = pgCamera.curVsProgram.vsProgramNs[2].addrIn;
                 GetTriggerVision(devIn, addrIn, out READ_VISION_TRIG3);
                 if (READ_VISION_TRIG3 && !Flag3)
                 {
@@ -623,12 +614,8 @@ namespace VisionInspection
                         Flag3 = false;
                     });
                     while (!vsComplete3) ;
-                    //Clear Bit Trigger Vision
-                    //if (SetTriggerVision(devIn, addrIn, false))
-                    //    AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
                 }
                 else { CallThreadStart3(); }
-                
             }
             catch (Exception ex)
             {
@@ -643,7 +630,8 @@ namespace VisionInspection
             {
                 //Reset Vision
                 var vsMain = pgCamera.toolAreaGrs[3].ToolAreaMain;
-                bool cpl = false;
+                DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[3].selectDevIn;
+                string addrIn = pgCamera.curVsProgram.vsProgramNs[3].addrIn;
                 this.Dispatcher.Invoke(() =>
                 {
                     SegmentNeuroEdit toolOutEdit = vsMain.Children.OfType<SegmentNeuroTool>().FirstOrDefault().toolEdit;
@@ -654,13 +642,9 @@ namespace VisionInspection
                         Task.Run(toolOutEdit.ResetBuffer);
                         toolOutEdit.SendBitReset(false);
                     }
-                    cpl = true;
                 });
-                while (!cpl) ;
 
                 //Trigger Vision
-                DeviceCode devIn = pgCamera.curVsProgram.vsProgramNs[3].selectDevIn;
-                string addrIn = pgCamera.curVsProgram.vsProgramNs[3].addrIn;
                 GetTriggerVision(devIn, addrIn, out READ_VISION_TRIG4);
                 if (READ_VISION_TRIG4 && !Flag4)
                 {
@@ -674,9 +658,6 @@ namespace VisionInspection
                         Flag4 = false;
                     });
                     while (!vsComplete4) ;
-                    //Clear Bit Trigger Vision
-                    //if (SetTriggerVision(devIn, addrIn, false))
-                    //    AddLog($"TRIGGER: {devIn}{addrIn} = OFF");
                 }
                 else { CallThreadStart4(); }
             }

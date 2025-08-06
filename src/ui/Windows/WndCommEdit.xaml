@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:VisionTools.ToolEdit"
         mc:Ignorable="d"
         Title="Edit Communication" WindowStyle="ToolWindow" 
-        ResizeMode="NoResize" Height="420" Width="480">
+        ResizeMode="NoResize" Height="450" Width="550">
     <Grid Background="#999999">
         <Grid.RowDefinitions>
             <RowDefinition Height="10"/>

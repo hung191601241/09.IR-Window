@@ -1357,7 +1357,6 @@ namespace VisionTools.ToolEdit
                 logger.Create("Delete oldest file error: " + ex.Message, ex);
             }
         }
-
         private string FormatBytes(long bytes, out string size)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB" };
@@ -1444,6 +1443,7 @@ namespace VisionTools.ToolEdit
             {
                 meaRunTime.Stop();
                 toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "FolderPath Error Syntax!");
+                logger.Create("FolderPath Error Syntax!");
                 return;
             }
             if (!Directory.Exists(txtFolderPath.Text))
@@ -1474,6 +1474,7 @@ namespace VisionTools.ToolEdit
             {
                 meaRunTime.Stop();
                 toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Save Image Fail!");
+                logger.Create("Save Image Fail!");
                 return;
             }
         }
@@ -1840,7 +1841,6 @@ namespace VisionTools.ToolEdit
                                         SaveGraphicImage(RunImageLst[i]);
                                     }
                                 });
-
                             });
                         }
                     }
