@@ -82,7 +82,6 @@ namespace VisionInspection
             this.Loaded += PgMainVision_Loaded;
             this.Unloaded += PgMainVision_Unloaded;
             this.DataContext = this;
-
         }
 
         private void PgMainVision_Loaded(object sender, RoutedEventArgs e)
@@ -475,7 +474,6 @@ namespace VisionInspection
                     Thread.Sleep(10);
                     CallThreadStart3(); 
                 }
-                
             }
             catch (Exception ex)
             {

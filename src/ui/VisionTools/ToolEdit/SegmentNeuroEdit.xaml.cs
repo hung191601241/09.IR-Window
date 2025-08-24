@@ -1387,7 +1387,6 @@ namespace VisionTools.ToolEdit
                 logger.Create("Delete oldest file error: " + ex.Message, ex);
             }
         }
-
         private string FormatBytes(long bytes, out string size)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB" };
@@ -1899,7 +1898,6 @@ namespace VisionTools.ToolEdit
                                         SaveGraphicImage(RunImageLst[i]);
                                     }
                                 });
-
                             });
                         }
                     }

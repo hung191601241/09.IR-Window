@@ -134,7 +134,7 @@
         </TabItem>
         <TabItem>
             <TabItem.Header>
-                <TextBlock FontSize="15" Background="Transparent" Text="Setting"></TextBlock>
+                <TextBlock FontSize="15" Background="Transparent" Text="Setting Filter"></TextBlock>
             </TabItem.Header>
             <Grid>
                 <Grid.RowDefinitions>
