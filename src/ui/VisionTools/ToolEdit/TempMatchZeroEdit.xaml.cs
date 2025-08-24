@@ -920,11 +920,11 @@ namespace VisionTools.ToolEdit
         }
         private bool CheckDeviceDSyntax(string _address)
         {
-            return Regex.IsMatch(_address, @"^D[1-9]\d*$");
+            return Regex.IsMatch(_address, @"^D[0-9]\d*$");
         }
         private bool CheckDeviceMSyntax(string _address)
         {
-            return Regex.IsMatch(_address, @"^M[1-9]\d*$");
+            return Regex.IsMatch(_address, @"^M[0-9]\d*$");
         }
         private bool String2Enum(string strDev, out DeviceCode _devType, out string _strDevNo)
         {
@@ -1147,7 +1147,7 @@ namespace VisionTools.ToolEdit
             }
         }
 
-        private SvImage runImage = new SvImage();
+        public SvImage runImage = new SvImage();
         public override void Run()
         {
             ShapeEditor shEdit = (oldSelect == 0) ? shEditSearch : shEditTrain;

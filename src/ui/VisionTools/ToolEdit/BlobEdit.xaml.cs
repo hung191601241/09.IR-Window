@@ -195,6 +195,14 @@ namespace VisionTools.ToolEdit
             RegisterEvent(); 
             toolBase.DataContext = this;
         }
+        public BlobEdit(Mat inputImage)
+        {
+            InputImage = new SvImage();
+            InputImage.Mat = inputImage.Clone();
+            kSize = 3;
+            minArea = 1000; maxArea = 1000000;
+            rangeLow = 0; rangeHigh = 255;
+        }
         protected override void DisplayInit()
         {
             toolBase.lbCurrentJob.Content = "Blob";
@@ -775,7 +783,6 @@ namespace VisionTools.ToolEdit
                         try
                         {
                             cvBlobs.RenderBlobs(OutputImage.Mat, OutputImage.Mat, RenderBlobsMode.Angle | RenderBlobsMode.Centroid | RenderBlobsMode.BoundingBox);
-                            OutputImage.Mat.SaveImage("HungTest.bmp");
                         }
                         catch
                         {
@@ -900,8 +907,11 @@ namespace VisionTools.ToolEdit
                 mask.Dispose();
                 pMat.Dispose();
 
-                ImgView.Source = BinaryImage.Mat.ToBitmapSource();
-                toolBase.cbxImage.SelectedIndex = isEditMode ? 1 : 0;
+                this.Dispatcher.Invoke(() =>
+                {
+                    ImgView.Source = BinaryImage.Mat.ToBitmapSource();
+                    toolBase.cbxImage.SelectedIndex = isEditMode ? 1 : 0;
+                });
             }
             catch (Exception ex)
             {

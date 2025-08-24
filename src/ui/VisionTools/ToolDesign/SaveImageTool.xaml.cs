@@ -78,10 +78,13 @@ namespace VisionTools.ToolDesign
                         switch (cntTag.Value[3])
                         {
                             case "lbInputImage":
-                                if (!(arrowConnectLst[cntTag.Key].data is SvImage)) continue;
-                                toolEdit.InputImage = arrowConnectLst[cntTag.Key].data as SvImage;
-                                if (!toolEdit.InputImage.IsNull && toolEdit.InputImage.Mat != null)
-                                    toolEdit.toolBase.isImgPath = false;
+                                if (arrowConnectLst[cntTag.Key].data is not SvImage) continue;
+                                Dispatcher.Invoke(() =>
+                                {
+                                    toolEdit.InputImage = arrowConnectLst[cntTag.Key].data as SvImage;
+                                    if (!toolEdit.InputImage.IsNull && toolEdit.InputImage.Mat != null)
+                                        toolEdit.toolBase.isImgPath = false;
+                                });
                                 break;
                         }
                         break;

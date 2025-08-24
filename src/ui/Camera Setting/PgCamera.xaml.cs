@@ -60,9 +60,6 @@ namespace VisionInspection
         private bool autoScrollMode = true;
         private ConnectionSettings connectionSettings = UiManager.appSettings.connection;
         private static MyLogger logger = new MyLogger("Camera Page");
-        private HikCam searchCam = new HikCam();
-        CameraOperator m_pOperator = new CameraOperator();
-        CameraOperatorHandle cameraHandle = new CameraOperatorHandle();
         private System.Timers.Timer clock;
         private System.Timers.Timer cycleTimer;
         private Mat Image;
@@ -105,7 +102,6 @@ namespace VisionInspection
             prop.AddValueChanged(this.imgView, SourceChangedHandler);
 
             //Tabar
-            this.btnCamCenterLine.Click += btnCamCenterLine_Clicked;
             this.btnCameraZoomOut.Click += BtnCameraZoomOut_Click;
             this.btnCameraZoomIn.Click += BtnCameraZoomIn_Click;
 
@@ -393,22 +389,6 @@ namespace VisionInspection
             bitmap.EndInit();
             img.Source = bitmap;
         }
-
-        void btnCamCenterLine_Clicked(object sender, RoutedEventArgs e)
-        {
-            this.cameraHandle.CrossCenter = !cameraHandle.CrossCenter;
-            if (cameraHandle.CrossCenter)
-            {
-                LineCreossX.Visibility = Visibility.Visible;
-                LineCreossY.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                LineCreossX.Visibility = Visibility.Hidden;
-                LineCreossY.Visibility = Visibility.Hidden;
-            }
-        }
-
         #endregion
 
         #region Config Canvas
@@ -595,14 +575,6 @@ namespace VisionInspection
                     }
                     imgView.Source = outBlobEdit.OriginImage.Mat.ToBitmapSource();
                     break;
-                case VisionToolType.OUTACQUISRES:
-                    var outAcqEdit = (outResTool as OutAcquisResTool).toolEdit;
-                    if (outAcqEdit.InputImage == null || outAcqEdit.InputImage.Mat == null || outAcqEdit.InputImage.Mat.Height <= 0 || outAcqEdit.InputImage.Mat.Width <= 0)
-                    {
-                        return;
-                    }
-                    imgView.Source = outAcqEdit.InputImage.Mat.ToBitmapSource();
-                    break;
                 case VisionToolType.OUTSEGNEURORES:
                     var outSegEdit = (outResTool as OutSegNeuroResTool).toolEdit;
                     if (outSegEdit.InputImage == null || outSegEdit.InputImage.Mat == null || outSegEdit.InputImage.Mat.Height <= 0 || outSegEdit.InputImage.Mat.Width <= 0)
@@ -651,7 +623,6 @@ namespace VisionInspection
                             switch (tool.ToolType)
                             {
                                 case VisionToolType.OUTBLOBRES:
-                                case VisionToolType.OUTACQUISRES:
                                 case VisionToolType.OUTSEGNEURORES:
                                 case VisionToolType.OUTVIDICOGRES:
                                     outResToolInputName = String.Format($"VP{toolAreaGr.index}.{toolAreaGr.ToolAreaMain.Name}.{tool.Name}.OutputImage");
@@ -676,7 +647,6 @@ namespace VisionInspection
                                 switch (tool.ToolType)
                                 {
                                     case VisionToolType.OUTBLOBRES:
-                                    case VisionToolType.OUTACQUISRES:
                                     case VisionToolType.OUTSEGNEURORES:
                                     case VisionToolType.OUTVIDICOGRES:
                                         outResToolInputName = String.Format($"VP{toolAreaGr.index}.{toolAreaSub.Name}.{tool.Name}.OutputImage");
@@ -1375,28 +1345,75 @@ namespace VisionInspection
             toolAreaSub.CreateArrowConnect("BlobTool1.lbBlobs-OutBlobResTool0.lbBlobs2", new Point(63.20667, 280), new Point(71.2933, 390));
         }
 
+        //*********************** Custom to Run Auto ***********************
+        public void CreateVisionProgram(VisionProgram vsProgram, ref List<ToolAreaGroup> toolAreaGrs, ref List<List<VisionTool>> vsToolLst, int idxVPn)
+        {
+            //Tạo ToolAreaGroup cho buttonRunVP
+            ToolAreaGroup toolAreaGr = new ToolAreaGroup() { index = idxVPn };
+            /**************************************VISION PROGRAM****************************************/
+            /**************************************INPUT TRIGGER***************************************/
+            /**************************************MAIN PROGRAM****************************************/
+            ToolArea toolAreaMain = new ToolArea
+            {
+                IsToolMain = true
+            };
+            toolAreaGr.ToolAreaMain = toolAreaMain;
+            /**************************************SUB PROGRAM****************************************/
+            // Thêm toolAreaGroup vào List toolAreaGroup
+            toolAreaGrs.Add(toolAreaGr);
+            //Load appSetting to ToolAreas
+            LoadToolAreaMain(vsProgram, idxVPn, toolAreaMain);
+            List<VisionTool> vsTool = new List<VisionTool>();
+            foreach (var tool in toolAreaMain.Children)
+            {
+                if (tool is VisionTool vs)
+                    vsTool.Add(vs);
+            }
+            vsToolLst.Add(vsTool);
+        }
+        public void LoadToolAreaMain(VisionProgram vsProgram, int index, ToolArea toolArea)
+        {
+            if (vsProgram.vsProgramNs.Count <= 0)
+                return;
+            toolArea.heightAllTool = this.curVsProgram.vsProgramNs[index].vsMain.heightAllTool;
+            toolArea.heightToolLst = this.curVsProgram.vsProgramNs[index].vsMain.heightToolLst;
+            VisionMainSub vsMain = vsProgram.vsProgramNs[index].vsMain;
+            for (int i = 0; i < vsMain.nameTools.Count; i++)
+            {
+                LoadToolCommon(index, i, toolArea, vsMain);
+            }
+            //Arrow Connect
+            foreach (var arrow in vsMain.arrowConnect)
+            {
+                toolArea.CreateArrowConnect(arrow.name, arrow.startPoint, arrow.endPoint);
+            }
+        }
+        //*******************************************************************************
+
         private void RunTreeToolMain(ToolArea toolArea)
         {
-            List<VisionTool> tools = toolArea.Children.OfType<VisionTool>().ToList();
-            if (tools == null || tools.Count == 0)
-                return;
             //Reset bộ đếm và stt tool NG
             toolArea.resRunTools = 0;
             toolArea.sttRunTools = "";
             Dictionary<int, string[]> connectTags = toolArea.CreateConnectTags(toolArea.arrowCntLst);
+
+            List<VisionTool> tools = new List<VisionTool>();
+            Dispatcher.Invoke(() =>
+            {
+                tools = toolArea.Children.OfType<VisionTool>().ToList();
+                if (tools == null || tools.Count == 0)
+                    return;
+            });
             foreach (VisionTool tool in tools)
             {
-                bool resRun = true;
-                switch (tool.ToolType)
+                if (tool.ToolType == VisionToolType.ACQUISITION)
                 {
-                    case VisionToolType.ACQUISITION:
-                        resRun = tool.RunToolInOut(toolArea.arrowCntLst, connectTags);
-                        if (!resRun) { toolArea.resRunTools += 1; toolArea.sttRunTools += "AcquisitionTool Error | "; }
-                        break;
-                    default:
-                        ToolRun(tool, toolArea, connectTags);
-                        break;
-                }    
+                    AcquisitionTool Tool = (tool as AcquisitionTool);
+                    bool resRun = Tool.RunToolInOut(toolArea.arrowCntLst, connectTags);
+                    if (!resRun) { toolArea.resRunTools += 1; toolArea.sttRunTools += "AcquisitionTool Error | "; }
+                }
+                else
+                    ToolRun(tool, toolArea, connectTags);
             }
 
         }
@@ -1496,7 +1513,6 @@ namespace VisionInspection
                     case VisionToolType.VIDICOGNEX:
                         toolArea.sttRunTools += "VidiCognexTool Error | ";
                         break;
-                    case VisionToolType.OUTACQUISRES:
                     case VisionToolType.OUTCHECKPRODUCT:
                     case VisionToolType.OUTSEGNEURORES:
                     case VisionToolType.OUTVIDICOGRES:
@@ -1706,6 +1722,12 @@ namespace VisionInspection
                 toolEdit.ckbxToGray.IsChecked = toolSetting.isGrayMode;
                 toolEdit.SelectedRotateMode = toolSetting.rotateMode;
                 toolEdit.SelectedGrayMode = toolSetting.grayMode;
+                toolEdit.txtAddrOK.Text = toolSetting.addrOK;
+                toolEdit.txtAddrNG.Text = toolSetting.addrNG;
+                toolEdit.SelectDevOK = toolSetting.selectDevOK;
+                toolEdit.SelectDevNG = toolSetting.selectDevNG;
+                toolEdit.ckbxIsUseBitOK.IsChecked = toolSetting.isUseBitOK;
+                toolEdit.ckbxIsUseBitNG.IsChecked = toolSetting.isUseBitNG;
 
                 string gainStr = "";
                 for(int i = 0; i < UiManager.CamList.Count; i++)
@@ -1847,6 +1869,14 @@ namespace VisionInspection
                 toolEdit.MaxCount = toolSetting.maxCount;
                 toolEdit.rectTrainCv = toolSetting.rectTrain;
                 toolEdit.rectSearchCv = toolSetting.rectSearch;
+
+                toolEdit.ckbxIsUsePx2mm.IsChecked = toolSetting.isUsePx2Mm;
+                toolEdit.ckbxIsSend2PLC.IsChecked = toolSetting.isSendData2PLC;
+                toolEdit.numUDPx2mm.Value = toolSetting.mmPixelVal;
+                toolEdit.txtAddrX.Text = toolSetting.addrOffsetX;
+                toolEdit.txtAddrY.Text = toolSetting.addrOffsetY;
+                toolEdit.txtAddrCpl.Text = toolSetting.addrCpl;
+                toolEdit.txtValCpl.Text = toolSetting.valCpl;
                 //Rect Search
                 toolEdit.CreatRect(toolSetting.rectSearch.X, toolSetting.rectSearch.Y, toolSetting.rectSearch.Width, toolSetting.rectSearch.Height, 0, colorSearchStroke, colorSearchFill, "S", toolEdit.inEle);
                 //Rect Train
@@ -1996,10 +2026,33 @@ namespace VisionInspection
 
                 SegmentNeuroEdit toolEdit = toolTool.toolEdit;
                 SegmentNeuroSetting toolSetting = vsMnSb.segmentNeuroSettings[idxToolType];
+                toolEdit.ckbxIsSaveImg.IsChecked = toolSetting.isUseSaveImage;
+                toolEdit.txtFileName.Text = toolSetting.fileName;
+                toolEdit.txtFolderPath.Text = toolSetting.folderPath;
+                toolEdit.ImageFormatSelected = toolSetting.imageFormat;
+                toolEdit.IsAddDateTime = toolSetting.isAddDateTime;
+                toolEdit.IsAddCounter = toolSetting.isAddCounter;
+                toolEdit.NumUDCounter = toolSetting.counter;
+                toolEdit.NumUDImageStorage = toolSetting.imageStorage;
+                toolEdit.SelectDevReset = toolSetting.selectDevReset;
+                toolEdit.SelectDevRcvImg = toolSetting.selectDevRcvImg;
+                toolEdit.SelectDevNG = toolSetting.selectDevNG;
+                toolEdit.SelectDevOK = toolSetting.selectDevOK;
+                toolEdit.TxtAddrReset = toolSetting.addrReset;
+                toolEdit.TxtAddrRcvImg = toolSetting.addrRcvImg;
+                toolEdit.TxtAddrNG = toolSetting.addrNG;
+                toolEdit.TxtAddrOK = toolSetting.addrOK;
+                toolEdit.addrNGLst = toolSetting.addrNGLst;
+                toolEdit.addrOKLst = toolSetting.addrOKLst;
+                toolEdit.ckbxIsUseBitRcvImg.IsChecked = toolSetting.isUseBitRcvImg;
+                toolEdit.ckbxIsUseBitReset.IsChecked = toolSetting.isUseBitReset;
+                toolEdit.NumberPos = toolSetting.numberPos;
+                toolEdit.UpdateDataGrid();
+
                 List<NeuroModel> nrtModels = toolSetting.modelNeuroes;
                 for (int i = 0; i < toolSetting.modelNeuroes.Count; i++)
                 {
-                    toolEdit.CreatNewModel(nrtModels[i].Name, nrtModels[i].Path, nrtModels[i].PathRuntime, nrtModels[i].Device, nrtModels[i].DeviceIdx, nrtModels[i].Score, i);
+                    toolEdit.CreatNewModel(nrtModels[i].Name, nrtModels[i].Path, nrtModels[i].PathRuntime, nrtModels[i].Device, nrtModels[i].DeviceIdx, nrtModels[i].Score, nrtModels[i].BatchSize, i);
                 }
             }
             else if (nameTool.Contains("VidiCognexTool"))
@@ -2072,21 +2125,6 @@ namespace VisionInspection
                 {
                     toolEdit.UpdateDataGrid(toolEdit.indexImgs.Count);
                 }    
-            }
-            else if (nameTool.Contains("OutAcquisResTool"))
-            {
-                if (vsMnSb.outAcquisResSettings.Count == 0 || vsMnSb.outAcquisResSettings[idxToolType] == null)
-                    return;
-                OutAcquisResTool outResultTool = new OutAcquisResTool() { Name = nameTool };
-                toolArea.InitLabelTool(outResultTool);
-                toolArea.LoadTool(outResultTool, toolArea.heightToolLst[indexTools]);
-
-                OutAcquisResSetting toolSetting = vsMnSb.outAcquisResSettings[idxToolType];
-                OutAcquisResEdit toolEdit = outResultTool.toolEdit;
-                toolEdit.txtAddrOutOK.Text = toolSetting.addrOutOK;
-                toolEdit.txtAddrOutNG.Text = toolSetting.addrOutNG;
-                toolEdit.SelectDevOutOK = toolSetting.selectDevOutOK;
-                toolEdit.SelectDevOutNG = toolSetting.selectDevOutNG;
             }
             else if (nameTool.Contains("OutCheckProductTool"))
             {
@@ -2161,6 +2199,12 @@ namespace VisionInspection
                         isGrayMode = (bool)toolEdit.ckbxToGray.IsChecked,
                         rotateMode = toolEdit.SelectedRotateMode,
                         grayMode = toolEdit.SelectedGrayMode,
+                        selectDevOK = toolEdit.SelectDevOK,
+                        selectDevNG = toolEdit.SelectDevNG,
+                        addrOK = toolEdit.txtAddrOK.Text,
+                        addrNG = toolEdit.txtAddrNG.Text,
+                        isUseBitOK = (bool)toolEdit.ckbxIsUseBitOK.IsChecked,
+                        isUseBitNG = (bool)toolEdit.ckbxIsUseBitNG.IsChecked,
                     };
                     if (toolEdit.cbxCamDevice.SelectedValue != null && toolEdit.cbxCamDevice.SelectedIndex != 0)
                     {
@@ -2276,10 +2320,16 @@ namespace VisionInspection
                         priorityCreteria = toolEdit.PriorityCreteria,
                         maxCount = toolEdit.MaxCount,
                         isUseROI = toolEdit.IsUseROI,
-                        //rectSearch = new OpenCvSharp.Rect((int)Canvas.GetLeft(toolEdit.rectSearch), (int)Canvas.GetTop(toolEdit.rectSearch), (int)toolEdit.rectSearch.Width, (int)toolEdit.rectSearch.Height),
-                        //rectTrain = new OpenCvSharp.Rect((int)Canvas.GetLeft(toolEdit.rectTrain), (int)Canvas.GetTop(toolEdit.rectTrain), (int)toolEdit.rectTrain.Width, (int)toolEdit.rectTrain.Height)
                         rectSearch = toolEdit.rectSearchCv,
                         rectTrain = toolEdit.rectTrainCv,
+
+                        isUsePx2Mm = (bool)toolEdit.ckbxIsUsePx2mm.IsChecked,
+                        isSendData2PLC = (bool)toolEdit.ckbxIsSend2PLC.IsChecked,
+                        mmPixelVal = (double)toolEdit.numUDPx2mm.Value,
+                        addrOffsetX = toolEdit.txtAddrX.Text,
+                        addrOffsetY = toolEdit.txtAddrY.Text,
+                        addrCpl = toolEdit.txtAddrCpl.Text,
+                        valCpl = toolEdit.txtValCpl.Text,
                     };
                     //Save patternData
                     if (toolEdit.patternData.PatternImage != null)
@@ -2386,7 +2436,31 @@ namespace VisionInspection
                 else if(tool.ToolType == VisionToolType.SEGMENTNEURO)
                 {
                     if (tool is not SegmentNeuroTool Tool) { continue; }
-                    SegmentNeuroSetting toolSetting = new SegmentNeuroSetting();
+                    var toolEdit = Tool.toolEdit;
+                    SegmentNeuroSetting toolSetting = new SegmentNeuroSetting
+                    {
+                        isUseSaveImage = (bool)toolEdit.ckbxIsSaveImg.IsChecked,
+                        fileName = toolEdit.txtFileName.Text,
+                        folderPath = toolEdit.txtFolderPath.Text,
+                        imageFormat = toolEdit.ImageFormatSelected,
+                        isAddDateTime = toolEdit.IsAddDateTime,
+                        isAddCounter = toolEdit.IsAddCounter,
+                        counter = toolEdit.NumUDCounter,
+                        imageStorage = toolEdit.NumUDImageStorage,
+                        addrReset = toolEdit.TxtAddrReset,
+                        addrNG = toolEdit.TxtAddrNG,
+                        addrOK = toolEdit.TxtAddrOK,
+                        addrRcvImg = toolEdit.TxtAddrRcvImg,
+                        selectDevReset = toolEdit.SelectDevReset,
+                        selectDevRcvImg = toolEdit.SelectDevRcvImg,
+                        selectDevNG = toolEdit.SelectDevNG,
+                        selectDevOK = toolEdit.SelectDevOK,
+                        addrNGLst = toolEdit.addrNGLst,
+                        addrOKLst = toolEdit.addrOKLst,
+                        numberPos = toolEdit.NumberPos,
+                        isUseBitRcvImg = (bool)toolEdit.ckbxIsUseBitRcvImg.IsChecked,
+                        isUseBitReset = (bool)toolEdit.ckbxIsUseBitReset.IsChecked
+                    };
                     Tool.toolEdit.modelList.ForEach(model => toolSetting.modelNeuroes.Add(model));
                     vsMnSb.segmentNeuroSettings.Add(toolSetting);
                 }
@@ -2427,19 +2501,6 @@ namespace VisionInspection
                         distanceSet = Tool.toolEdit.DistSet,
                     };
                     vsMnSb.outBlobResSettings.Add(toolSetting);
-                }
-                else if (tool.ToolType == VisionToolType.OUTACQUISRES)
-                {
-                    OutAcquisResTool Tool = (tool as OutAcquisResTool);
-                    if (Tool == null) { continue; }
-                    OutAcquisResSetting toolSetting = new OutAcquisResSetting()
-                    {
-                        selectDevOutOK = Tool.toolEdit.SelectDevOutOK,
-                        selectDevOutNG = Tool.toolEdit.SelectDevOutNG,
-                        addrOutOK = Tool.toolEdit.txtAddrOutOK.Text,
-                        addrOutNG = Tool.toolEdit.txtAddrOutNG.Text,
-                    };
-                    vsMnSb.outAcquisResSettings.Add(toolSetting);
                 }
                 else if (tool.ToolType == VisionToolType.OUTCHECKPRODUCT)
                 {

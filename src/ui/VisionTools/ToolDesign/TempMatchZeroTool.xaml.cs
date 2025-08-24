@@ -178,9 +178,12 @@ namespace VisionTools.ToolDesign
             if (inputImage != null && inputImage.Mat != null && inputImage.Mat.Width != 0 && inputImage.Mat.Height != 0)
                 return;
 
-            Rectangle rect = toolEdit.CanvasImg.Children.OfType<Rectangle>().FirstOrDefault();
-            if (toolEdit.oldSelect == 0) { toolEdit.rectSearchCv = new OpenCvSharp.Rect((int)Canvas.GetLeft(rect), (int)Canvas.GetTop(rect), (int)rect.Width, (int)rect.Height); }
-            else if (toolEdit.oldSelect == 1) { toolEdit.rectTrainCv = new OpenCvSharp.Rect((int)Canvas.GetLeft(rect), (int)Canvas.GetTop(rect), (int)rect.Width, (int)rect.Height); }
+            if(toolEdit.runImage.Mat != null)
+            {
+                Rectangle rect = toolEdit.CanvasImg.Children.OfType<Rectangle>().FirstOrDefault();
+                if (toolEdit.oldSelect == 0) { toolEdit.rectSearchCv = new OpenCvSharp.Rect((int)Canvas.GetLeft(rect), (int)Canvas.GetTop(rect), (int)rect.Width, (int)rect.Height); }
+                else if (toolEdit.oldSelect == 1) { toolEdit.rectTrainCv = new OpenCvSharp.Rect((int)Canvas.GetLeft(rect), (int)Canvas.GetTop(rect), (int)rect.Width, (int)rect.Height); }
+            }  
             ToolArea toolArea = this.Parent as ToolArea;
             RunToolInOut(toolArea.arrowCntLst, toolArea.CreateConnectTags(toolArea.arrowCntLst));   
         }

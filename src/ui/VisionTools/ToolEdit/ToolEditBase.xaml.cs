@@ -386,17 +386,21 @@ namespace VisionTools.ToolEdit
         }
         public void SetLbTime(bool isSuccessed, long timeMs, string ErrMsg = "")
         {
-            elipSttRun.Fill = isSuccessed ? (Brush)new BrushConverter().ConvertFromString("#FF00F838") : (Brush)new BrushConverter().ConvertFromString("#FFE90E0E");
-            lbTimeRun.Content = string.Format("{0:F2}ms", timeMs);
-            if (isSuccessed)
+            Dispatcher.BeginInvoke(() =>
             {
+                elipSttRun.Fill = isSuccessed ? (Brush)new BrushConverter().ConvertFromString("#FF00F838") : (Brush)new BrushConverter().ConvertFromString("#FFE90E0E");
                 lbTimeRun.Content = string.Format("{0:F2}ms", timeMs);
-            }
-            else
-            {
-                lbTimeRun.Content = string.Format("{0:F2}ms", timeMs) + $" - {ErrMsg}";
-            }
-            BitStatus = isSuccessed;
+                if (isSuccessed)
+                {
+                    lbTimeRun.Content = string.Format("{0:F2}ms", timeMs);
+                }
+                else
+                {
+                    lbTimeRun.Content = string.Format("{0:F2}ms", timeMs) + $" - {ErrMsg}";
+                }
+                BitStatus = isSuccessed;
+
+            });
         }
         public void OnBitStatusChanged()
         {

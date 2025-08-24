@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Development;
+using Microsoft.Win32;
 using MVSDK_Net;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
@@ -8,6 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -47,6 +49,11 @@ namespace VisionTools.ToolEdit
 
         //Binding
         public event PropertyChangedEventHandler PropertyChanged;
+        public Array DeviceCodes => Enum.GetValues(typeof(DeviceCode));
+
+        private DeviceCode _selectDevOK = DeviceCode.M, _selectDevNG = DeviceCode.M;
+        public DeviceCode SelectDevOK { get => _selectDevOK; set => _selectDevOK = value; }
+        public DeviceCode SelectDevNG { get => _selectDevNG; set => _selectDevNG = value; }
         public enum RotateMode { Rotate0, Rotate90, Rotate180, Rotate270 }
         public Array RotateModes => Enum.GetValues(typeof(RotateMode));
         public enum GrayMode { BGR2Gray, RGB2Gray, BGR2RGB }
@@ -58,9 +65,9 @@ namespace VisionTools.ToolEdit
         private long _widthCam = 100, _heightCam = 100, _minWidth = 0, _minHeight = 0, _maxWidth = 100, _maxHeight = 100;
         private double _minExpo, _maxExpo, _minGain, _maxGain;
         private Visibility _isImgVisible = Visibility.Visible, _isAcqVisible = Visibility.Hidden;
-        public double MinExpo { get => _minExpo; set { _minExpo = value; OnPropertyChanged(nameof(MinExpo)); } }     
+        public double MinExpo { get => _minExpo; set { _minExpo = value; OnPropertyChanged(nameof(MinExpo)); } }
         public double MaxExpo { get => _maxExpo; set { _maxExpo = value; OnPropertyChanged(nameof(MaxExpo)); } }
-        public double MinGain { get => _minGain; set { _minGain = value; OnPropertyChanged(nameof(MinGain)); } }    
+        public double MinGain { get => _minGain; set { _minGain = value; OnPropertyChanged(nameof(MinGain)); } }
         public double MaxGain { get => _maxGain; set { _maxGain = value; OnPropertyChanged(nameof(MaxGain)); } }
         public long nMinWidth { get => _minWidth; set { _minWidth = value; OnPropertyChanged(nameof(nMinWidth)); } }
         public long nMinHeight { get => _minHeight; set { _minHeight = value; OnPropertyChanged(nameof(nMinHeight)); } }
@@ -68,24 +75,30 @@ namespace VisionTools.ToolEdit
         public long nMaxHeight { get => _maxHeight; set { _maxHeight = value; OnPropertyChanged(nameof(nMaxHeight)); } }
         public RotateMode SelectedRotateMode { get => _selectedRotateMode; set { _selectedRotateMode = value; OnPropertyChanged(nameof(SelectedRotateMode)); } }
         public GrayMode SelectedGrayMode { get => _selectedGrayMode; set { _selectedGrayMode = value; OnPropertyChanged(nameof(SelectedGrayMode)); } }
-        public BitmapSource ImgViewSource { get => (BitmapSource)toolBase.imgView.Source; set
+        public BitmapSource ImgViewSource
+        {
+            get => (BitmapSource)toolBase.imgView.Source; set
             {
                 toolBase.imgView.Source = value;
                 OutputImage.Mat = value.ToMat();
             }
         }
 
-        public double ExposureValue { get => _exposureVal; set
+        public double ExposureValue
+        {
+            get => _exposureVal; set
             {
-                if(_exposureVal != value)
+                if (_exposureVal != value)
                 {
                     _exposureVal = value;
                     this.Camera.SetExposeTime(_exposureVal);
                     OnPropertyChanged(nameof(ExposureValue));
-                }    
+                }
             }
         }
-        public double GainValue { get => _gainVal; set
+        public double GainValue
+        {
+            get => _gainVal; set
             {
                 if (_gainVal != value)
                 {
@@ -95,22 +108,28 @@ namespace VisionTools.ToolEdit
                 }
             }
         }
-        public long WidthCam { get => _widthCam; set 
+        public long WidthCam
+        {
+            get => _widthCam; set
             {
                 _widthCam = value;
                 this.Camera.SetHeight(_widthCam);
                 OnPropertyChanged(nameof(WidthCam));
-            } 
+            }
         }
-        public long HeightCam { get => _heightCam; set 
+        public long HeightCam
+        {
+            get => _heightCam; set
             {
                 _heightCam = value;
                 this.Camera.SetHeight(_heightCam);
                 OnPropertyChanged(nameof(HeightCam));
-            } 
+            }
         }
-        
-        public bool IsStopCamera { get => isStopCamera; set
+
+        public bool IsStopCamera
+        {
+            get => isStopCamera; set
             {
                 isStopCamera = value;
                 numUDWidthCam.IsEnabled = isStopCamera;
@@ -180,6 +199,7 @@ namespace VisionTools.ToolEdit
         private void AcquisitionEdit_Unloaded(object sender, RoutedEventArgs e)
         {
             IsStopCamera = true;
+            CheckAddrUse();
         }
 
         private void CbxCamDevice_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -246,11 +266,11 @@ namespace VisionTools.ToolEdit
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     logger.Create("CbxCamDevice Error: " + ex.Message, ex);
-                } 
-            }       
+                }
+            }
         }
 
         private void CanvasSmallList_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -271,8 +291,8 @@ namespace VisionTools.ToolEdit
             catch (Exception ex)
             {
                 logger.Create("Choose Small Image Error: " + ex.Message, ex);
-            } 
-            
+            }
+
         }
 
         private void BtnBackImg_Click(object sender, RoutedEventArgs e)
@@ -307,10 +327,10 @@ namespace VisionTools.ToolEdit
                 }
                 lbCurrentPos.Content = String.Format("{0} / {1}", countNxBk + 1, imgFolderLst.Count);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Create("Button Back Error: " + ex.Message, ex);
-            } 
+            }
         }
 
         private void BtnNextImg_Click(object sender, RoutedEventArgs e)
@@ -354,11 +374,11 @@ namespace VisionTools.ToolEdit
                 }
                 lbCurrentPos.Content = String.Format("{0} / {1}", countNxBk + 1, imgFolderLst.Count);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Create("Button Next Error: " + ex.Message, ex);
-            } 
-             
+            }
+
         }
 
 
@@ -393,10 +413,10 @@ namespace VisionTools.ToolEdit
                     isImageCam = false;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Create("Button Load Image Error: " + ex.Message, ex);
-            } 
+            }
         }
 
         private void DisplayInSmallImg(List<Mat> imgLst)
@@ -424,7 +444,7 @@ namespace VisionTools.ToolEdit
             catch (Exception ex)
             {
                 logger.Create("Display Small Image Error: " + ex.Message, ex);
-            } 
+            }
         }
         private void FitImage(Image srcImage, Canvas boundImage)
         {
@@ -455,58 +475,160 @@ namespace VisionTools.ToolEdit
                 transformGroup.Children.Add(transTrans);
                 srcImage.RenderTransform = transformGroup;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Create("Fit Image Error: " + ex.Message, ex);
             }
         }
+        #region PLC
+        public void CheckAddrUse()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                if ((bool)ckbxIsUseBitOK.IsChecked)
+                {
+                    if (string.IsNullOrEmpty(txtAddrOK.Text) || !IsPositiveInteger(txtAddrOK.Text))
+                    {
+                        MessageBox.Show("PLC Address OK is Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        logger.Create("PLC Address OK is Empty or Error Syntax!");
+                        return;
+                    }
+                }
+                if ((bool)ckbxIsUseBitNG.IsChecked)
+                {
+
+                    if (string.IsNullOrEmpty(txtAddrNG.Text) || !IsPositiveInteger(txtAddrNG.Text))
+                    {
+                        MessageBox.Show("PLC Address NG is Empty or Error Syntax!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        logger.Create("PLC Address NG is Empty or Error Syntax!");
+                        return;
+                    }
+                }
+            });
+        }
+        public bool String2Enum(string strDev, out DeviceCode _devType, out string _strDevNo)
+        {
+            bool isDefined = false;
+            string letters = "";
+            _devType = DeviceCode.M;
+            _strDevNo = "";
+            try
+            {
+                foreach (char synx in strDev)
+                {
+                    if (char.IsLetter(synx)) { letters += synx; }
+                    else if (char.IsDigit(synx)) { _strDevNo += synx; }
+                }
+
+                isDefined = Enum.IsDefined(typeof(DeviceCode), letters);
+                if (isDefined)
+                {
+                    _devType = (DeviceCode)Enum.Parse(typeof(DeviceCode), letters);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Create("Convert syntax error: " + ex.Message);
+            }
+            return isDefined;
+        }
+        bool IsPositiveInteger(string input)
+        {
+            return int.TryParse(input, out int number) && number >= 0;
+        }
+        private bool SendResultOK(bool value)
+        {
+            try
+            {
+                return UiManager.PLC1.device.WriteBit(SelectDevOK, int.Parse(txtAddrOK.Text), value);
+            }
+            catch (Exception ex)
+            {
+                logger.Create(String.Format("TRIGGER_OK Error: " + ex.Message));
+                return false;
+            }
+        }
+        private bool SendResultNG(bool value)
+        {
+            try
+            {
+                return UiManager.PLC1.device.WriteBit(SelectDevNG, int.Parse(txtAddrNG.Text), value);
+            }
+            catch (Exception ex)
+            {
+                logger.Create(String.Format("TRIGGER_NG Error: " + ex.Message));
+                return false;
+            }
+        }
+        private void SendTriggerCpl(bool value)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                if ((bool)ckbxIsUseBitOK.IsChecked)
+                {
+                    SendResultOK(value);
+                }
+                if ((bool)ckbxIsUseBitNG.IsChecked)
+                {
+                    SendResultNG(!value);
+                }
+            });
+        }
+        #endregion
         public override void Run()
         {
             Mat img = null;
             OutputImage = new SvImage(new Mat());
             try
             {
-                if (isImageFolder && !isImageCam)
+                CheckAddrUse();
+                if (isImageCam && !isImageFolder)
                 {
-                    if (imgFolderLst.Count <= 0)
-                    {
-                        meaRunTime.Stop();
-                        toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Can't find any image is imported from folder image!");
-                        return;
-                    }
-                    BtnNextImg_Click(toolBase.btnRun, null);
-                    img = ImgRunPara(imgFolderLst[countNxBk]);
-                    if (img == null)
-                    {
-                        meaRunTime.Stop();
-                        toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Image From Folder Path Error!");
-                        return;
-                    }
-                    ImgViewSource = img.ToBitmapSource();
-                    OutputImage.Mat = img;
-                }
-                else if (isImageCam && !isImageFolder)
-                {
-                    IsStopCamera = true;
+                    this.Dispatcher.Invoke(() => IsStopCamera = true);
                     img = this.Camera.CaptureImage();
                     if (img == null)
                     {
+                        SendTriggerCpl(false);
                         meaRunTime.Stop();
                         toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Camera Grab Image Fail!");
                         return;
                     }
-                    ImgViewSource = img.ToBitmapSource();
+                    SendTriggerCpl(true);
+                    this.Dispatcher.Invoke(() => ImgViewSource = img.ToBitmapSource());
                     OutputImage.Mat = img;
                 }
-                if (img == null)
+                else if (isImageFolder && !isImageCam)
                 {
+                    if (imgFolderLst.Count <= 0)
+                    {
+                        SendTriggerCpl(false);
+                        meaRunTime.Stop();
+                        toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Can't find any image is imported from folder image!");
+                        return;
+                    }
+                    this.Dispatcher.Invoke(() => BtnNextImg_Click(toolBase.btnRun, null));
+                    img = ImgRunPara(imgFolderLst[countNxBk]);
+                    if (img == null)
+                    {
+                        SendTriggerCpl(false);
+                        meaRunTime.Stop();
+                        toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Image From Folder Path Error!");
+                        return;
+                    }
+                    SendTriggerCpl(true);
+                    this.Dispatcher.Invoke(() => ImgViewSource = img.ToBitmapSource());
+                    OutputImage.Mat = img;
+                }
+                if (OutputImage.Mat == null)
+                {
+                    SendTriggerCpl(false);
                     meaRunTime.Stop();
                     toolBase.SetLbTime(false, meaRunTime.ElapsedMilliseconds, "Have no Image Source!");
                     return;
                 }
-                OutputImage.RegionRect.Rect = new OpenCvSharp.Rect(0, 0, (int)ImgViewSource.Width, (int)ImgViewSource.Height);
+                OutputImage.RegionRect.Rect = new OpenCvSharp.Rect(0, 0, OutputImage.Mat.Width, OutputImage.Mat.Height);
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 logger.Create("Run Error: " + ex.Message, ex);
             }
@@ -559,10 +681,10 @@ namespace VisionTools.ToolEdit
                     }
                 });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Create("Image Parameter Error: " + ex.Message, ex);
-            } 
+            }
             return img;
         }
         public void AddCamDevice()
@@ -651,7 +773,7 @@ namespace VisionTools.ToolEdit
             catch (Exception ex)
             {
                 logger.Create("Show Camera Device Error: " + ex.Message, ex);
-            } 
+            }
         }
         public bool ConectCamera()
         {
@@ -677,7 +799,7 @@ namespace VisionTools.ToolEdit
                         this.ExposureValue = dTemp;
 
                         string gainStr = "";
-                        switch(this.Camera.eCamDevType)
+                        switch (this.Camera.eCamDevType)
                         {
                             case ECamDevType.Hikrobot:
                                 gainStr = "Gain";
@@ -699,7 +821,7 @@ namespace VisionTools.ToolEdit
                         this.nMaxWidth = temp;
                         numUDWidthCam.IsEnabled = true;
                         numUDWidthCam.IsEnabled &= this.Camera.SetWidth(WidthCam);
-                        if(!numUDWidthCam.IsEnabled)
+                        if (!numUDWidthCam.IsEnabled)
                         {
                             this.Camera.GetIntValue("Width", out temp);
                             this.WidthCam = temp;
@@ -711,7 +833,7 @@ namespace VisionTools.ToolEdit
                         this.nMaxHeight = temp;
                         numUDHeightCam.IsEnabled = true;
                         numUDHeightCam.IsEnabled &= this.Camera.SetHeight(HeightCam);
-                        if(!numUDHeightCam.IsEnabled)
+                        if (!numUDHeightCam.IsEnabled)
                         {
                             this.Camera.GetIntValue("Height", out temp);
                             this.HeightCam = temp;
@@ -758,20 +880,16 @@ namespace VisionTools.ToolEdit
             lock (_cameraTrigger)
             {
                 OpenCvSharp.Mat src1 = new Mat();
-                //OpenCvSharp.Mat srcDisplay1 = new Mat();
                 OpenCvSharp.Mat srcDisplay2 = new Mat();
                 try
                 {
                     src1 = this.Camera.CaptureImage();
                     if (src1 != null)
                     {
-                        //src1.SaveImage("temp1Hung.bmp");
-                        //src1 = Cv2.ImRead("temp1Hung.bmp", ImreadModes.Color);
-                        //srcDisplay2 = src1.Clone();
                         srcDisplay2 = ImgRunPara(src1);
                         if (srcDisplay2.Channels() == 3)
                         {
-                            if(SelectedGrayMode == GrayMode.BGR2RGB)
+                            if (SelectedGrayMode == GrayMode.BGR2RGB)
                             {
                                 this.Dispatcher.Invoke(() =>
                                 {
@@ -795,7 +913,7 @@ namespace VisionTools.ToolEdit
                                 ImgViewSource = srcDisplay2.ToWriteableBitmap(PixelFormats.Gray8);
                                 GC.Collect();
                             });
-                        }  
+                        }
                         OutputImage.Mat = srcDisplay2;
                     }
                     else

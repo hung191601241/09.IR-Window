@@ -119,19 +119,19 @@ namespace VisionTools.ToolDesign
                         switch (cntTag.Value[3])
                         {
                             case "lbOriginImage":
-                                if (!(arrowConnectLst[cntTag.Key].data is SvImage)) continue;
+                                if (arrowConnectLst[cntTag.Key].data is not SvImage) continue;
                                 toolEdit.OriginImage = arrowConnectLst[cntTag.Key].data as SvImage;
                                 break;
                             case "lbInputImage":
-                                if (!(arrowConnectLst[cntTag.Key].data is SvImage)) continue;
+                                if (arrowConnectLst[cntTag.Key].data is not SvImage) continue;
                                 toolEdit.InputImage = arrowConnectLst[cntTag.Key].data as SvImage;
                                 break;
                             case "lbBlobs1":
-                                if (!(arrowConnectLst[cntTag.Key].data is List<BlobObject>)) continue;
+                                if (arrowConnectLst[cntTag.Key].data is not List<BlobObject>) continue;
                                 toolEdit.Blobs1 = arrowConnectLst[cntTag.Key].data as List<BlobObject>;
                                 break;
                             case "lbBlobs2":
-                                if (!(arrowConnectLst[cntTag.Key].data is List<BlobObject>)) continue;
+                                if (arrowConnectLst[cntTag.Key].data is not List<BlobObject>) continue;
                                 toolEdit.Blobs2 = arrowConnectLst[cntTag.Key].data as List<BlobObject>;
                                 break;
                         }

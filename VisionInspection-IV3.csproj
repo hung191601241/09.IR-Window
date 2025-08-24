@@ -351,9 +351,6 @@
     <Compile Include="src\ui\VisionTools\ToolDesign\ImageProcessTool.xaml.cs">
       <DependentUpon>ImageProcessTool.xaml</DependentUpon>
     </Compile>
-    <Compile Include="src\ui\VisionTools\ToolDesign\OutAcquisResTool.xaml.cs">
-      <DependentUpon>OutAcquisResTool.xaml</DependentUpon>
-    </Compile>
     <Compile Include="src\ui\VisionTools\ToolDesign\OutCheckProductTool.xaml.cs">
       <DependentUpon>OutCheckProductTool.xaml</DependentUpon>
     </Compile>
@@ -497,10 +494,10 @@
     <Compile Include="src\ui\Windows\WndMessenger.xaml.cs">
       <DependentUpon>WndMessenger.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TCP Tranfer Vision Data\DATACheck.cs" />
-    <Compile Include="TCP Tranfer Vision Data\FormatVision.cs" />
-    <Compile Include="TCP Tranfer Vision Data\MESVisionService.cs" />
-    <Compile Include="TCP Tranfer Vision Data\VisionTCPClient.cs" />
+    <Compile Include="TCP Transfer Vision Data\DATACheck.cs" />
+    <Compile Include="TCP Transfer Vision Data\FormatVision.cs" />
+    <Compile Include="TCP Transfer Vision Data\MESVisionService.cs" />
+    <Compile Include="TCP Transfer Vision Data\VisionTCPClient.cs" />
     <Compile Include="VisionProtocolPacket.cs" />
     <Compile Include="src\ui\Windows\WndAlarm.xaml.cs">
       <DependentUpon>WndAlarm.xaml</DependentUpon>
@@ -572,10 +569,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="src\ui\VisionTools\ToolDesign\ImageProcessTool.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="src\ui\VisionTools\ToolDesign\OutAcquisResTool.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
